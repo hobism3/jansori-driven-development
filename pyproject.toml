@@ -1,0 +1,35 @@
+[project]
+name = "jansori-server"
+version = "0.1.0"
+description = "Jansori U1 — loopback-only Capsule server, store & contracts (single source of truth for SPEC 8 contracts)"
+requires-python = ">=3.10,<3.12"
+dependencies = [
+    "fastapi>=0.110,<1.0",
+    "uvicorn>=0.29,<1.0",
+    "pydantic>=2.6,<3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",          # FastAPI TestClient dependency
+    "hypothesis>=6.100",    # property-based testing (full PBT harness lives in U4)
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+# U4 marker registration (avoids PytestUnknownMarkWarning). PBT-08: the Hypothesis
+# profile + seed logging is configured in tests/conftest.py, not here.
+markers = [
+    "pbt: property-based tests (Hypothesis; PBT-01..10)",
+    "golden: example-based golden/regression tests (PBT-10 complement)",
+    "verify: real-server boot/teardown contract tests (make verify; US-17)",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["server", "server.app", "server.services", "server.domain", "server.store", "server.security"]

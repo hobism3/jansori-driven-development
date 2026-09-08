@@ -1,0 +1,6 @@
+{
+  "name": "jansori",
+  "description": "Jansori — accumulate corrections ('nags') into versioned skill capsules and propagate them to the next session. Loopback-only local server client (U2 plugin).",
+  "version": "0.1.0",
+  "author": { "name": "Jansori Team" }
+}
