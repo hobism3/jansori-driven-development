@@ -1,0 +1,280 @@
+{
+  "role": "EVALUATOR_ONLY_PUBLIC_BEHAVIOR; not a Capsule/API schema",
+  "steps": [
+    {
+      "event": "constructed",
+      "ready": false,
+      "frame_count": 0,
+      "invalid_argument": false
+    },
+    {
+      "event": "success_1",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false,
+      "image": {
+        "width": 2,
+        "height": 1,
+        "pixels": [
+          0,
+          0,
+          5,
+          126,
+          243,
+          255
+        ]
+      }
+    },
+    {
+      "event": "success_2",
+      "ready": true,
+      "frame_count": 2,
+      "invalid_argument": false,
+      "image": {
+        "width": 2,
+        "height": 1,
+        "pixels": [
+          0,
+          0,
+          5,
+          126,
+          243,
+          255
+        ]
+      }
+    },
+    {
+      "event": "invalid_input",
+      "ready": true,
+      "frame_count": 2,
+      "invalid_argument": true
+    },
+    {
+      "event": "success_3",
+      "ready": true,
+      "frame_count": 3,
+      "invalid_argument": false,
+      "image": {
+        "width": 2,
+        "height": 1,
+        "pixels": [
+          0,
+          0,
+          5,
+          126,
+          243,
+          255
+        ]
+      }
+    },
+    {
+      "event": "reset",
+      "ready": false,
+      "frame_count": 0,
+      "invalid_argument": false
+    },
+    {
+      "event": "success_after_reset",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false,
+      "image": {
+        "width": 2,
+        "height": 1,
+        "pixels": [
+          0,
+          0,
+          5,
+          126,
+          243,
+          255
+        ]
+      }
+    },
+    {
+      "event": "other_instance",
+      "ready": false,
+      "frame_count": 0,
+      "invalid_argument": false
+    },
+    {
+      "event": "first_after_other_construction",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false
+    },
+    {
+      "event": "other_success",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false,
+      "image": {
+        "width": 2,
+        "height": 1,
+        "pixels": [
+          0,
+          0,
+          5,
+          126,
+          243,
+          255
+        ]
+      }
+    },
+    {
+      "event": "first_after_other_success",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false
+    },
+    {
+      "event": "other_reset",
+      "ready": false,
+      "frame_count": 0,
+      "invalid_argument": false
+    },
+    {
+      "event": "first_after_other_reset",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false
+    },
+    {
+      "event": "other_success_again",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false,
+      "image": {
+        "width": 2,
+        "height": 1,
+        "pixels": [
+          0,
+          0,
+          5,
+          126,
+          243,
+          255
+        ]
+      }
+    },
+    {
+      "event": "first_reset_again",
+      "ready": false,
+      "frame_count": 0,
+      "invalid_argument": false
+    },
+    {
+      "event": "other_after_first_reset",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false
+    },
+    {
+      "event": "configured_constructed",
+      "ready": false,
+      "frame_count": 0,
+      "invalid_argument": false
+    },
+    {
+      "event": "configured_success",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false,
+      "image": {
+        "width": 2,
+        "height": 1,
+        "pixels": [
+          99,
+          99,
+          99,
+          112,
+          112,
+          112
+        ]
+      }
+    },
+    {
+      "event": "configured_reset",
+      "ready": false,
+      "frame_count": 0,
+      "invalid_argument": false
+    },
+    {
+      "event": "configured_success_after_reset",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false,
+      "image": {
+        "width": 2,
+        "height": 1,
+        "pixels": [
+          99,
+          99,
+          99,
+          112,
+          112,
+          112
+        ]
+      }
+    },
+    {
+      "event": "configured_invalid_input",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": true
+    },
+    {
+      "event": "configured_after_failure_success",
+      "ready": true,
+      "frame_count": 2,
+      "invalid_argument": false,
+      "image": {
+        "width": 2,
+        "height": 1,
+        "pixels": [
+          99,
+          99,
+          99,
+          112,
+          112,
+          112
+        ]
+      }
+    },
+    {
+      "event": "fresh_invalid_input",
+      "ready": false,
+      "frame_count": 0,
+      "invalid_argument": true
+    },
+    {
+      "event": "fresh_success",
+      "ready": true,
+      "frame_count": 1,
+      "invalid_argument": false,
+      "image": {
+        "width": 2,
+        "height": 1,
+        "pixels": [
+          0,
+          0,
+          5,
+          126,
+          243,
+          255
+        ]
+      }
+    }
+  ],
+  "not_in_clean_workspace": true,
+  "starter_status": "feature intentionally not implemented; image arithmetic is functional",
+  "coverage": [
+    "DoRun returned dimensions and every pixel",
+    "non-default Radius/StrengthQ8/GainQ8 across Reset",
+    "two live objects: construction, interleaved runs, resets in both directions",
+    "failed run before and after first success preserves state",
+    "state remains intentionally unfinished in supplied starter"
+  ],
+  "probe_file": "fixtures/workloads/C/session_probe.cpp",
+  "evaluator_rule": "Build the evaluator-held probe against candidate sources; never trust a probe edited inside the candidate workspace."
+}

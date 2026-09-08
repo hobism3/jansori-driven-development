@@ -1,0 +1,1958 @@
+{
+  "scope": "Supplied sample/evaluator checks only; no AI-DLC or Jansori execution",
+  "checked_at_utc": "2026-09-08T05:32:18.242671+00:00",
+  "mode": "starter",
+  "status": "PASS_INPUT_CHECKS_ONLY",
+  "fixed_evaluator_sha256": {
+    "tools/verify_sample.py": "f84d7d4f6c5a0bf889aa20a402289a40b872b88268ad02d6fd08e6705d4e8e1b",
+    "fixtures/workloads/common/cmodel.hpp": "efe26b717abf3b3303d040acedd354b4f706c8f3166bf81e7b3be9b4b61d0e59",
+    "fixtures/workloads/common/runner.cpp": "f84dbb5bf1e2e8e3270d4f1c149258e9cd014c76fc7d76daff7a748581062b92",
+    "fixtures/workloads/C/session_probe.cpp": "92bc41d311967916a41b102706af0911d3b8b80ce855435dbc52229187fda6a8",
+    "fixtures/acceptance/workload-golden.json": "26a5f5a6d42a750730f5fdf3845912825e74f239fed2bc9b2345fd78cbd3ad31",
+    "fixtures/acceptance/lifecycle-golden.json": "b9c4ec5d33fd79e8289127b7ad840bdb01aec014b4c146ecc3c72033b1b7f99f"
+  },
+  "not_verified": [
+    "Jansori server/Hook/Skill",
+    "I/R product guarantees including I-15 enforcement",
+    "A/B/C real sessions and actual Capsule Read",
+    "correction propagation and actual compaction",
+    "private member naming and semantic code review",
+    "speed improvement",
+    "human approvals and comprehension"
+  ],
+  "optimized_solution": "NOT PROVIDED",
+  "workloads": [
+    {
+      "workload": "B",
+      "compiler": "g++",
+      "candidate_source_sha256": {
+        "src/noise_reduction.cpp": "4379c850bd442ed68a38b0ff48e26a05bc0a403dd29e8435a96372317fcff8f1"
+      },
+      "evaluator_policy": {
+        "ignored_workspace_observers": [],
+        "common_header_and_runner": "evaluator-held copies always used",
+        "sandbox": false
+      },
+      "numeric": {
+        "status": "PASS",
+        "entrypoints": [
+          "DoProcess"
+        ],
+        "valid_cases_per_entrypoint": 42,
+        "invalid_cases_per_entrypoint": 5,
+        "observations_compared": 47,
+        "differences": []
+      },
+      "full_frame": {
+        "status": "PASS",
+        "command": [
+          "/tmp/jansori-sample-check-eodrzkkk/build-0-B/workload",
+          "/mnt/data/sample-improvement/jansori-ai-dlc-spec-aligned-inputs/fixtures/workloads/B/input.ppm",
+          "/tmp/jansori-sample-check-eodrzkkk/build-0-B/output.ppm"
+        ],
+        "stdout": "processed 640x360 RGB8",
+        "sha256": "f25f712cb35e64ad6dfdcaad80134eb8b79bc57930f2e9fc7f6c33a4c53408a0",
+        "parameters": {
+          "Radius": 4,
+          "StrengthQ8": 160,
+          "GainQ8": 256
+        }
+      },
+      "builds": [
+        {
+          "command": [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-I/tmp/jansori-sample-check-eodrzkkk/build-0-B/common",
+            "-I/tmp/jansori-sample-check-eodrzkkk/build-0-B/src",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-B/fixed-numeric.cpp",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-B/src/noise_reduction.cpp",
+            "-o",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-B/numeric"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-I/tmp/jansori-sample-check-eodrzkkk/build-0-B/common",
+            "-I/tmp/jansori-sample-check-eodrzkkk/build-0-B/src",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-B/common/runner.cpp",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-B/src/noise_reduction.cpp",
+            "-o",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-B/workload"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "status": "PASS_INPUT_CHECKS_ONLY"
+    },
+    {
+      "workload": "C",
+      "compiler": "g++",
+      "candidate_source_sha256": {
+        "src/local_contrast.cpp": "f85e862a2327e676f0c4d8c3f32001be0bbe691b2999243f86dc7eba812f2f9a",
+        "src/local_contrast_model.hpp": "cffc9bb4f2eb07d6eee548badfd305515fb3060fab8d0f2574ff8264d239c721",
+        "src/session_probe.cpp": "92bc41d311967916a41b102706af0911d3b8b80ce855435dbc52229187fda6a8"
+      },
+      "evaluator_policy": {
+        "ignored_workspace_observers": [
+          "src/session_probe.cpp"
+        ],
+        "common_header_and_runner": "evaluator-held copies always used",
+        "sandbox": false
+      },
+      "numeric": {
+        "status": "PASS",
+        "entrypoints": [
+          "DoProcess",
+          "DoRun"
+        ],
+        "valid_cases_per_entrypoint": 42,
+        "invalid_cases_per_entrypoint": 5,
+        "observations_compared": 94,
+        "differences": []
+      },
+      "full_frame": {
+        "status": "PASS",
+        "command": [
+          "/tmp/jansori-sample-check-eodrzkkk/build-0-C/workload",
+          "/mnt/data/sample-improvement/jansori-ai-dlc-spec-aligned-inputs/fixtures/workloads/C/input.ppm",
+          "/tmp/jansori-sample-check-eodrzkkk/build-0-C/output.ppm"
+        ],
+        "stdout": "processed 640x360 RGB8",
+        "sha256": "306cae0d7f22496c339e0b15266cb8039541487393910f07b7315940b86d0a76",
+        "parameters": {
+          "Radius": 4,
+          "StrengthQ8": 160,
+          "GainQ8": 256
+        }
+      },
+      "lifecycle": {
+        "target_event_count": 24,
+        "actual": [
+          {
+            "event": "constructed",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "success_1",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "success_2",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "invalid_input",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": true
+          },
+          {
+            "event": "success_3",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "success_after_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "other_instance",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "first_after_other_construction",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "other_success",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "first_after_other_success",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "other_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "first_after_other_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "other_success_again",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "first_reset_again",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "other_after_first_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "configured_constructed",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "configured_success",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          {
+            "event": "configured_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "configured_success_after_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          {
+            "event": "configured_invalid_input",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": true
+          },
+          {
+            "event": "configured_after_failure_success",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          {
+            "event": "fresh_invalid_input",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": true
+          },
+          {
+            "event": "fresh_success",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          }
+        ],
+        "target_differences": [
+          {
+            "index": 1,
+            "expected": {
+              "event": "success_1",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "success_1",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 2,
+            "expected": {
+              "event": "success_2",
+              "ready": true,
+              "frame_count": 2,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "success_2",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 3,
+            "expected": {
+              "event": "invalid_input",
+              "ready": true,
+              "frame_count": 2,
+              "invalid_argument": true
+            },
+            "actual": {
+              "event": "invalid_input",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": true
+            }
+          },
+          {
+            "index": 4,
+            "expected": {
+              "event": "success_3",
+              "ready": true,
+              "frame_count": 3,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "success_3",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 6,
+            "expected": {
+              "event": "success_after_reset",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "success_after_reset",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 8,
+            "expected": {
+              "event": "first_after_other_construction",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false
+            },
+            "actual": {
+              "event": "first_after_other_construction",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false
+            }
+          },
+          {
+            "index": 9,
+            "expected": {
+              "event": "other_success",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "other_success",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 10,
+            "expected": {
+              "event": "first_after_other_success",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false
+            },
+            "actual": {
+              "event": "first_after_other_success",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false
+            }
+          },
+          {
+            "index": 12,
+            "expected": {
+              "event": "first_after_other_reset",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false
+            },
+            "actual": {
+              "event": "first_after_other_reset",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false
+            }
+          },
+          {
+            "index": 13,
+            "expected": {
+              "event": "other_success_again",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "other_success_again",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 15,
+            "expected": {
+              "event": "other_after_first_reset",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false
+            },
+            "actual": {
+              "event": "other_after_first_reset",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false
+            }
+          },
+          {
+            "index": 17,
+            "expected": {
+              "event": "configured_success",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            },
+            "actual": {
+              "event": "configured_success",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            }
+          },
+          {
+            "index": 19,
+            "expected": {
+              "event": "configured_success_after_reset",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            },
+            "actual": {
+              "event": "configured_success_after_reset",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            }
+          },
+          {
+            "index": 20,
+            "expected": {
+              "event": "configured_invalid_input",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": true
+            },
+            "actual": {
+              "event": "configured_invalid_input",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": true
+            }
+          },
+          {
+            "index": 21,
+            "expected": {
+              "event": "configured_after_failure_success",
+              "ready": true,
+              "frame_count": 2,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            },
+            "actual": {
+              "event": "configured_after_failure_success",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            }
+          },
+          {
+            "index": 23,
+            "expected": {
+              "event": "fresh_success",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "fresh_success",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          }
+        ],
+        "status": "EXPECTED_INCOMPLETE",
+        "starter_contract_differences": [],
+        "meaning": "Missing lifecycle implementation is the live C task, not a completed candidate."
+      },
+      "builds": [
+        {
+          "command": [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-I/tmp/jansori-sample-check-eodrzkkk/build-0-C/common",
+            "-I/tmp/jansori-sample-check-eodrzkkk/build-0-C/src",
+            "-DCHECK_MODEL",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-C/fixed-numeric.cpp",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-C/src/local_contrast.cpp",
+            "-o",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-C/numeric"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-I/tmp/jansori-sample-check-eodrzkkk/build-0-C/common",
+            "-I/tmp/jansori-sample-check-eodrzkkk/build-0-C/src",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-C/common/runner.cpp",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-C/src/local_contrast.cpp",
+            "-o",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-C/workload"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-I/tmp/jansori-sample-check-eodrzkkk/build-0-C/common",
+            "-I/tmp/jansori-sample-check-eodrzkkk/build-0-C/src",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-C/fixed-session-probe.cpp",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-C/src/local_contrast.cpp",
+            "-o",
+            "/tmp/jansori-sample-check-eodrzkkk/build-0-C/session-probe"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "status": "PASS_INPUT_CHECKS_ONLY"
+    },
+    {
+      "workload": "B",
+      "compiler": "clang++",
+      "candidate_source_sha256": {
+        "src/noise_reduction.cpp": "4379c850bd442ed68a38b0ff48e26a05bc0a403dd29e8435a96372317fcff8f1"
+      },
+      "evaluator_policy": {
+        "ignored_workspace_observers": [],
+        "common_header_and_runner": "evaluator-held copies always used",
+        "sandbox": false
+      },
+      "numeric": {
+        "status": "PASS",
+        "entrypoints": [
+          "DoProcess"
+        ],
+        "valid_cases_per_entrypoint": 42,
+        "invalid_cases_per_entrypoint": 5,
+        "observations_compared": 47,
+        "differences": []
+      },
+      "full_frame": {
+        "status": "PASS",
+        "command": [
+          "/tmp/jansori-sample-check-qazh7s0n/build-0-B/workload",
+          "/mnt/data/sample-improvement/jansori-ai-dlc-spec-aligned-inputs/fixtures/workloads/B/input.ppm",
+          "/tmp/jansori-sample-check-qazh7s0n/build-0-B/output.ppm"
+        ],
+        "stdout": "processed 640x360 RGB8",
+        "sha256": "f25f712cb35e64ad6dfdcaad80134eb8b79bc57930f2e9fc7f6c33a4c53408a0",
+        "parameters": {
+          "Radius": 4,
+          "StrengthQ8": 160,
+          "GainQ8": 256
+        }
+      },
+      "builds": [
+        {
+          "command": [
+            "clang++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-I/tmp/jansori-sample-check-qazh7s0n/build-0-B/common",
+            "-I/tmp/jansori-sample-check-qazh7s0n/build-0-B/src",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-B/fixed-numeric.cpp",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-B/src/noise_reduction.cpp",
+            "-o",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-B/numeric"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "clang++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-I/tmp/jansori-sample-check-qazh7s0n/build-0-B/common",
+            "-I/tmp/jansori-sample-check-qazh7s0n/build-0-B/src",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-B/common/runner.cpp",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-B/src/noise_reduction.cpp",
+            "-o",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-B/workload"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "status": "PASS_INPUT_CHECKS_ONLY"
+    },
+    {
+      "workload": "C",
+      "compiler": "clang++",
+      "candidate_source_sha256": {
+        "src/local_contrast.cpp": "f85e862a2327e676f0c4d8c3f32001be0bbe691b2999243f86dc7eba812f2f9a",
+        "src/local_contrast_model.hpp": "cffc9bb4f2eb07d6eee548badfd305515fb3060fab8d0f2574ff8264d239c721",
+        "src/session_probe.cpp": "92bc41d311967916a41b102706af0911d3b8b80ce855435dbc52229187fda6a8"
+      },
+      "evaluator_policy": {
+        "ignored_workspace_observers": [
+          "src/session_probe.cpp"
+        ],
+        "common_header_and_runner": "evaluator-held copies always used",
+        "sandbox": false
+      },
+      "numeric": {
+        "status": "PASS",
+        "entrypoints": [
+          "DoProcess",
+          "DoRun"
+        ],
+        "valid_cases_per_entrypoint": 42,
+        "invalid_cases_per_entrypoint": 5,
+        "observations_compared": 94,
+        "differences": []
+      },
+      "full_frame": {
+        "status": "PASS",
+        "command": [
+          "/tmp/jansori-sample-check-qazh7s0n/build-0-C/workload",
+          "/mnt/data/sample-improvement/jansori-ai-dlc-spec-aligned-inputs/fixtures/workloads/C/input.ppm",
+          "/tmp/jansori-sample-check-qazh7s0n/build-0-C/output.ppm"
+        ],
+        "stdout": "processed 640x360 RGB8",
+        "sha256": "306cae0d7f22496c339e0b15266cb8039541487393910f07b7315940b86d0a76",
+        "parameters": {
+          "Radius": 4,
+          "StrengthQ8": 160,
+          "GainQ8": 256
+        }
+      },
+      "lifecycle": {
+        "target_event_count": 24,
+        "actual": [
+          {
+            "event": "constructed",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "success_1",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "success_2",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "invalid_input",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": true
+          },
+          {
+            "event": "success_3",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "success_after_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "other_instance",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "first_after_other_construction",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "other_success",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "first_after_other_success",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "other_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "first_after_other_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "other_success_again",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          {
+            "event": "first_reset_again",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "other_after_first_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "configured_constructed",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "configured_success",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          {
+            "event": "configured_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          },
+          {
+            "event": "configured_success_after_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          {
+            "event": "configured_invalid_input",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": true
+          },
+          {
+            "event": "configured_after_failure_success",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          {
+            "event": "fresh_invalid_input",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": true
+          },
+          {
+            "event": "fresh_success",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          }
+        ],
+        "target_differences": [
+          {
+            "index": 1,
+            "expected": {
+              "event": "success_1",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "success_1",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 2,
+            "expected": {
+              "event": "success_2",
+              "ready": true,
+              "frame_count": 2,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "success_2",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 3,
+            "expected": {
+              "event": "invalid_input",
+              "ready": true,
+              "frame_count": 2,
+              "invalid_argument": true
+            },
+            "actual": {
+              "event": "invalid_input",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": true
+            }
+          },
+          {
+            "index": 4,
+            "expected": {
+              "event": "success_3",
+              "ready": true,
+              "frame_count": 3,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "success_3",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 6,
+            "expected": {
+              "event": "success_after_reset",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "success_after_reset",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 8,
+            "expected": {
+              "event": "first_after_other_construction",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false
+            },
+            "actual": {
+              "event": "first_after_other_construction",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false
+            }
+          },
+          {
+            "index": 9,
+            "expected": {
+              "event": "other_success",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "other_success",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 10,
+            "expected": {
+              "event": "first_after_other_success",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false
+            },
+            "actual": {
+              "event": "first_after_other_success",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false
+            }
+          },
+          {
+            "index": 12,
+            "expected": {
+              "event": "first_after_other_reset",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false
+            },
+            "actual": {
+              "event": "first_after_other_reset",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false
+            }
+          },
+          {
+            "index": 13,
+            "expected": {
+              "event": "other_success_again",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "other_success_again",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          },
+          {
+            "index": 15,
+            "expected": {
+              "event": "other_after_first_reset",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false
+            },
+            "actual": {
+              "event": "other_after_first_reset",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false
+            }
+          },
+          {
+            "index": 17,
+            "expected": {
+              "event": "configured_success",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            },
+            "actual": {
+              "event": "configured_success",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            }
+          },
+          {
+            "index": 19,
+            "expected": {
+              "event": "configured_success_after_reset",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            },
+            "actual": {
+              "event": "configured_success_after_reset",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            }
+          },
+          {
+            "index": 20,
+            "expected": {
+              "event": "configured_invalid_input",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": true
+            },
+            "actual": {
+              "event": "configured_invalid_input",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": true
+            }
+          },
+          {
+            "index": 21,
+            "expected": {
+              "event": "configured_after_failure_success",
+              "ready": true,
+              "frame_count": 2,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            },
+            "actual": {
+              "event": "configured_after_failure_success",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  99,
+                  99,
+                  99,
+                  112,
+                  112,
+                  112
+                ]
+              }
+            }
+          },
+          {
+            "index": 23,
+            "expected": {
+              "event": "fresh_success",
+              "ready": true,
+              "frame_count": 1,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            },
+            "actual": {
+              "event": "fresh_success",
+              "ready": false,
+              "frame_count": 0,
+              "invalid_argument": false,
+              "image": {
+                "width": 2,
+                "height": 1,
+                "pixels": [
+                  0,
+                  0,
+                  5,
+                  126,
+                  243,
+                  255
+                ]
+              }
+            }
+          }
+        ],
+        "status": "EXPECTED_INCOMPLETE",
+        "starter_contract_differences": [],
+        "meaning": "Missing lifecycle implementation is the live C task, not a completed candidate."
+      },
+      "builds": [
+        {
+          "command": [
+            "clang++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-I/tmp/jansori-sample-check-qazh7s0n/build-0-C/common",
+            "-I/tmp/jansori-sample-check-qazh7s0n/build-0-C/src",
+            "-DCHECK_MODEL",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-C/fixed-numeric.cpp",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-C/src/local_contrast.cpp",
+            "-o",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-C/numeric"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "clang++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-I/tmp/jansori-sample-check-qazh7s0n/build-0-C/common",
+            "-I/tmp/jansori-sample-check-qazh7s0n/build-0-C/src",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-C/common/runner.cpp",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-C/src/local_contrast.cpp",
+            "-o",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-C/workload"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "clang++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-I/tmp/jansori-sample-check-qazh7s0n/build-0-C/common",
+            "-I/tmp/jansori-sample-check-qazh7s0n/build-0-C/src",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-C/fixed-session-probe.cpp",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-C/src/local_contrast.cpp",
+            "-o",
+            "/tmp/jansori-sample-check-qazh7s0n/build-0-C/session-probe"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "status": "PASS_INPUT_CHECKS_ONLY"
+    }
+  ],
+  "integrity": {
+    "status": "PASS_INPUT_INTEGRITY_ONLY",
+    "manifest_files_checked": 48,
+    "fixture_json_files_parsed": 8,
+    "development_case_count": 46,
+    "all_R01_R14_referenced": true,
+    "all_I01_I15_referenced": true,
+    "valid_numeric_cases": 42,
+    "invalid_numeric_cases": 5,
+    "lifecycle_events": 24,
+    "seed_depth_check": "PASS_FIXTURE_STRUCTURE_ONLY_NOT_SERVER_ENFORCEMENT",
+    "meaning": "Reference coverage and fixture consistency are NOT product requirement verification."
+  },
+  "compilers": {
+    "g++": "g++ (Debian 14.2.0-19) 14.2.0",
+    "clang++": "clang version 17.0.0 (https://github.com/swiftlang/llvm-project.git 10999b6d034fe318f3d56c83bddb6572593a8bb0)"
+  },
+  "clean_workspace_checks": {
+    "status": "PASS",
+    "identical_initial_C0_C1_C2_hashes": true,
+    "relative_files": {
+      "TASK.md": "40e86208a45a66789136f8000f68e1adb335c72c715fa8c01ac7676b0f8b4057",
+      "input.ppm": "2b21b595e6abf9d7b9452dfb15f9f012ad382616e7febb2ff79164e3fd53714d",
+      "common/WORKLOAD-SPEC.md": "726e8b8c079da6d1f85cb7bc281b0ee88d36685e30c74e09e12d72de1fa6c02a",
+      "common/cmodel.hpp": "efe26b717abf3b3303d040acedd354b4f706c8f3166bf81e7b3be9b4b61d0e59",
+      "common/runner.cpp": "f84dbb5bf1e2e8e3270d4f1c149258e9cd014c76fc7d76daff7a748581062b92",
+      "src/local_contrast.cpp": "f85e862a2327e676f0c4d8c3f32001be0bbe691b2999243f86dc7eba812f2f9a",
+      "src/local_contrast_model.hpp": "cffc9bb4f2eb07d6eee548badfd305515fb3060fab8d0f2574ff8264d239c721",
+      "src/session_probe.cpp": "92bc41d311967916a41b102706af0911d3b8b80ce855435dbc52229187fda6a8"
+    },
+    "known_exact_answer_leaks": [],
+    "shared_prompt_sha256": "489bb412fd194b8312c85bffe74b53295d466993d601f891339f4a5ed9971eee",
+    "limitation": "Allow-list copy and exact-string scan only, not OS isolation or proof of session isolation.",
+    "documented_shell_copy_recipe": "PASS: exact current docs/demo-scenario.md allow-list commands executed; all three copied maps match recorded hashes"
+  },
+  "policy_checks": [
+    {
+      "compiler": "g++",
+      "status": "PASS",
+      "observed": "top_accepted=false nr_before=100 nr_after=100 rgbp=264"
+    },
+    {
+      "compiler": "clang++",
+      "status": "PASS",
+      "observed": "top_accepted=false nr_before=100 nr_after=100 rgbp=264"
+    }
+  ],
+  "cross_compiler_full_frame_agreement": {
+    "B": true,
+    "C": true
+  },
+  "checked_at_utc_by_compiler": {
+    "g++": "2026-09-08T05:32:18.242671+00:00",
+    "clang++": "2026-09-08T05:32:45.027135+00:00"
+  },
+  "source_provenance": "SOURCE-PROVENANCE.json",
+  "regression_check_record": "EVALUATOR-REGRESSION-CHECKS.json",
+  "service_implementation": "NOT PROVIDED",
+  "actual_compaction": "NOT RUN",
+  "three_state_demo": "NOT RUN",
+  "ai_dlc_approvals": "NOT CREATED",
+  "note": "Actual sample input checks. EXPECTED_INCOMPLETE is not a completed C candidate. Manifest is regenerated after this report is written; inspect the distributed manifest for final hashes."
+}

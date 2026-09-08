@@ -1,0 +1,1 @@
+cmodel-code-rule의 멤버 접두사 규칙을 교정해. 직접 작성하는 클래스의 private boolean 멤버에만 m_ 대신 is_를 사용해. 논리 이름 ready이면 is_ready다. boolean이 아닌 일반 private 멤버는 기존 m_ 규칙을 그대로 유지해. 이 교정을 cmodel-code-rule에 공유 지침으로 저장해. 공개 API나 외부에서 고정한 이름을 바꾸라는 뜻은 아니야.

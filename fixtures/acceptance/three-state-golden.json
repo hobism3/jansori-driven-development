@@ -1,0 +1,93 @@
+{
+  "role": "EVALUATOR_ONLY_EXPECTATIONS_NOT_OBSERVED_RESULTS",
+  "basis": [
+    "SPEC §7",
+    "SPEC I-01/I-02/I-03/I-11",
+    "team scenario choice"
+  ],
+  "prompt_file": "prompts/demo/C-START.txt",
+  "same_initial_files": "fixtures/workloads/C plus common, except naming-neutral evaluator-free workspace copy",
+  "states": [
+    {
+      "state": "C0",
+      "meaning": "교정 전",
+      "versions": {
+        "cmodel-development": 1,
+        "cmodel-refactoring": 1,
+        "cmodel-code-rule": 1
+      },
+      "code_corrections_count": 0,
+      "expected_ready_member": "m_ready",
+      "expected_frame_count_member": "m_frame_count",
+      "preserve_existing_member": "m_parameters",
+      "public_behavior": "lifecycle-golden.json",
+      "numeric_contract": "workload-golden.json"
+    },
+    {
+      "state": "C1",
+      "meaning": "교정 후·compaction 전",
+      "versions": {
+        "cmodel-development": 1,
+        "cmodel-refactoring": 2,
+        "cmodel-code-rule": 3
+      },
+      "code_corrections_count": 2,
+      "expected_ready_member": "is_ready",
+      "expected_frame_count_member": "m_frame_count",
+      "preserve_existing_member": "m_parameters",
+      "public_behavior": "lifecycle-golden.json",
+      "numeric_contract": "workload-golden.json"
+    },
+    {
+      "state": "C2",
+      "meaning": "compaction 후",
+      "versions": {
+        "cmodel-development": 1,
+        "cmodel-refactoring": 2,
+        "cmodel-code-rule": 5
+      },
+      "code_corrections_count": 0,
+      "expected_ready_member": "is_ready",
+      "expected_frame_count_member": "m_frame_count",
+      "preserve_existing_member": "m_parameters",
+      "public_behavior": "lifecycle-golden.json",
+      "numeric_contract": "workload-golden.json"
+    }
+  ],
+  "threshold": 3,
+  "events": [
+    {
+      "event": "initial seed",
+      "state": "C0"
+    },
+    {
+      "event": "refactoring nag once",
+      "ref_version": 2
+    },
+    {
+      "event": "code nag 1",
+      "code_version": 2
+    },
+    {
+      "event": "code nag 2",
+      "code_version": 3,
+      "state": "C1"
+    },
+    {
+      "event": "code nag 3 restates same effective rules",
+      "code_version": 4,
+      "runtime_compaction": "pending separately; no content mutation for status"
+    },
+    {
+      "event": "successful background compaction",
+      "code_version": 5,
+      "state": "C2",
+      "historical_v4": "preserved with all three corrections"
+    }
+  ],
+  "version_conditions": "Exact numbers assume v1 start, accepted fresh writes, no extra metadata/body edits or extra nags. Always record actual committed versions.",
+  "semantic_control": "C1 measured with two corrections below threshold. Third correction adds no effective rule; verify this in transcript before treating C1/C2 as semantic-preservation evidence. Automatic tests also compare exact v4/v5 content-preservation boundary.",
+  "contamination_rule": "No golden/prompt answers/reference/B edits/other C outputs in any clean C environment",
+  "observations_status": "NOT_RUN",
+  "functional_evaluation": "tools/verify_sample.py candidate mode, evaluator-held copy; 42 valid + 5 invalid cases, C DoProcess/DoRun, 24 lifecycle observations. Functional PASS is not actual propagation PASS."
+}

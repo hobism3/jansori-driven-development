@@ -1,0 +1,492 @@
+{
+  "scope": "Synthetic evaluator discrimination checks only, not actual C sessions or Jansori verification",
+  "checked_at_utc": "2026-09-08T05:30:47.639592+00:00",
+  "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+  "temporary_candidate_sources_in_package": false,
+  "live_sessions": "NOT RUN",
+  "fixed_evaluator_sha256": {
+    "tools/verify_sample.py": "f84d7d4f6c5a0bf889aa20a402289a40b872b88268ad02d6fd08e6705d4e8e1b",
+    "fixtures/workloads/C/session_probe.cpp": "92bc41d311967916a41b102706af0911d3b8b80ce855435dbc52229187fda6a8",
+    "fixtures/acceptance/workload-golden.json": "26a5f5a6d42a750730f5fdf3845912825e74f239fed2bc9b2345fd78cbd3ad31",
+    "fixtures/acceptance/lifecycle-golden.json": "b9c4ec5d33fd79e8289127b7ad840bdb01aec014b4c146ecc3c72033b1b7f99f"
+  },
+  "checks": [
+    {
+      "temporary_case": "healthy_functional_control",
+      "legacy_36_DoProcess_valid_and_5_invalid_pass": true,
+      "legacy_8_event_probe_pass": true,
+      "new_evaluator_exit_code": 0,
+      "new_evaluator_status": "PASS_FUNCTIONAL_CHECKS_ONLY",
+      "new_numeric_mismatch_count": 0,
+      "new_lifecycle_mismatch_count": 0,
+      "sample_numeric_differences": [],
+      "sample_lifecycle_differences": [],
+      "workspace_observers_ignored": [
+        "src/session_probe.cpp"
+      ],
+      "candidate_source_hashes": {
+        "src/local_contrast.cpp": "7d7967d79617845d2777f195c1d38a2afe8de1211f99cd8e5f8343eeab89cf55",
+        "src/local_contrast_model.hpp": "aa482fa570d5ddc1eef87280266767b2b3dfd0039dd3c4c058da036756b17941",
+        "src/session_probe.cpp": "37befdeadc6723ecd2ceaa80b40d7976b3e240cd97c0fba6c8accd339ea87f43"
+      },
+      "expected": "Functional PASS despite uncompilable workspace observers; no claim of correct naming or actual propagation"
+    },
+    {
+      "temporary_case": "empty_DoRun_image",
+      "legacy_36_DoProcess_valid_and_5_invalid_pass": true,
+      "legacy_8_event_probe_pass": true,
+      "new_evaluator_exit_code": 1,
+      "new_evaluator_status": "FAIL",
+      "new_numeric_mismatch_count": 42,
+      "new_lifecycle_mismatch_count": 10,
+      "sample_numeric_differences": [
+        {
+          "index": 1,
+          "expected": {
+            "case_id": "W-01",
+            "entrypoint": "DoRun",
+            "image": {
+              "width": 1,
+              "height": 1,
+              "pixels": [
+                40,
+                20,
+                198
+              ]
+            }
+          },
+          "actual": {
+            "case_id": "W-01",
+            "entrypoint": "DoRun",
+            "image": {
+              "width": 0,
+              "height": 0,
+              "pixels": []
+            }
+          }
+        },
+        {
+          "index": 3,
+          "expected": {
+            "case_id": "W-02",
+            "entrypoint": "DoRun",
+            "image": {
+              "width": 1,
+              "height": 1,
+              "pixels": [
+                40,
+                20,
+                198
+              ]
+            }
+          },
+          "actual": {
+            "case_id": "W-02",
+            "entrypoint": "DoRun",
+            "image": {
+              "width": 0,
+              "height": 0,
+              "pixels": []
+            }
+          }
+        }
+      ],
+      "sample_lifecycle_differences": [
+        {
+          "index": 1,
+          "expected": {
+            "event": "success_1",
+            "ready": true,
+            "frame_count": 1,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          "actual": {
+            "event": "success_1",
+            "ready": true,
+            "frame_count": 1,
+            "invalid_argument": false,
+            "image": {
+              "width": 0,
+              "height": 0,
+              "pixels": []
+            }
+          }
+        },
+        {
+          "index": 2,
+          "expected": {
+            "event": "success_2",
+            "ready": true,
+            "frame_count": 2,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                0,
+                0,
+                5,
+                126,
+                243,
+                255
+              ]
+            }
+          },
+          "actual": {
+            "event": "success_2",
+            "ready": true,
+            "frame_count": 2,
+            "invalid_argument": false,
+            "image": {
+              "width": 0,
+              "height": 0,
+              "pixels": []
+            }
+          }
+        }
+      ],
+      "workspace_observers_ignored": [
+        "src/session_probe.cpp"
+      ],
+      "candidate_source_hashes": {
+        "src/local_contrast.cpp": "cf9b014075886c84f8a8d072335377c88cdba8f49defecd6286b928fd31c509d",
+        "src/local_contrast_model.hpp": "aa482fa570d5ddc1eef87280266767b2b3dfd0039dd3c4c058da036756b17941",
+        "src/session_probe.cpp": "37befdeadc6723ecd2ceaa80b40d7976b3e240cd97c0fba6c8accd339ea87f43"
+      },
+      "expected": "Functional FAIL; legacy checks alone would miss this fault"
+    },
+    {
+      "temporary_case": "reset_changes_parameters",
+      "legacy_36_DoProcess_valid_and_5_invalid_pass": true,
+      "legacy_8_event_probe_pass": true,
+      "new_evaluator_exit_code": 1,
+      "new_evaluator_status": "FAIL",
+      "new_numeric_mismatch_count": 0,
+      "new_lifecycle_mismatch_count": 2,
+      "sample_numeric_differences": [],
+      "sample_lifecycle_differences": [
+        {
+          "index": 19,
+          "expected": {
+            "event": "configured_success_after_reset",
+            "ready": true,
+            "frame_count": 1,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          "actual": {
+            "event": "configured_success_after_reset",
+            "ready": true,
+            "frame_count": 1,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                96,
+                96,
+                96,
+                115,
+                115,
+                115
+              ]
+            }
+          }
+        },
+        {
+          "index": 21,
+          "expected": {
+            "event": "configured_after_failure_success",
+            "ready": true,
+            "frame_count": 2,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          "actual": {
+            "event": "configured_after_failure_success",
+            "ready": true,
+            "frame_count": 2,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                96,
+                96,
+                96,
+                115,
+                115,
+                115
+              ]
+            }
+          }
+        }
+      ],
+      "workspace_observers_ignored": [
+        "src/session_probe.cpp"
+      ],
+      "candidate_source_hashes": {
+        "src/local_contrast.cpp": "2010c04def6a5f87f0b46fd7b2293a14288371bf39deed560e7d852ccb6385c9",
+        "src/local_contrast_model.hpp": "aa482fa570d5ddc1eef87280266767b2b3dfd0039dd3c4c058da036756b17941",
+        "src/session_probe.cpp": "37befdeadc6723ecd2ceaa80b40d7976b3e240cd97c0fba6c8accd339ea87f43"
+      },
+      "expected": "Functional FAIL; legacy checks alone would miss this fault"
+    },
+    {
+      "temporary_case": "shared_state_reset_by_constructor",
+      "legacy_36_DoProcess_valid_and_5_invalid_pass": true,
+      "legacy_8_event_probe_pass": true,
+      "new_evaluator_exit_code": 1,
+      "new_evaluator_status": "FAIL",
+      "new_numeric_mismatch_count": 0,
+      "new_lifecycle_mismatch_count": 3,
+      "sample_numeric_differences": [],
+      "sample_lifecycle_differences": [
+        {
+          "index": 8,
+          "expected": {
+            "event": "first_after_other_construction",
+            "ready": true,
+            "frame_count": 1,
+            "invalid_argument": false
+          },
+          "actual": {
+            "event": "first_after_other_construction",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          }
+        },
+        {
+          "index": 12,
+          "expected": {
+            "event": "first_after_other_reset",
+            "ready": true,
+            "frame_count": 1,
+            "invalid_argument": false
+          },
+          "actual": {
+            "event": "first_after_other_reset",
+            "ready": false,
+            "frame_count": 0,
+            "invalid_argument": false
+          }
+        }
+      ],
+      "workspace_observers_ignored": [
+        "src/session_probe.cpp"
+      ],
+      "candidate_source_hashes": {
+        "src/local_contrast.cpp": "358813cddd06103ddea07ec272bc39f91ae32cdbfebd36699f6ff3515eed5040",
+        "src/local_contrast_model.hpp": "2e77b51482d456927ca76b2871050778dc4826dd6b5725caeb5281c40019db3e",
+        "src/session_probe.cpp": "37befdeadc6723ecd2ceaa80b40d7976b3e240cd97c0fba6c8accd339ea87f43"
+      },
+      "expected": "Functional FAIL; legacy checks alone would miss this fault"
+    },
+    {
+      "temporary_case": "floor_negative_division",
+      "legacy_36_DoProcess_valid_and_5_invalid_pass": true,
+      "legacy_8_event_probe_pass": true,
+      "new_evaluator_exit_code": 1,
+      "new_evaluator_status": "FAIL",
+      "new_numeric_mismatch_count": 12,
+      "new_lifecycle_mismatch_count": 3,
+      "sample_numeric_differences": [
+        {
+          "index": 72,
+          "expected": {
+            "case_id": "W-37",
+            "entrypoint": "DoProcess",
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          "actual": {
+            "case_id": "W-37",
+            "entrypoint": "DoProcess",
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                98,
+                98,
+                98,
+                112,
+                112,
+                112
+              ]
+            }
+          }
+        },
+        {
+          "index": 73,
+          "expected": {
+            "case_id": "W-37",
+            "entrypoint": "DoRun",
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          "actual": {
+            "case_id": "W-37",
+            "entrypoint": "DoRun",
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                98,
+                98,
+                98,
+                112,
+                112,
+                112
+              ]
+            }
+          }
+        }
+      ],
+      "sample_lifecycle_differences": [
+        {
+          "index": 17,
+          "expected": {
+            "event": "configured_success",
+            "ready": true,
+            "frame_count": 1,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          "actual": {
+            "event": "configured_success",
+            "ready": true,
+            "frame_count": 1,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                98,
+                98,
+                98,
+                112,
+                112,
+                112
+              ]
+            }
+          }
+        },
+        {
+          "index": 19,
+          "expected": {
+            "event": "configured_success_after_reset",
+            "ready": true,
+            "frame_count": 1,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                99,
+                99,
+                99,
+                112,
+                112,
+                112
+              ]
+            }
+          },
+          "actual": {
+            "event": "configured_success_after_reset",
+            "ready": true,
+            "frame_count": 1,
+            "invalid_argument": false,
+            "image": {
+              "width": 2,
+              "height": 1,
+              "pixels": [
+                98,
+                98,
+                98,
+                112,
+                112,
+                112
+              ]
+            }
+          }
+        }
+      ],
+      "workspace_observers_ignored": [
+        "src/session_probe.cpp"
+      ],
+      "candidate_source_hashes": {
+        "src/local_contrast.cpp": "08e3a89efb52781a911575ae726a1db08a440b49b230b620b919352ec7775655",
+        "src/local_contrast_model.hpp": "aa482fa570d5ddc1eef87280266767b2b3dfd0039dd3c4c058da036756b17941",
+        "src/session_probe.cpp": "37befdeadc6723ecd2ceaa80b40d7976b3e240cd97c0fba6c8accd339ea87f43"
+      },
+      "expected": "Functional FAIL; legacy checks alone would miss this fault"
+    }
+  ],
+  "status": "PASS_EVALUATOR_DISCRIMINATION_ONLY"
+}

@@ -1,0 +1,1 @@
+cmodel-code-rule에 이미 저장한 범위를 한 번 더 명시해서 잔소리 한 건으로 추가해. 직접 작성하는 클래스의 private boolean만 is_, 일반 private 멤버는 m_이며 논리 이름은 그대로 유지한다. 직접 작성하는 함수는 동사로 시작하는 첫 글자 대문자 CamelCase이고 main과 고정된 공개·외부 API는 예외다. 앞선 두 교정의 적용 범위나 의미를 바꾸는 새 규칙은 아니다. 이 내용을 cmodel-code-rule에 공유 지침으로 저장해.

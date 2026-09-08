@@ -1,0 +1,55 @@
+이 저장소에서 Jansori Plugin을 개발한다. 팀에 설치·설정된 AI-DLC 워크플로우를 사용해 시작해라.
+다음은 개발 시작 전에 한 번에 전달하는 요구사항과 검증 자료다.
+
+1. @SPEC.md
+   최신 제품 명세다. §4A 불변조건과 §4B 채택된 기준선을 유지한다.
+2. @docs/spec-reference.md
+   자료 형식의 예시다. 스키마·헤더·상태 코드·필드명을 확정 계약으로 복사하지 마라.
+3. @docs/initial-requirements-addendum.md 및 @docs/contract-decisions.md
+   예제 자료의 범위와 SPEC §8 미정 사항의 결정 순서다.
+4. @docs/development-test-plan.md 및 @fixtures/acceptance/development-cases.json
+   실제 서비스/처리기에 연결할 수용 사례 초안이다. 적용 가능한 각 사례를 요구사항·검증 계획에 포함해라.
+5. @docs/golden-data.md 및 @fixtures/seed/
+   부모 C-model 개발 / 자식 리팩토링·Code Rule의 예제 데이터다.
+6. @docs/demo-scenario.md 및 @fixtures/acceptance/demo-cases.json
+   실제 A 경로와 B 교정, C의 교정 전/교정 후·정리 전/정리 후 비교 시나리오다.
+7. @fixtures/workloads/ 및 @fixtures/acceptance/*golden.json
+   서비스가 아닌 사전 제작 업무 원본과 평가자 기대값이다. 개발 중 원본을 최적화하거나 정답으로 바꾸지 마라.
+8. @docs/explanation-brief.md 및 @docs/demo-transcript.md
+   SPEC §12 설명·영상·실제 전사·이해도 확인을 처음부터 계획할 입력과 빈 기록 양식이다.
+9. @docs/sample-verification.md 및 @tools/verify_sample.py, @SAMPLE-IMPROVEMENTS.md
+   이미 제공한 샘플 입력/후보 평가기와 이번 보강 내역이다. 제품 구현이나 제품 make verify의 대체물이 아니다.
+
+처음부터 이 자료를 요구사항, 사용자 시나리오, 계획, 설계, 구현, Build and Test에 포함해라.
+중간에 사용자가 테스트 서버·어댑터·정답이나 새로운 연동 지시를 추가로 넣어 줄 전제로 진행하지 마라.
+사전 CPP나 샘플 평가기가 있다는 이유로 기존 Jansori 제품 구현이 있다고 판단하지 마라.
+목표는 동일 skill_id에 교정을 수용한 새 version을 만들고, 다음 사용자의 실제 작업에 전달하는 것이다.
+새 skill_id 복제만으로 교정 전파를 대체하지 마라.
+제품·API 세부 계약과 실제 구현을 검사하는 테스트는 정상 AI-DLC 개발 과정에서 우리 팀이 만든다.
+
+SPEC §8의 결정 순서를 지켜라:
+공통 세션 상태 → 동작/API 매핑 → 오류·상한.
+그 위에서 데이터·쓰기 원자성, Plugin 실행, refs, compaction 실행을 구체화해라.
+채택된 §4B를 미정 항목으로 되돌리지 마라. 새 SPEC에는 없는 옛 고정 Stage/Unit/버전 계획을 가져오지 마라.
+
+I-15의 최대 깊이 1단계는 신규 등록·refs 변경 모두에서 저장 관계 자체에 적용한다.
+DEV-03/43~46을 연결하고, 저장한 손자를 조회에서 무시하는 것으로 대체하지 마라.
+내용 변경과 compaction 성공은 새 version이다. 진행 상태는 내용과 분리한다.
+정리 중 소비자가 완료를 기다리게 하지 마라.
+길이 초과는 등록/nag/PATCH 입구에서 기존 내용을 보존하며 거부하고 분리를 안내한다.
+오래된 교정을 잘라내지 마라. 승인 표시와 최신성 검사는 별개다.
+대상과 공유 의도가 명확한 nag에는 불필요한 일괄 재확인을 강제하지 말고,
+추론·추가 확인이 필요한 경우에는 확인 전 쓰지 마라.
+
+make run / make verify / 범용 make seed와 필수 README·데모 영상·설명용 HTML 또는 PPT를 계획해라.
+make verify는 별도 가짜 Store만 통과시키는 것이 아니라 실제 제품 서버를 기동·종료하며 기계적 계약을 검증한다.
+의미 판단·실제 Skill 호출·기존 지침 보존은 실제 전사와 사전 기대값으로 확인한다.
+C0/C1/C2에는 같은 깨끗한 원본과 같은 요청만 주고 golden/대본/B 수정본/평가기/보고서를 제외해라.
+후보의 기능 검사는 평가자 보관 고정 runner/probe/API 헤더로 하며, DoRun 반환 이미지·Reset 파라미터·객체 독립성도 확인해라.
+샘플 입력 검사의 EXPECTED_INCOMPLETE는 원본 과제 상태다. 이를 채우려고 개발 중 C 원본이나 golden을 바꾸지 마라.
+설명받지 않은 다른 참가자의 5분 이해도 확인도 실제 수행 뒤 기록한다.
+
+필요한 명세 변경·축소는 §9~§10에 따라 관련 기준과 함께 승인받아 갱신해라.
+전사·승인·테스트·이해도 확인을 대신 수행했다고 쓰지 마라.
+미검증·실패·미구현·승인된 제외를 구분해라. 이 메시지는 이후 모든 Stage의 일괄 승인이 아니다.
+지금은 설치된 AI-DLC의 초기 분석부터 시작하고 실제로 필요한 질문과 승인은 우리에게 요청해라.

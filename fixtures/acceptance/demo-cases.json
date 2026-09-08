@@ -1,0 +1,129 @@
+{
+  "status": "NOT_RUN",
+  "cases": [
+    {
+      "case_id": "DEMO-A",
+      "prompt_file": "prompts/demo/A-START.txt",
+      "expected": [
+        "SPEC §3의 실제 완료·제안·동의·재검색·생성 경로",
+        "seed로 대체하지 않음"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    },
+    {
+      "case_id": "DEMO-C0",
+      "prompt_file": "prompts/demo/C-START.txt",
+      "expected": [
+        "교정 전 별도 C 세션",
+        "Top1/Ref1/Code1",
+        "m_ready/m_frame_count/m_parameters",
+        "동일 초기 작업물과 동일 요청"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    },
+    {
+      "case_id": "DEMO-B-START",
+      "prompt_file": "prompts/demo/B-START.txt",
+      "expected": [
+        "B 별도 세션, 초기 원본 NR 실행",
+        "실제 부모/자식 로드 및 version 기록"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    },
+    {
+      "case_id": "DEMO-B-REF",
+      "prompt_file": "prompts/demo/B-NAG-REFACTORING.txt",
+      "expected": [
+        "Ref v2, 부모/Code 불변",
+        "명확한 대상/공유 의도이면 공통 nag 경로",
+        "현재 NR 코드 적용"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    },
+    {
+      "case_id": "DEMO-B-CODE1",
+      "prompt_file": "prompts/demo/B-NAG-CODE-1.txt",
+      "expected": [
+        "Code v2",
+        "private boolean에만 is_ 예외",
+        "일반 m_ 보존"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    },
+    {
+      "case_id": "DEMO-B-CODE2",
+      "prompt_file": "prompts/demo/B-NAG-CODE-2.txt",
+      "expected": [
+        "Code v3, corrections 2건",
+        "함수 CamelCase 교정"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    },
+    {
+      "case_id": "DEMO-C1",
+      "prompt_file": "prompts/demo/C-START.txt",
+      "expected": [
+        "교정 후·정리 전 별도 C 세션",
+        "Top1/Ref2/Code3",
+        "is_ready/m_frame_count/m_parameters",
+        "C0와 동일 초기 파일/요청"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    },
+    {
+      "case_id": "DEMO-B-CODE3",
+      "prompt_file": "prompts/demo/B-NAG-CODE-3.txt",
+      "expected": [
+        "새 유효 규칙 없이 앞선 교정 재명시 1건",
+        "Code v4, corrections 3건",
+        "별도 상태에서 백그라운드 compaction 시작"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    },
+    {
+      "case_id": "DEMO-COMPACTION",
+      "prompt_file": null,
+      "expected": [
+        "실제 서브에이전트 결과로 Code v5 생성",
+        "과거 v4 보존",
+        "본문에 유효 지침 보존·corrections 비움",
+        "소비자가 완료를 기다리는 흐름 아님"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    },
+    {
+      "case_id": "DEMO-C2",
+      "prompt_file": "prompts/demo/C-START.txt",
+      "expected": [
+        "정리 후 별도 C 세션",
+        "Top1/Ref2/Code5",
+        "is_ready/m_frame_count/m_parameters",
+        "C0/C1과 동일 초기 파일/요청"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    },
+    {
+      "case_id": "DEMO-EXPLANATION",
+      "prompt_file": null,
+      "expected": [
+        "README·영상·설명용 HTML 또는 PPT",
+        "설명받지 않은 참가자의 실제 5분 이해도 확인",
+        "실제 관측만 전사에 기록"
+      ],
+      "mode": "actual_plugin_transcript",
+      "status": "NOT_RUN"
+    }
+  ],
+  "version_assumption": "Fresh initial v1, no unlisted content writes, threshold=3; record actual versions even if different.",
+  "functional_evaluation": "tools/verify_sample.py candidate mode, evaluator-held copy; 42 valid + 5 invalid cases, C DoProcess/DoRun, 24 lifecycle observations. Functional PASS is not actual propagation PASS."
+}

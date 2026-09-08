@@ -1,0 +1,1453 @@
+{
+  "status": "INITIAL_ACCEPTANCE_DRAFT_TO_BE_CONFIRMED_UNDER_SPEC_SECTION_8",
+  "authority": "SPEC.md, not spec-reference examples",
+  "cases": [
+    {
+      "case_id": "DEV-01",
+      "title": "업무 시작 인덱스와 모델 선택의 분리",
+      "r_ids": [
+        "R-01",
+        "R-02"
+      ],
+      "invariants": [
+        "I-08"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "정상 인덱스, 실제 설치 버전에서 확정한 Hook/Skill 설정"
+      ],
+      "actions": [
+        "업무 시작 입력",
+        "실제 모델 load 호출 관측"
+      ],
+      "expected": [
+        "자동: UserPromptSubmit이 선택에 필요한 name/description 등을 제한된 시간 내 전달하고 LLM을 호출하지 않는다",
+        "전사: Claude가 관련 부모 Skill을 실제 호출한다; 안내 문자열만으로 성공 처리하지 않는다"
+      ],
+      "evidence": [
+        "실제 hook 출력/시간",
+        "모델 Skill 호출 및 권한 결과"
+      ],
+      "decision_dependencies": [
+        "D-01",
+        "D-02",
+        "D-03",
+        "D-05"
+      ]
+    },
+    {
+      "case_id": "DEV-02",
+      "title": "부모와 자식 본문·교정 전개",
+      "r_ids": [
+        "R-03"
+      ],
+      "invariants": [
+        "I-02",
+        "I-03"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "직접 자식 2개를 참조하는 부모",
+        "각 자식에 body와 유효 corrections 존재"
+      ],
+      "actions": [
+        "실제 load 경로 실행"
+      ],
+      "expected": [
+        "부모와 직접 자식 모두 body+corrections를 소비 가능하게 전달",
+        "실제 로드한 부모·자식 skill_id/version 기록",
+        "소비 부모 SKILL.md를 로컬 원본으로 유지하지 않음"
+      ],
+      "evidence": [
+        "반환한 내용·refs 파일·로드 식별 정보"
+      ],
+      "decision_dependencies": [
+        "D-02",
+        "D-06"
+      ]
+    },
+    {
+      "case_id": "DEV-03",
+      "title": "잘못된 refs 처리와 깊이 제한",
+      "r_ids": [
+        "R-03"
+      ],
+      "invariants": [
+        "I-03",
+        "I-15"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "없는 ID·자기 참조·중복 참조·손자를 포함한 입력 각각"
+      ],
+      "actions": [
+        "신규 등록·refs 변경·조회 경로를 확정된 계약대로 각각 시도"
+      ],
+      "expected": [
+        "I-15의 깊이 1단계는 저장 관계 자체의 제한이다. 다단계 관계를 저장한 뒤 로드에서 손자를 생략하는 것으로 대체하지 않는다",
+        "자식이 부모가 되는 연결과 자식을 가진 Capsule을 다른 Capsule의 자식으로 연결하는 변경을 확정 저장 전에 거부한다",
+        "누락·자기·중복의 세부 계약과 오류 응답 형식은 §8에서 확정하되, 손자 연결 허용 여부를 미정으로 되돌리지 않는다",
+        "신규 등록·refs 변경 실패 뒤 기존 내용/version/최신 포인터를 보존한다. 경계 사례는 DEV-43~46으로 별도 확인한다",
+        "spec-reference의 예시만으로 skip/오류 코드를 임의 확정하지 않는다"
+      ],
+      "evidence": [
+        "각 참조 유형의 관측 결과와 확정 계약"
+      ],
+      "decision_dependencies": [
+        "D-06"
+      ]
+    },
+    {
+      "case_id": "DEV-04",
+      "title": "내용 버전 불변성과 최초 등록",
+      "r_ids": [
+        "R-06",
+        "R-07"
+      ],
+      "invariants": [
+        "I-01",
+        "I-06"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "동일 ID 없는 저장소"
+      ],
+      "actions": [
+        "최초 등록",
+        "서로 다른 유효 내용 변경 2회",
+        "과거 내용 비교"
+      ],
+      "expected": [
+        "최초 v1",
+        "각 내용 변경은 새 version",
+        "같은 ID/version 내용은 바뀌지 않고 과거본 보존"
+      ],
+      "evidence": [
+        "내용 JSON·최신 포인터·과거본 비교"
+      ],
+      "decision_dependencies": [
+        "D-04"
+      ]
+    },
+    {
+      "case_id": "DEV-05",
+      "title": "자식 nag의 독립성",
+      "r_ids": [
+        "R-07"
+      ],
+      "invariants": [
+        "I-01",
+        "I-13"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "Top1/Ref1/Code1"
+      ],
+      "actions": [
+        "명확한 대상 Ref에 새 nag 1회"
+      ],
+      "expected": [
+        "Ref v2와 correction 1건",
+        "Top/Code 내용과 version 불변",
+        "과거 Ref v1 보존"
+      ],
+      "evidence": [
+        "전후 내용·버전 비교"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-06",
+      "title": "동일 요청 재전송의 중복 방지",
+      "r_ids": [
+        "R-07"
+      ],
+      "invariants": [
+        "I-05",
+        "I-12"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "최초 nag 응답이 유실된 상황",
+        "확정된 request_id·동일성·보존 계약"
+      ],
+      "actions": [
+        "같은 요청 재전송"
+      ],
+      "expected": [
+        "교정과 version이 한 번만 생성됨",
+        "이미 확정된 요청의 결과를 안전하게 재확인",
+        "24시간이나 특정 헤더 이름은 미리 고정하지 않음"
+      ],
+      "evidence": [
+        "응답·재전송 기록·최신 version"
+      ],
+      "decision_dependencies": [
+        "D-04"
+      ]
+    },
+    {
+      "case_id": "DEV-07",
+      "title": "오래된 base의 nag 처리",
+      "r_ids": [
+        "R-07",
+        "R-09"
+      ],
+      "invariants": [
+        "I-01",
+        "I-04",
+        "I-05"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "사용자가 읽은 base 이후 다른 nag가 확정됨"
+      ],
+      "actions": [
+        "오래된 base로 새 nag 제출"
+      ],
+      "expected": [
+        "최신 교정과 내용을 잃거나 덮어쓰지 않음",
+        "append+stale 안내/거부+재확인 등 정확한 nag 충돌 처리 방식은 §8 확정 계약에 따름",
+        "spec-reference의 base_version_stale 예시를 필수 필드나 무조건 append 정책으로 취급하지 않음"
+      ],
+      "evidence": [
+        "최신 내용·확정된 stale 계약과 관측"
+      ],
+      "decision_dependencies": [
+        "D-02",
+        "D-04"
+      ]
+    },
+    {
+      "case_id": "DEV-08",
+      "title": "부모 번호가 같아도 최신 자식 전달",
+      "r_ids": [
+        "R-03",
+        "R-14"
+      ],
+      "invariants": [
+        "I-02",
+        "I-03"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "부모 v1 유지, 자식 v2 확정"
+      ],
+      "actions": [
+        "정상 부모 재조회",
+        "새 C 세션에서 자식 파일 읽기"
+      ],
+      "expected": [
+        "자동: 조회 시점 최신 확정 자식 v2의 body+corrections 전달",
+        "부모 번호만으로 캐시를 재사용하지 않음",
+        "전사: C의 실제 Read와 사용 확인"
+      ],
+      "evidence": [
+        "부모/자식 ID·version·내용",
+        "실제 C 전사"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-09",
+      "title": "같은 ID 신규 중복 등록 금지",
+      "r_ids": [
+        "R-06"
+      ],
+      "invariants": [
+        "I-06"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "동일 skill_id 존재"
+      ],
+      "actions": [
+        "동일 ID로 신규 등록 재시도"
+      ],
+      "expected": [
+        "중복 신규 Capsule을 만들지 않음",
+        "기존 내용 불변",
+        "오류 코드/응답 구조는 §8 계약 사용"
+      ],
+      "evidence": [
+        "등록 처리 결과·저장 내용"
+      ],
+      "decision_dependencies": [
+        "D-02"
+      ]
+    },
+    {
+      "case_id": "DEV-10",
+      "title": "save 직전 유사 스킬 재검색",
+      "r_ids": [
+        "R-06"
+      ],
+      "invariants": [
+        "I-06",
+        "I-07"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "업무 완료 시점에 유사 Capsule 존재"
+      ],
+      "actions": [
+        "저장 직전 재검색",
+        "사용자 선택에 따른 처리"
+      ],
+      "expected": [
+        "자동: 실제 재검색이 수행됨",
+        "전사: 의미 판단과 사용자 의도에 맞는 저장/기존 교정 분기",
+        "검색을 했다는 사실과 의미상 중복 완전 차단을 구분"
+      ],
+      "evidence": [
+        "실제 처리기 호출",
+        "검색 결과·사람 선택"
+      ],
+      "decision_dependencies": [
+        "D-02",
+        "D-05"
+      ]
+    },
+    {
+      "case_id": "DEV-11",
+      "title": "보호 변경의 승인 플래그 검사",
+      "r_ids": [
+        "R-11"
+      ],
+      "invariants": [
+        "I-14"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "name/description/keywords/assets/refs 각각의 변경안"
+      ],
+      "actions": [
+        "승인 플래그 없이 변경 요청"
+      ],
+      "expected": [
+        "보호 변경은 반영되지 않음",
+        "현재 내용과 과거본 유지",
+        "정확한 플래그/상태 코드는 §8 계약을 사용"
+      ],
+      "evidence": [
+        "각 필드별 전후 내용 및 거부 응답"
+      ],
+      "decision_dependencies": [
+        "D-02"
+      ]
+    },
+    {
+      "case_id": "DEV-12",
+      "title": "유효한 승인 변경도 새 내용 버전",
+      "r_ids": [
+        "R-11"
+      ],
+      "invariants": [
+        "I-01",
+        "I-04",
+        "I-14"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "현재 base를 기준으로 한 변경안",
+        "실제 승인된 before/after"
+      ],
+      "actions": [
+        "승인과 최신성 정보를 검증한 뒤 반영"
+      ],
+      "expected": [
+        "자동: 유효한 변경이 새 version에 기록되고 과거 내용 보존",
+        "전사: 승인 플래그 존재와 실제 사람 동의 증거를 구분"
+      ],
+      "evidence": [
+        "전후 내용·버전",
+        "실제 승인 응답"
+      ],
+      "decision_dependencies": [
+        "D-02",
+        "D-04"
+      ]
+    },
+    {
+      "case_id": "DEV-13",
+      "title": "compaction 임계값은 교정 개수",
+      "r_ids": [
+        "R-09"
+      ],
+      "invariants": [
+        "I-10"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "기본 임계값 10, 시험 임계값 3",
+        "내용 version과 corrections 개수가 다른 Capsule"
+      ],
+      "actions": [
+        "2건과 3건 경계 검사",
+        "실제 서브에이전트 호출 경계 연결"
+      ],
+      "expected": [
+        "version 숫자가 아닌 corrections 개수로 판단",
+        "별도 실행 상태로 작업 진행 관리",
+        "LLM 응답 대역으로 호출 연결만 시험한 경우 의미 보존은 검증하지 않았다고 표시"
+      ],
+      "evidence": [
+        "설정·교정 수·진행 상태·호출 기록"
+      ],
+      "decision_dependencies": [
+        "D-07"
+      ]
+    },
+    {
+      "case_id": "DEV-14",
+      "title": "compaction 성공은 새 버전",
+      "r_ids": [
+        "R-09",
+        "R-10"
+      ],
+      "invariants": [
+        "I-01",
+        "I-11",
+        "I-12"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "v4에 본문과 교정 3건",
+        "v4를 기준으로 한 유효 compaction 결과"
+      ],
+      "actions": [
+        "정리 결과 원자적 반영"
+      ],
+      "expected": [
+        "성공 시 v5에 정리 본문과 빈 corrections 저장",
+        "과거 v4 전체 내용 보존",
+        "assets와 refs 내용 유지",
+        "최신 포인터·재전송 기록을 포함한 내용 쓰기 원자성 유지",
+        "같은 v4에 본문을 덮어쓰거나 pending 상태를 내용에 끼워 넣지 않음"
+      ],
+      "evidence": [
+        "v4/v5 내용·최신 포인터·재전송 기록"
+      ],
+      "decision_dependencies": [
+        "D-04",
+        "D-07"
+      ]
+    },
+    {
+      "case_id": "DEV-15",
+      "title": "정리 도중 새 교정과 오래된 결과",
+      "r_ids": [
+        "R-07",
+        "R-09"
+      ],
+      "invariants": [
+        "I-04",
+        "I-12"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "v4 기준 compaction 실행 중"
+      ],
+      "actions": [
+        "새 nag 확정으로 v5 생성",
+        "v4 기준 정리 결과 제출"
+      ],
+      "expected": [
+        "오래된 정리 결과가 v5 내용을 덮어쓰지 않음",
+        "새 nag 보존",
+        "거부/재시작의 구체 과정은 §8에서 확정한 계약 사용"
+      ],
+      "evidence": [
+        "base와 최신 version·거부/재시작 관측"
+      ],
+      "decision_dependencies": [
+        "D-07"
+      ]
+    },
+    {
+      "case_id": "DEV-16",
+      "title": "정리 중에도 즉시 본 업무 진행",
+      "r_ids": [
+        "R-03",
+        "R-09",
+        "R-12"
+      ],
+      "invariants": [
+        "I-02",
+        "I-03",
+        "I-08",
+        "I-10"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "정리가 끝나지 않은 현재 확정본 body+corrections"
+      ],
+      "actions": [
+        "다른 소비자가 load",
+        "정리 완료를 지연시킨 동안 소비 흐름 관측"
+      ],
+      "expected": [
+        "현재 확정본과 교정으로 바로 업무 진행",
+        "compaction 완료를 위해 폴링·대기·재조회하지 않음",
+        "관측용 지연은 개발 테스트 의존성에서 제어하고 제품 소비 경로에 대기 기능을 만들지 않음"
+      ],
+      "evidence": [
+        "응답·소비 요청 순서·처리 시간",
+        "필요 시 실제 소비 전사"
+      ],
+      "decision_dependencies": [
+        "D-03",
+        "D-07"
+      ]
+    },
+    {
+      "case_id": "DEV-17",
+      "title": "compaction 실패·중단·늦은 응답",
+      "r_ids": [
+        "R-09"
+      ],
+      "invariants": [
+        "I-01",
+        "I-04",
+        "I-11"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "진행 중 작업 실패/중단/세션 종료"
+      ],
+      "actions": [
+        "실패·중단 처리를 실행",
+        "더 이상 유효하지 않은 결과 도착"
+      ],
+      "expected": [
+        "실패로 현재 내용과 교정을 바꾸지 않음",
+        "현재 유효하지 않은 결과가 내용을 덮어쓰지 않음",
+        "상태 수명/만료/재시작 값과 처리 방식은 §8에서 확정하며 특정 토큰이나 만료 초를 고정하지 않음"
+      ],
+      "evidence": [
+        "내용·별도 상태·최신성 검증 결과"
+      ],
+      "decision_dependencies": [
+        "D-07"
+      ]
+    },
+    {
+      "case_id": "DEV-18",
+      "title": "실제 정리의 의미 보존",
+      "r_ids": [
+        "R-10"
+      ],
+      "invariants": [
+        "I-11"
+      ],
+      "mode": "transcript",
+      "setup": [
+        "기존 유효 일반 규칙·boolean 예외 교정·함수 규칙"
+      ],
+      "actions": [
+        "실제 별도 서브에이전트 compaction",
+        "C1/C2 결과 비교 및 본문 검토"
+      ],
+      "expected": [
+        "일반 m_와 boolean is_ 예외 모두 유효하게 유지",
+        "공개 API 예외·기능 계약·함수 규칙 유지",
+        "assets/refs 보존",
+        "기계적 문자열 검사만으로 전체 의미 보존을 증명했다고 하지 않음"
+      ],
+      "evidence": [
+        "실제 정리 입력·출력",
+        "사람 의미 검토·C 비교"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-19",
+      "title": "Stop은 저장 제안 안내만",
+      "r_ids": [
+        "R-05"
+      ],
+      "invariants": [
+        "I-08"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "현재 세션 완료/미완료·재진입 상태",
+        "설치 버전에서 확정된 Stop 호출/출력 방식"
+      ],
+      "actions": [
+        "Stop 호출 및 재진입"
+      ],
+      "expected": [
+        "자동: 훅은 직접 대화·저장하지 않고 대기 상한 준수",
+        "전사: 응답 종료만으로 업무 완료로 단정하지 않음",
+        "추가 문맥 기능/재진입 입력의 구체 계약은 설치 환경에서 확인"
+      ],
+      "evidence": [
+        "실제 훅 프로세스·쓰기 없음",
+        "실제 대화"
+      ],
+      "decision_dependencies": [
+        "D-01",
+        "D-03",
+        "D-05"
+      ]
+    },
+    {
+      "case_id": "DEV-20",
+      "title": "공통 세션 상태와 후속 발화",
+      "r_ids": [
+        "R-01",
+        "R-05",
+        "R-07",
+        "R-08"
+      ],
+      "invariants": [
+        "I-02",
+        "I-13"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "활성 부모·자식 ID/version과 저장 수락/거절 상태"
+      ],
+      "actions": [
+        "후속 잔소리·수락·거절·새 세션"
+      ],
+      "expected": [
+        "공통 상태 계약을 load/save/nag가 일관되게 사용",
+        "한 세션은 부모 하나와 직접 자식만 활성화",
+        "저장/거절 내용이 변경되지 않았으면 반복 제안하지 않음",
+        "새 업무는 새 세션에서 시작"
+      ],
+      "evidence": [
+        "상태 수명·공유 방식 검사",
+        "실제 후속 대화"
+      ],
+      "decision_dependencies": [
+        "D-01"
+      ]
+    },
+    {
+      "case_id": "DEV-21",
+      "title": "연결·응답 지연 상한과 fail-open",
+      "r_ids": [
+        "R-12"
+      ],
+      "invariants": [
+        "I-07",
+        "I-08"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "연결 거절·연결 지연·응답 지연 각각"
+      ],
+      "actions": [
+        "실제 hook 경로 실행"
+      ],
+      "expected": [
+        "§8에서 확정한 연결/응답/전체 대기 상한 준수",
+        "본 업무 진행 허용",
+        "장애를 스킬 없음이나 최신본 전달 성공으로 표시하지 않음"
+      ],
+      "evidence": [
+        "실측 상한·출력·요청 기록"
+      ],
+      "decision_dependencies": [
+        "D-03"
+      ]
+    },
+    {
+      "case_id": "DEV-22",
+      "title": "조회 장애 후 신규 등록 금지",
+      "r_ids": [
+        "R-13"
+      ],
+      "invariants": [
+        "I-06",
+        "I-07"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "저장 직전 존재/유사성 조회 실패"
+      ],
+      "actions": [
+        "save 시도"
+      ],
+      "expected": [
+        "존재 확인이 불가능한 신규 등록을 하지 않음",
+        "장애를 관련 스킬 부재로 해석하지 않음"
+      ],
+      "evidence": [
+        "실제 조회 실패 및 신규 쓰기 없음"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-23",
+      "title": "길이 초과는 쓰기 입구에서 거부",
+      "r_ids": [
+        "R-07",
+        "R-09",
+        "R-11"
+      ],
+      "invariants": [
+        "I-01",
+        "I-09"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "§8에서 정한 렌더 한도 L",
+        "등록·nag·PATCH 각각 L 이하/경계/초과 입력"
+      ],
+      "actions": [
+        "세 종류 쓰기 시도",
+        "거부 후 추가 nag 없이 정상 조회"
+      ],
+      "expected": [
+        "한도 초과 변경 거부, 기존 내용·교정·최신 포인터 보존",
+        "자식 분리 안내 제공",
+        "오래된 교정을 자르거나 다음 nag 때까지 문제를 방치하지 않음",
+        "한도 단위/값과 부모·자식 합산 범위는 §8 계약 사용"
+      ],
+      "evidence": [
+        "전후 내용·거부 안내·별도 후속 조회"
+      ],
+      "decision_dependencies": [
+        "D-03"
+      ]
+    },
+    {
+      "case_id": "DEV-24",
+      "title": "파일 경로와 스크립트 동의",
+      "r_ids": [
+        "R-03",
+        "R-11"
+      ],
+      "invariants": [
+        "I-14"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "assets/refs 정상 경로와 경계 이탈 시도",
+        "실행 가능 표시가 있는 평문 스크립트"
+      ],
+      "actions": [
+        "전개·실행 요청"
+      ],
+      "expected": [
+        "실제 파일 저장이 지정 임시 디렉터리 밖으로 나가지 않음",
+        "자동 실행하지 않음",
+        "전사: 실행 전 내용 요약과 실제 사람 동의",
+        "본문의 경로 문자열과 실제 저장 경로 검사를 혼동하지 않음"
+      ],
+      "evidence": [
+        "실제 생성 경로·자동 실행 없음",
+        "요약 및 동의"
+      ],
+      "decision_dependencies": [
+        "D-06"
+      ]
+    },
+    {
+      "case_id": "DEV-25",
+      "title": "명확한 잔소리와 불명확한 잔소리 분리",
+      "r_ids": [
+        "R-07",
+        "R-08"
+      ],
+      "invariants": [
+        "I-13"
+      ],
+      "mode": "transcript",
+      "setup": [
+        "부모와 주제별 자식 활성화"
+      ],
+      "actions": [
+        "명시적 대상+공유 의도인 nag",
+        "대상/공유 의도가 불명확하거나 추론이 필요한 발화"
+      ],
+      "expected": [
+        "명확한 요청은 공통 nag 경로로 반영; 매번 별도 확인을 필수로 만들지 않음",
+        "추론/추가 확인이 필요한 경우 확인 전 쓰지 않음",
+        "일회성 코드 수정 요청을 공유 nag로 자동 저장하지 않음"
+      ],
+      "evidence": [
+        "실제 발화·판정·대상·쓰기"
+      ],
+      "decision_dependencies": [
+        "D-01",
+        "D-02"
+      ]
+    },
+    {
+      "case_id": "DEV-26",
+      "title": "A의 실제 생성·저장·동의 경로",
+      "r_ids": [
+        "R-02",
+        "R-05",
+        "R-06"
+      ],
+      "invariants": [
+        "I-06",
+        "I-07",
+        "I-13"
+      ],
+      "mode": "transcript",
+      "setup": [
+        "관련 스킬이 없는 정상 서버",
+        "A 별도 실제 Plugin 세션"
+      ],
+      "actions": [
+        "업무 수행·완료",
+        "저장 제안",
+        "실제 사람 수락 또는 거절",
+        "유사 스킬 재확인 및 생성/등록"
+      ],
+      "expected": [
+        "미완성/미동의 등록 없음",
+        "실제 수락한 경우에만 v1 생성",
+        "seed를 실제 생성 경로의 증거로 대체하지 않음",
+        "Generator/파일 경로는 §8에서 정한 실제 방식으로 기록"
+      ],
+      "evidence": [
+        "A 전사·재검색·등록 결과"
+      ],
+      "decision_dependencies": [
+        "D-05"
+      ]
+    },
+    {
+      "case_id": "DEV-27",
+      "title": "동일 C 원본·요청으로 세 상태 비교",
+      "r_ids": [
+        "R-04",
+        "R-10",
+        "R-14"
+      ],
+      "invariants": [
+        "I-02",
+        "I-03",
+        "I-11"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "three-state-golden.json",
+        "별도 C0/C1/C2 세션과 byte-identical 초기 작업물·동일 요청"
+      ],
+      "actions": [
+        "교정 전 실행",
+        "교정 후·정리 전 실행",
+        "실제 compaction 후 실행"
+      ],
+      "expected": [
+        "자동: 원본/요청 hash 일치, 관측 결과를 사전 기대값과 대조",
+        "전사: 실제 로드한 부모·자식 version과 교정 Read·업무 적용 기록",
+        "다른 B/C 알고리즘 비교만으로 세 상태 비교를 대체하지 않음",
+        "같은 정답이 우연히 나온 가능성을 줄이는 비교를 하되 인과관계 증명으로 과장하지 않음"
+      ],
+      "evidence": [
+        "세 상태 입력/후보 hash",
+        "실제 전사·코드/이미지 비교"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-28",
+      "title": "내용과 진행 상태 분리",
+      "r_ids": [
+        "R-03",
+        "R-09"
+      ],
+      "invariants": [
+        "I-01",
+        "I-10"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "같은 확정 content version",
+        "정리 전/진행/실패/완료 상태 변화"
+      ],
+      "actions": [
+        "상태 변경 중 버전 내용 직렬화 비교"
+      ],
+      "expected": [
+        "pending 상태만 바뀌어 같은 ID/version 내용이 변하지 않음",
+        "진행 상태는 별도 저장/응답 영역",
+        "성공한 내용 변경만 새 version"
+      ],
+      "evidence": [
+        "내용 hash·별도 상태 기록"
+      ],
+      "decision_dependencies": [
+        "D-04",
+        "D-07"
+      ]
+    },
+    {
+      "case_id": "DEV-29",
+      "title": "승인받은 오래된 변경안 거부",
+      "r_ids": [
+        "R-09",
+        "R-11"
+      ],
+      "invariants": [
+        "I-04",
+        "I-14"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "v3 기준 보호 변경안을 사람이 승인하는 동안 nag가 v4로 확정"
+      ],
+      "actions": [
+        "과거 v3 변경안을 승인 플래그와 함께 제출"
+      ],
+      "expected": [
+        "승인은 최신성 검사를 대체하지 않음",
+        "v4 내용을 덮어쓰지 않음",
+        "변경 재검토/재승인 등 후속 흐름은 확정 계약 적용"
+      ],
+      "evidence": [
+        "base·최신 version·거부 응답",
+        "실제 승인/재확인"
+      ],
+      "decision_dependencies": [
+        "D-02",
+        "D-04"
+      ]
+    },
+    {
+      "case_id": "DEV-30",
+      "title": "쓰기 원자성과 장애 주입",
+      "r_ids": [
+        "R-07",
+        "R-09"
+      ],
+      "invariants": [
+        "I-01",
+        "I-05",
+        "I-12"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "새 version/최신 포인터/재전송 기록 갱신의 각 경계",
+        "nag와 백그라운드 compaction 교차"
+      ],
+      "actions": [
+        "저장 경계 오류 주입",
+        "재시도·내용 조회"
+      ],
+      "expected": [
+        "전체 변경 전 또는 일관된 변경 후 상태만 관측",
+        "미완성 최신본이나 교정 중복 생성 없음",
+        "전체 다중 사용자 성능 시험이 아니라 로컬 쓰기 원자성 검사"
+      ],
+      "evidence": [
+        "쓰기 실패 지점·일관성·재시도"
+      ],
+      "decision_dependencies": [
+        "D-04"
+      ]
+    },
+    {
+      "case_id": "DEV-31",
+      "title": "같은 request_id에 다른 내용",
+      "r_ids": [
+        "R-07",
+        "R-11"
+      ],
+      "invariants": [
+        "I-05",
+        "I-12"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "동일 ID 요청이 이미 기록됨"
+      ],
+      "actions": [
+        "내용이 다른 요청을 같은 ID로 제출"
+      ],
+      "expected": [
+        "§8에서 정한 동일성/충돌 정책으로 처리",
+        "다른 요청에 기존 성공 응답을 무분별하게 적용하거나 중복 변경하지 않음",
+        "spec-reference의 오류 이름과 헤더를 필수로 고정하지 않음"
+      ],
+      "evidence": [
+        "요청 fingerprint·충돌 결과·내용 불변"
+      ],
+      "decision_dependencies": [
+        "D-04"
+      ]
+    },
+    {
+      "case_id": "DEV-32",
+      "title": "승인 재요청과 멱등성의 경계",
+      "r_ids": [
+        "R-11"
+      ],
+      "invariants": [
+        "I-04",
+        "I-05",
+        "I-14"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "보호 변경 미승인 요청 결과가 기록됨"
+      ],
+      "actions": [
+        "실제 승인 후 승인 표시가 추가된 재요청",
+        "승인된 요청의 네트워크 재시도"
+      ],
+      "expected": [
+        "확정된 요청 ID 정책으로 미승인/승인/재시도를 구분",
+        "새 변경은 한 번 반영",
+        "오래된 base는 승인 여부와 무관하게 검사"
+      ],
+      "evidence": [
+        "확정 계약과 요청별 처리 결과"
+      ],
+      "decision_dependencies": [
+        "D-04"
+      ]
+    },
+    {
+      "case_id": "DEV-33",
+      "title": "본문/스크립트 내용과 경로 검사의 구분",
+      "r_ids": [
+        "R-03",
+        "R-11"
+      ],
+      "invariants": [
+        "I-14"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "본문 안 설명용 경로 문자열",
+        "실제 asset/refs 저장 경로 이탈",
+        "무해한 예제 비밀정보 패턴"
+      ],
+      "actions": [
+        "내용 검증과 파일 전개 각각 수행"
+      ],
+      "expected": [
+        "경로 보장은 실제 저장 대상에 적용",
+        "내용/비밀정보 검사는 보조 수단임을 명시",
+        "이전 명세의 절대경로·이메일 무조건 거부를 새 필수 계약으로 재사용하지 않음"
+      ],
+      "evidence": [
+        "경로/내용 분리된 테스트 결과"
+      ],
+      "decision_dependencies": [
+        "D-04",
+        "D-06"
+      ]
+    },
+    {
+      "case_id": "DEV-34",
+      "title": "루프백 전용 바인딩",
+      "r_ids": [
+        "R-12"
+      ],
+      "invariants": [
+        "I-08"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "실제 make run 서버"
+      ],
+      "actions": [
+        "실제 바인딩 주소 검사"
+      ],
+      "expected": [
+        "127.0.0.1 또는 ::1에만 바인딩",
+        "사내망 전체 노출/운영 보안 주장 없음"
+      ],
+      "evidence": [
+        "리스닝 주소·README 한계"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-35",
+      "title": "업무 소스·프롬프트 자동 수집 없음",
+      "r_ids": [
+        "R-03",
+        "R-07"
+      ],
+      "invariants": [
+        "I-13"
+      ],
+      "mode": "automatic+transcript",
+      "setup": [
+        "업무 소스·일반 프롬프트·사용자가 명시적으로 Capsule에 포함한 내용"
+      ],
+      "actions": [
+        "업무 실행 및 저장 경로 관측"
+      ],
+      "expected": [
+        "업무 소스와 프롬프트 원문을 자동 수집/저장하지 않음",
+        "명시적 Capsule 포함과 자동 수집을 구분",
+        "현재 사용자 요청/실행 권한 우선 안내와 간접 주입 잔여 위험 명시"
+      ],
+      "evidence": [
+        "저장 범위·전송 로그·README",
+        "명시적 포함 의도"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-36",
+      "title": "실제 Skill 호출 설정과 세션 격리",
+      "r_ids": [
+        "R-02",
+        "R-14"
+      ],
+      "invariants": [
+        "I-02",
+        "I-13"
+      ],
+      "mode": "transcript",
+      "setup": [
+        "설치 버전에서 모델 호출 허용·권한 확인",
+        "부모 하나·직접 자식 활성화"
+      ],
+      "actions": [
+        "B/C 새 세션 load",
+        "권한·호출 성공 관측"
+      ],
+      "expected": [
+        "Skill 안내 텍스트만 전달한 상태와 실제 호출 성공을 구분",
+        "새 세션에는 기존 대화/작업물/저장거절 상태를 부당하게 전달하지 않음"
+      ],
+      "evidence": [
+        "실제 버전·권한·모델 호출",
+        "세션별 증거"
+      ],
+      "decision_dependencies": [
+        "D-01",
+        "D-05"
+      ]
+    },
+    {
+      "case_id": "DEV-37",
+      "title": "조회를 마친 뒤 생긴 최신 버전의 해석",
+      "r_ids": [
+        "R-03",
+        "R-14"
+      ],
+      "invariants": [
+        "I-02"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "조회 시점 v3가 최신 확정본"
+      ],
+      "actions": [
+        "v3 로드 완료 후 별도 교정/정리로 v4 생성"
+      ],
+      "expected": [
+        "로드 기록은 실제 받은 v3로 유지",
+        "로드 후 생성된 v4 때문에 이미 완료한 v3 로드를 위반이라 판정하지 않음",
+        "다음 정상 조회는 그 시점의 최신 확정본 전달"
+      ],
+      "evidence": [
+        "시점별 commit/load 기록"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-38",
+      "title": "범용 seed와 내용 비종속",
+      "r_ids": [
+        "R-06",
+        "R-07"
+      ],
+      "invariants": [
+        "I-01",
+        "I-06"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "fixtures/seed의 도메인 ID와 무관한 별도 유효 fixture"
+      ],
+      "actions": [
+        "범용 등록 명령 실행"
+      ],
+      "expected": [
+        "고정 세 ID나 영상 파일 이름에 제품 동작을 하드코딩하지 않음",
+        "기존 ID/과거 버전 무단 덮어쓰기 없음",
+        "구체 seed 스키마는 §8 계약에 매핑",
+        "seed 자동화 축소가 승인된 경우 재현 가능한 수동 등록 절차와 제외 기록"
+      ],
+      "evidence": [
+        "명령·등록 결과·축소 승인 여부"
+      ],
+      "decision_dependencies": [
+        "D-04"
+      ]
+    },
+    {
+      "case_id": "DEV-39",
+      "title": "설명·제출물과 완료 판정",
+      "r_ids": [
+        "R-04",
+        "R-14"
+      ],
+      "invariants": [],
+      "mode": "artifact_review",
+      "setup": [
+        "SPEC §12의 필수 제출물"
+      ],
+      "actions": [
+        "README·영상·설명용 HTML 또는 PPT·전사·명령 검토"
+      ],
+      "expected": [
+        "문제→교정→다음 결과→기존 지침 유지→증거 연결",
+        "제품용 웹 UI와 설명용 산출물을 구분",
+        "미구현/미검증/실패/승인된 제외를 구분",
+        "내용이 있다는 것만으로 완료 선언하지 않음"
+      ],
+      "evidence": [
+        "제출물 경로·F-01~F-07 대조"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-40",
+      "title": "설명 이해도 실제 확인",
+      "r_ids": [
+        "R-04",
+        "R-14"
+      ],
+      "invariants": [],
+      "mode": "transcript",
+      "setup": [
+        "프로젝트 설명을 듣지 않은 다른 참가자",
+        "설명 자료"
+      ],
+      "actions": [
+        "5분 안에 핵심 루프를 설명할 수 있는지 관찰"
+      ],
+      "expected": [
+        "관측 시간·참가자 설명·혼동점을 demo-transcript에 기록",
+        "실제로 하지 않은 확인을 했다고 기록하지 않음",
+        "추가 hands-on은 여력 있을 때 하며 전체 사용성 검증이라고 하지 않음"
+      ],
+      "evidence": [
+        "실제 이해도 확인 기록"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-41",
+      "title": "실패/미구현/축소 승인 구분",
+      "r_ids": [
+        "R-09",
+        "R-10",
+        "R-14"
+      ],
+      "invariants": [
+        "I-01",
+        "I-03",
+        "I-10",
+        "I-11",
+        "I-14"
+      ],
+      "mode": "artifact_review",
+      "setup": [
+        "범위 변경/기능 축소 제안이 있는 경우"
+      ],
+      "actions": [
+        "SPEC §9~§10 절차와 F 기준 검토"
+      ],
+      "expected": [
+        "승인 전 기존 불변조건을 약화하지 않음",
+        "요구·수용 기준·적용 불변조건·실패 기준을 함께 갱신",
+        "축소 순서 seed→assets→refs→compaction 준수",
+        "README/영상/최소 설명물·증거 정직성을 축소로 면제하지 않음"
+      ],
+      "evidence": [
+        "실제 승인·변경 기록·적용 대상"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-42",
+      "title": "영상/상태 기능 기대값과 전파 증거 분리",
+      "r_ids": [
+        "R-04",
+        "R-14"
+      ],
+      "invariants": [],
+      "mode": "automatic+transcript",
+      "setup": [
+        "workload-golden 및 확장 lifecycle-golden",
+        "실제 제출 후보 소스와 평가자 보관 고정 runner/probe/API 헤더"
+      ],
+      "actions": [
+        "고정 평가기로 free DoProcess와 C DoRun의 전체 픽셀·크기·오류 계약 비교",
+        "비기본 파라미터 Reset 전후와 두 객체 교차 실행·Reset의 상태/출력 비교",
+        "평가자 밖에서 처리 시간 별도 측정"
+      ],
+      "expected": [
+        "원본 영상과 후보가 동일한 수치 계약 유지",
+        "상태 기능을 초기 공개 계약에 맞게 구현",
+        "속도 개선 미관측이면 그대로 보고",
+        "수치/이름이 맞았다는 것만으로 실제 Capsule Read/전파를 통과시키지 않음",
+        "DoRun이 빈/다른 영상을 반환하면 실패",
+        "Reset이 파라미터를 바꾸거나 객체 간 상태가 공유되면 실패",
+        "음수 분수 나눗셈의 0 방향 절삭 사례 W-37~42를 통과",
+        "후보 폴더에서 수정한 runner/probe를 최종 판정 도구로 사용하지 않음"
+      ],
+      "evidence": [
+        "후보 hash·기능 관측·실측 조건",
+        "실제 코드 적용 전사",
+        "평가자 고정 파일 hash·JSON 보고서의 expected/actual 비교; 도구 성공과 실제 전파 판정은 분리"
+      ],
+      "decision_dependencies": []
+    },
+    {
+      "case_id": "DEV-43",
+      "title": "기존 자식에 자식을 추가하는 refs 변경 거부",
+      "r_ids": [
+        "R-03",
+        "R-11"
+      ],
+      "invariants": [
+        "I-15",
+        "I-12",
+        "I-14"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "A→B, B는 leaf, 독립적인 leaf C가 정상 저장됨",
+        "보호 변경에 실제 승인 증거/승인 플래그와 현재 base_version이 있음"
+      ],
+      "actions": [
+        "B.refs에 C를 추가하는 변경 시도"
+      ],
+      "expected": [
+        "I-15에 따라 거부: A→B→C를 저장하지 않음",
+        "거부 시 기존 Capsule 내용·과거 version·최신 포인터·refs를 바꾸지 않음",
+        "거부된 변경을 성공한 내용 쓰기로 기록하지 않음; 오류 형식·재시도 응답은 §8 계약대로 검사",
+        "로드 시 손자만 생략하는 우회 구현을 통과시키지 않음"
+      ],
+      "evidence": [
+        "요청 전후 관계·내용/version/최신 포인터·결과 비교",
+        "실제 서비스 테스트 위치와 I-15 연결"
+      ],
+      "decision_dependencies": [
+        "D-02",
+        "D-04",
+        "D-06"
+      ]
+    },
+    {
+      "case_id": "DEV-44",
+      "title": "자식을 가진 Capsule을 다른 부모의 자식으로 연결하는 refs 변경 거부",
+      "r_ids": [
+        "R-03",
+        "R-11"
+      ],
+      "invariants": [
+        "I-15",
+        "I-12",
+        "I-14"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "A→B가 정상 저장되고 X는 독립 leaf",
+        "보호 변경에 실제 승인 증거/승인 플래그와 현재 base_version이 있음"
+      ],
+      "actions": [
+        "X.refs에 A를 추가하는 변경 시도"
+      ],
+      "expected": [
+        "I-15에 따라 거부: X→A→B를 저장하지 않음",
+        "거부 시 기존 Capsule 내용·과거 version·최신 포인터·refs를 바꾸지 않음",
+        "거부된 변경을 성공한 내용 쓰기로 기록하지 않음; 오류 형식·재시도 응답은 §8 계약대로 검사",
+        "로드 시 손자만 생략하는 우회 구현을 통과시키지 않음"
+      ],
+      "evidence": [
+        "요청 전후 관계·내용/version/최신 포인터·결과 비교",
+        "실제 서비스 테스트 위치와 I-15 연결"
+      ],
+      "decision_dependencies": [
+        "D-02",
+        "D-04",
+        "D-06"
+      ]
+    },
+    {
+      "case_id": "DEV-45",
+      "title": "신규 등록에서 기존 부모를 자식으로 감싸는 관계 거부",
+      "r_ids": [
+        "R-03"
+      ],
+      "invariants": [
+        "I-15",
+        "I-12"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "A→B가 정상 저장됨",
+        "신규 ID X는 존재하지 않음"
+      ],
+      "actions": [
+        "refs=[A]인 신규 Capsule X를 등록 시도"
+      ],
+      "expected": [
+        "I-15에 따라 신규 X 등록 거부: X→A→B를 저장하지 않음",
+        "실패 뒤 X의 version/최신 포인터/인덱스 항목이 부분 생성되지 않음",
+        "거부 시 기존 Capsule 내용·과거 version·최신 포인터·refs를 바꾸지 않음",
+        "거부된 변경을 성공한 내용 쓰기로 기록하지 않음; 오류 형식·재시도 응답은 §8 계약대로 검사",
+        "로드 시 손자만 생략하는 우회 구현을 통과시키지 않음"
+      ],
+      "evidence": [
+        "요청 전후 관계·내용/version/최신 포인터·결과 비교",
+        "실제 서비스 테스트 위치와 I-15 연결"
+      ],
+      "decision_dependencies": [
+        "D-02",
+        "D-04",
+        "D-06"
+      ]
+    },
+    {
+      "case_id": "DEV-46",
+      "title": "허용 경계: 직접 자식 한 단계 등록·변경은 유지",
+      "r_ids": [
+        "R-03",
+        "R-11"
+      ],
+      "invariants": [
+        "I-15",
+        "I-12",
+        "I-14"
+      ],
+      "mode": "automatic",
+      "setup": [
+        "독립 leaf B, C가 정상 저장됨",
+        "신규 ID A는 존재하지 않음"
+      ],
+      "actions": [
+        "refs=[B]인 A를 신규 등록",
+        "실제 승인 증거/승인 플래그와 현재 base_version으로 A.refs를 [C]로 변경"
+      ],
+      "expected": [
+        "A→B 신규 등록을 깊이 위반으로 거부하지 않음",
+        "A→C 변경을 허용하되 내용 새 version·과거본 보존 등 기존 계약 유지",
+        "최종 관계에 손자가 없고 로드가 현재 직접 자식을 전개함",
+        "다중 부모 허용 등 이 사례와 무관한 새 계약을 요구하지 않음"
+      ],
+      "evidence": [
+        "요청 전후 관계·내용/version/최신 포인터·결과 비교",
+        "실제 서비스 테스트 위치와 I-15 연결"
+      ],
+      "decision_dependencies": [
+        "D-02",
+        "D-04",
+        "D-06"
+      ]
+    }
+  ],
+  "note": "R-ID를 추가하지 않았다. 자동 검증은 팀이 구현한 실제 서비스/처리기에 연결한다. 보안/설명/불변조건도 관련 R에 연결하되 추가 근거를 유지한다. D-xx는 계약 빈칸이며 docs/contract-decisions.md 참조."
+}
