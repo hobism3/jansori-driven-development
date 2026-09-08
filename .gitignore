@@ -1,0 +1,6 @@
+# Local-only Claude Code settings
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
