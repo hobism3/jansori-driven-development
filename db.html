@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>DB — jansori-data.json</title>
+<title>잔소리는 어디에 쌓이는가 — Jansori Plugin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
   --font-sans:'Pretendard','Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   --font-mono:'Fira Code',monospace;
   --font-display:'Archivo Black','Pretendard','Inter',sans-serif;
-  --hdr-h:113px;
+  --hdr-h:115px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:17px;scroll-behavior:smooth}
@@ -41,9 +41,9 @@ header{padding:0;background:var(--bg);border-bottom:4px solid #111;position:stic
 a.logo{display:flex;align-items:center;gap:10px;font-size:1.25rem;text-decoration:none;color:inherit;white-space:nowrap}
 .logo span.badge{font-size:.7rem;background:var(--primary);color:#fff;border:2px solid #111;padding:3px 8px;font-weight:700;letter-spacing:0}
 a.logo:hover span.badge{background:#111}
-/* 1단 = 페이지 전환(소개글/DB/시연 영상), 2단 = 이 페이지 안의 목차 */
-.nav-main{display:flex;gap:10px;font-size:.92rem;font-weight:700}
-.nav-main a{text-decoration:none;color:var(--text-muted);padding:4px 13px;border:2px solid transparent;transition:color .2s}
+/* 1단 = 페이지 전환, 2단 = 이 페이지 안의 목차 */
+.nav-main{display:flex;gap:10px;font-size:.92rem;font-weight:700;flex:none}
+.nav-main a{text-decoration:none;color:var(--text-muted);padding:4px 13px;border:2px solid transparent;white-space:nowrap;transition:color .2s}
 .nav-main a:hover{color:#111;border-color:#111}
 .nav-main a.here{background:#111;color:#fdf6e3;border-color:#111}
 .nav-sub-bar{border-top:2px solid #111;background:#fff}
@@ -52,79 +52,106 @@ a.logo:hover span.badge{background:#111}
 .nav-sub::-webkit-scrollbar{display:none}
 .nav-sub a{text-decoration:none;color:inherit;white-space:nowrap;padding-bottom:2px;border-bottom:2px solid transparent;transition:color .2s}
 .nav-sub a:hover{color:#111;border-bottom-color:#111}
-.nav-main a{white-space:nowrap}
-@media(max-width:560px){.nav-main{gap:2px;font-size:.8rem}.nav-main a{padding:4px 7px}
-  .logo{font-size:1.02rem;gap:6px}.logo span.badge{font-size:.62rem;padding:2px 5px}}
+/* 탭 이름이 길어 좁은 화면에서는 로고 아래로 내려 가로 스크롤시킨다 */
+@media(max-width:860px){
+  .nav-inner{flex-direction:column;align-items:flex-start;gap:10px}
+  .nav-main{width:100%;overflow-x:auto;scrollbar-width:none}
+  .nav-main::-webkit-scrollbar{display:none}
+}
+@media(max-width:560px){
+  .nav-main{gap:2px;font-size:.8rem}.nav-main a{padding:4px 7px}
+  .logo{font-size:1.02rem;gap:6px}.logo span.badge{font-size:.62rem;padding:2px 5px}
+}
 
 /* ---------- 페이지 타이틀 ---------- */
 .page-head{padding:44px 0 30px}
 .eyebrow{font-family:var(--font-mono);font-size:.8rem;color:var(--primary);display:block;margin-bottom:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
 .page-head h1{font-size:clamp(2rem,4.6vw,3rem);line-height:1.1;margin-bottom:14px}
-.page-head p{color:var(--text-muted);max-width:760px}
-.src{font-family:var(--font-mono);font-size:.8rem;background:#111;color:#fdf6e3;padding:3px 9px;display:inline-block;margin-top:14px}
+.page-head p{color:var(--text-muted);max-width:780px}
+
+/* 실시간 연동 표시 */
+.sync{display:inline-flex;align-items:center;gap:9px;font-family:var(--font-mono);font-size:.76rem;
+  border:2px solid #111;background:#fff;padding:5px 11px;margin-top:16px;font-weight:600}
+.sync .led{width:9px;height:9px;background:var(--accent-emerald);flex:none}
+.sync.off .led{background:var(--text-muted)}
+.sync.hit{background:var(--primary);color:#fff}
+.sync.hit .led{background:#fff}
 
 /* ---------- 지표 타일 ---------- */
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:56px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:20px;margin-bottom:56px}
 .metric{background:var(--card-bg);border:3px solid #111;box-shadow:6px 6px 0 #111;padding:20px 22px}
-.metric .k{font-family:var(--font-mono);font-size:.74rem;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.metric .k{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
 .metric .v{font-family:var(--font-display);font-size:2.3rem;line-height:1.1;margin-top:6px}
 .metric.hl{box-shadow:6px 6px 0 var(--primary)}
 .metric.hl .v{color:var(--primary)}
 
 /* ---------- 섹션 ---------- */
 section{margin-bottom:72px}
-.sec-title{display:flex;align-items:baseline;gap:14px;border-bottom:3px solid #111;padding-bottom:10px;margin-bottom:28px;flex-wrap:wrap}
+.sec-title{display:flex;align-items:baseline;gap:14px;border-bottom:3px solid #111;padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap}
 .sec-title h2{font-size:1.5rem}
 .sec-title .cnt{font-family:var(--font-mono);font-size:.8rem;background:#111;color:#fdf6e3;padding:2px 8px}
+.sec-note{color:var(--text-muted);font-size:.9rem;margin-bottom:28px}
 
-/* ---------- 캡슐 카드 ---------- */
+/* ---------- 캡슐: 현재 상태 ---------- */
 .capsule{background:var(--card-bg);border:3px solid #111;box-shadow:6px 6px 0 #111;margin-bottom:40px}
-.cap-head{border-bottom:3px solid #111;padding:22px 24px;background:#fff}
+.cap-head{border-bottom:3px solid #111;padding:22px 24px}
 .cap-id{font-family:var(--font-mono);font-size:.78rem;background:var(--accent-purple);color:#fff;border:2px solid #111;padding:3px 9px;display:inline-block;margin-bottom:12px}
 .cap-head h3{font-family:var(--font-display);font-size:1.5rem;letter-spacing:-1px;line-height:1.2}
 .cap-desc{color:var(--text-muted);margin-top:8px}
 .cap-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
 .chip{font-family:var(--font-mono);font-size:.74rem;border:2px solid #111;padding:2px 8px;background:#fdf6e3;font-weight:600}
 .chip.ver{background:var(--primary);color:#fff}
-.chip.nag{background:var(--accent-emerald);color:#fff}
+.chip.pend{background:var(--accent-emerald);color:#fff}
+.chip.zero{background:#fdf6e3;color:var(--text-muted)}
 .cap-body{padding:24px}
 .sub{font-family:var(--font-mono);font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:10px}
 .body-pre{font-family:var(--font-mono);font-size:.83rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;background:#111;color:#e2e8f0;padding:20px;overflow-x:auto}
 .body-pre .num{color:var(--primary);font-weight:600}
+.empty-note{border:3px dashed #111;padding:14px 16px;font-size:.9rem;color:var(--text-muted);background:#fdf6e3}
 
-/* ---------- 교정(잔소리) ---------- */
-.corr-list{list-style:none;margin-top:28px}
-.corr{border:3px solid #111;background:#fff;box-shadow:4px 4px 0 var(--accent-emerald);padding:16px 18px;margin-bottom:16px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
-.corr-seq{font-family:var(--font-display);font-size:1.5rem;background:#111;color:#fdf6e3;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex:none}
-.corr-text{font-size:.95rem}
-.corr-foot{font-family:var(--font-mono);font-size:.7rem;color:var(--text-muted);margin-top:10px;word-break:break-all}
+/* 대기 중인 교정 */
+.corr{border:3px solid #111;background:#fff;box-shadow:4px 4px 0 var(--accent-emerald);padding:16px 18px;margin-bottom:14px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.corr-seq{font-family:var(--font-display);font-size:1.4rem;background:#111;color:#fdf6e3;width:42px;height:42px;display:flex;align-items:center;justify-content:center;flex:none}
+.corr-foot{font-family:var(--font-mono);font-size:.7rem;color:var(--text-muted);margin-top:9px;word-break:break-all}
 @media(max-width:560px){.corr{grid-template-columns:1fr}}
 
-/* ---------- 히스토리 ---------- */
+/* ---------- 히스토리: 변화만 ---------- */
 .hist{border:3px solid #111;background:#fff;box-shadow:6px 6px 0 #111;margin-bottom:32px}
 .hist-head{background:#111;color:#fdf6e3;padding:12px 18px;font-family:var(--font-mono);font-size:.82rem;font-weight:600}
-.hist-row{border-bottom:2px solid #111;padding:14px 18px}
+.hist-row{border-bottom:2px solid #111;padding:18px}
 .hist-row:last-child{border-bottom:none}
-.hist-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hist-top{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:14px}
 .hist-no{font-family:var(--font-display);font-size:1.05rem;background:#fdf6e3;border:2px solid #111;padding:1px 10px}
-.origin{font-family:var(--font-mono);font-size:.72rem;border:2px solid #111;padding:2px 8px;font-weight:600}
+.origin{font-family:var(--font-mono);font-size:.72rem;border:2px solid #111;padding:2px 8px;font-weight:600;text-transform:uppercase}
 .origin.register{background:var(--accent-cyan);color:#fff}
 .origin.nag{background:var(--primary);color:#fff}
+.origin.normalize{background:var(--accent-purple);color:#fff}
+.origin.other{background:#fdf6e3;color:#111}
+.what{font-size:.9rem;font-weight:700}
 .hist-when{font-family:var(--font-mono);font-size:.74rem;color:var(--text-muted);margin-left:auto}
-details.snap{margin-top:10px}
-details.snap summary{font-family:var(--font-mono);font-size:.76rem;cursor:pointer;color:var(--text-muted);font-weight:600;list-style:none;display:inline-block;border:2px solid #111;padding:2px 9px;background:#fdf6e3}
-details.snap summary::-webkit-details-marker{display:none}
-details.snap summary:hover{background:var(--primary);color:#fff}
-details.snap[open] summary{background:#111;color:#fdf6e3}
-details.snap .body-pre{margin-top:12px;font-size:.78rem}
+@media(max-width:560px){.hist-when{margin-left:0;width:100%}}
+.hist-req{font-family:var(--font-mono);font-size:.7rem;color:var(--text-muted);margin-top:12px;word-break:break-all}
 
-/* ---------- 원본 JSON ---------- */
-details.raw{border:3px solid #111;box-shadow:6px 6px 0 #111;background:#fff}
-details.raw summary{font-family:var(--font-display);font-size:1rem;padding:16px 20px;cursor:pointer;list-style:none}
-details.raw summary::-webkit-details-marker{display:none}
-details.raw summary::after{content:" \25BE";color:var(--primary)}
-details.raw[open] summary{border-bottom:3px solid #111}
-details.raw pre{font-family:var(--font-mono);font-size:.76rem;line-height:1.6;background:#111;color:#e2e8f0;padding:20px;overflow-x:auto;max-height:560px}
+/* 변경 내용 블록 */
+.change{border-left:6px solid #111;padding-left:16px}
+.change .sub{margin-bottom:8px}
+.nag-text{border:3px solid #111;background:#fff;box-shadow:4px 4px 0 var(--primary);padding:14px 16px;font-size:.95rem}
+.d-skip{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);padding:5px 0 5px 12px;border-left:3px dashed #bbb;margin:6px 0}
+.dline{font-family:var(--font-mono);font-size:.8rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;padding:6px 12px 6px 30px;position:relative;border:2px solid #111;margin-bottom:6px}
+.dline::before{position:absolute;left:9px;top:6px;font-weight:700}
+.dline.del{background:#fdeaef;border-color:var(--accent-rose)}
+.dline.del::before{content:"−";color:var(--accent-rose)}
+.dline.add{background:#e8f6ee;border-color:var(--accent-emerald)}
+.dline.add::before{content:"+";color:var(--accent-emerald)}
+mark.w-del{background:#f9c2d0;color:#7a0b26;text-decoration:line-through;padding:0 1px}
+mark.w-add{background:#a7e8c0;color:#0a4a25;padding:0 1px}
+details.more{margin-top:12px}
+details.more summary{font-family:var(--font-mono);font-size:.74rem;cursor:pointer;color:var(--text-muted);font-weight:600;
+  list-style:none;display:inline-block;border:2px solid #111;padding:2px 9px;background:#fdf6e3}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary:hover{background:var(--primary);color:#fff}
+details.more[open] summary{background:#111;color:#fdf6e3}
+details.more .body-pre{margin-top:12px;font-size:.78rem}
 
 .load-msg{font-family:var(--font-mono);font-size:.85rem;padding:20px;border:3px dashed #111}
 footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text-muted);font-size:.88rem}
@@ -137,25 +164,25 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
     <a class="logo" href="index.html">⚡ Jansori <span class="badge">NDD Engine</span></a>
     <nav class="nav-main">
       <a href="index.html">소개글</a>
-      <a href="db.html" class="here">DB</a>
+      <a href="db.html" class="here">잔소리는 어디에 쌓이는가</a>
       <a href="demo.html">시연 영상</a>
     </nav>
   </div>
   <div class="nav-sub-bar">
     <nav class="container nav-sub">
-      <a href="#capsules">Capsules</a>
-      <a href="#history">History</a>
-      <a href="#raw">원본 JSON</a>
+      <a href="#capsule">Capsule — 현재 상태</a>
+      <a href="#history">History — 변화만</a>
     </nav>
   </div>
 </header>
 
 <div class="container">
   <div class="page-head">
-    <span class="eyebrow">Capsule Store Snapshot</span>
+    <span class="eyebrow">Capsule Store</span>
     <h1>잔소리는 어디에 쌓이는가</h1>
-    <p>Jansori 서버가 들고 있는 Capsule Store의 스냅샷입니다. 사람이 한 번 한 잔소리가 <strong>교정(correction)</strong>으로 캡슐에 박히고, 캡슐은 버전을 올리며 히스토리를 남깁니다. 아래는 그 파일을 그대로 펼쳐 놓은 것입니다.</p>
-    <div class="src">jansori-data.json</div>
+    <p>사람이 한 번 한 잔소리는 <strong>correction</strong>으로 캡슐에 적립되고, <strong>normalize</strong>에서 본문(body)에 접혀 들어갑니다.
+       아래 <strong>Capsule</strong>은 지금 이 순간의 상태를, <strong>History</strong>는 매 단계에서 <em>바뀐 것만</em> 보여줍니다.</p>
+    <div class="sync off" id="sync"><span class="led"></span><span id="sync-text">불러오는 중…</span></div>
   </div>
 
   <div id="app"><div class="load-msg">데이터를 불러오는 중…</div></div>
@@ -175,34 +202,9 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
       "skill_id": "pick-team-dinner-venue",
       "name": "회식 장소 고르기",
       "description": "팀 규모·지역·예산·선호를 반영해 회식 장소를 고르는 절차",
-      "body": "팀 회식 장소를 고를 때 다음 절차를 따른다.\n\n1. 입력 조건 정리: 팀 규모(인원 수), 지역/접근성, 1인 예산, 회식 성격(가벼운/격식), 술·메뉴 선호를 먼저 확인한다. 누락된 조건은 가정을 명시하거나 사용자에게 질문한다.\n2. 선정 기준을 명시한다. 기본 4대 기준: (a) 단체석 수용력 — 전체 인원이 한 테이블/붙은 공간에 앉을 수 있는가, (b) 대화 가능성 — 소음 수준, (c) 메뉴 무난함 — 호불호·술 궁합, (d) 접근성과 비용 — 지역 도보권·예산대.\n3. 후보 3곳을 제시한다. 각 후보마다 장점과 단점을 함께 정리한다.\n4. 최종 추천 1곳을 선정하고 이유를 선정 기준과 연결해 설명한다.\n5. 팀 성격에 따른 대안을 함께 제시한다(예: 격식 자리 / 캐주얼 자리).\n6. 실시간 예약·영업 정보는 확인 불가할 수 있으므로, 예약 전 전화로 단체석·영업시간 확인을 권고한다.",
-      "version": 4,
-      "corrections": [
-        {
-          "id": "5850939f-bbe9-4028-8610-cab578907eb5",
-          "target": "pick-team-dinner-venue",
-          "instruction_text": "후보를 카테고리(고깃집/한정식 등)로만 제시하지 말고, 반드시 검증 가능한 실제 상호명을 제시할 것. 상호를 특정할 수 없으면 웹 검색 등으로 확인하고, 그래도 불확실하면 불확실하다고 명시하되 구체적 후보 상호를 최소 3곳 제시한다.",
-          "request_id": "0afb7f38-2e9e-4444-ac9b-2ee57ef5015e",
-          "seq": 1,
-          "created_at": 1788917667.3497038
-        },
-        {
-          "id": "6c57624a-b36e-4ccf-8557-401cf8163afd",
-          "target": "pick-team-dinner-venue",
-          "instruction_text": "1인 예산은 회사 회의비/식대 규정 기준으로 반드시 확인·반영한다(예: 인당 4.5만 원). 각 후보마다 해당 예산 대비 인당 예상 비용과 예산 내 소화 가능 여부(여유/경계선/초과)를 명시하고, 예산에 가장 안전하게 맞는 곳을 우선 추천한다.",
-          "request_id": "0337e3ec-5252-449f-955d-f76ecdd154c3",
-          "seq": 2,
-          "created_at": 1788917786.789389
-        },
-        {
-          "id": "1a61a7c5-49bc-4bee-a274-35a3b6c66641",
-          "target": "pick-team-dinner-venue",
-          "instruction_text": "가게를 추천할 때는 반드시 각 가게의 상세정보 링크(네이버지도 등)를 함께 첨부해 사용자가 상세정보를 바로 확인할 수 있게 한다.",
-          "request_id": "4af5f67f-04ab-4717-b7ca-83901b0e6905",
-          "seq": 3,
-          "created_at": 1788919007.284832
-        }
-      ],
+      "body": "팀 회식 장소를 고를 때 다음 절차를 따른다.\n\n1. 입력 조건 정리: 팀 규모(인원 수), 지역/접근성, 1인 예산, 회식 성격(가벼운/격식), 술·메뉴 선호를 먼저 확인한다. 1인 예산은 회사 회의비/식대 규정 기준으로 반드시 확인·반영한다(예: 인당 4.5만 원). 누락된 조건은 가정을 명시하거나 사용자에게 질문한다.\n2. 선정 기준(기본 4대): (a) 단체석 수용력 — 전원이 붙은 공간에 앉을 수 있는가, (b) 대화 가능성 — 소음 수준, (c) 메뉴 무난함 — 호불호·술 궁합, (d) 접근성·비용 — 도보권·예산대.\n3. 후보 3곳을 제시한다. 카테고리(고깃집/한정식 등)로만 제시하지 말고 반드시 검증 가능한 실제 상호명을 제시한다. 상호를 특정하기 어려우면 웹 검색 등으로 확인하고, 그래도 불확실하면 불확실하다고 명시하되 구체적 상호를 최소 3곳 제시한다. 각 후보마다 장단점, 예산 대비 인당 예상 비용과 소화 가능 여부(여유/경계선/초과), 그리고 상세정보 링크(네이버지도 등)를 함께 제시한다.\n4. 최종 추천 1곳을 선정하고 이유를 선정 기준과 연결해 설명하되, 예산에 가장 안전하게 맞는 곳을 우선 추천한다.\n5. 팀 성격에 따른 대안을 함께 제시한다(격식 자리 / 캐주얼 자리).\n6. 실시간 예약·영업 정보는 확인 불가할 수 있으므로, 예약 전 전화로 단체석·영업시간 확인을 권고한다.",
+      "version": 5,
+      "corrections": [],
       "refs_children": [],
       "assets": [],
       "protected_fields": [
@@ -212,7 +214,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
         "protected_fields"
       ],
       "created_at": 1788917446.1386619,
-      "updated_at": 1788919007.284832
+      "updated_at": 1788921785.4208934
     }
   ],
   "history": {
@@ -244,6 +246,13 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
         "request_id": "4af5f67f-04ab-4717-b7ca-83901b0e6905",
         "origin": "nag",
         "created_at": 1788919007.284832
+      },
+      {
+        "number": 5,
+        "body_snapshot": "팀 회식 장소를 고를 때 다음 절차를 따른다.\n\n1. 입력 조건 정리: 팀 규모(인원 수), 지역/접근성, 1인 예산, 회식 성격(가벼운/격식), 술·메뉴 선호를 먼저 확인한다. 1인 예산은 회사 회의비/식대 규정 기준으로 반드시 확인·반영한다(예: 인당 4.5만 원). 누락된 조건은 가정을 명시하거나 사용자에게 질문한다.\n2. 선정 기준(기본 4대): (a) 단체석 수용력 — 전원이 붙은 공간에 앉을 수 있는가, (b) 대화 가능성 — 소음 수준, (c) 메뉴 무난함 — 호불호·술 궁합, (d) 접근성·비용 — 도보권·예산대.\n3. 후보 3곳을 제시한다. 카테고리(고깃집/한정식 등)로만 제시하지 말고 반드시 검증 가능한 실제 상호명을 제시한다. 상호를 특정하기 어려우면 웹 검색 등으로 확인하고, 그래도 불확실하면 불확실하다고 명시하되 구체적 상호를 최소 3곳 제시한다. 각 후보마다 장단점, 예산 대비 인당 예상 비용과 소화 가능 여부(여유/경계선/초과), 그리고 상세정보 링크(네이버지도 등)를 함께 제시한다.\n4. 최종 추천 1곳을 선정하고 이유를 선정 기준과 연결해 설명하되, 예산에 가장 안전하게 맞는 곳을 우선 추천한다.\n5. 팀 성격에 따른 대안을 함께 제시한다(격식 자리 / 캐주얼 자리).\n6. 실시간 예약·영업 정보는 확인 불가할 수 있으므로, 예약 전 전화로 단체석·영업시간 확인을 권고한다.",
+        "request_id": "restore-normalize-utf8",
+        "origin": "normalize",
+        "created_at": 1788921785.4208934
       }
     ]
   }
@@ -252,141 +261,254 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
 <script>
 (function(){
   var app = document.getElementById('app');
+  var syncEl = document.getElementById('sync');
+  var syncText = document.getElementById('sync-text');
+  var POLL_MS = 4000;
+  var lastRaw = null, live = false, hitTimer = null;
 
   function esc(s){
     return String(s).replace(/[&<>"']/g, function(c){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
   }
-  // 에폭 초 -> 사람이 읽는 시각
   function when(ts){
     if(typeof ts !== 'number') return '—';
-    var d = new Date(ts * 1000);
-    var p = function(n){ return String(n).padStart(2,'0'); };
+    var d = new Date(ts*1000), p = function(n){ return String(n).padStart(2,'0'); };
     return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
   }
-  // 절차 본문의 선두 번호에 색을 준다
-  function bodyHtml(text){
-    return esc(text).replace(/^(\d+\.)/gm, '<span class="num">$1</span>');
+  function clock(){
+    var d = new Date(), p = function(n){ return String(n).padStart(2,'0'); };
+    return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+  }
+  function bodyHtml(t){ return esc(t).replace(/^(\d+\.)/gm, '<span class="num">$1</span>'); }
+
+  /* ── LCS 기반 시퀀스 비교. 줄 단위로 한 번, 바뀐 줄 안에서 단어 단위로 한 번 더 ── */
+  function diffSeq(a, b){
+    var n = a.length, m = b.length, i, j;
+    var dp = []; for(i=0;i<=n;i++) dp.push(new Int32Array(m+1));
+    for(i=n-1;i>=0;i--) for(j=m-1;j>=0;j--)
+      dp[i][j] = a[i]===b[j] ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
+    var ops = []; i=0; j=0;
+    while(i<n && j<m){
+      if(a[i]===b[j]){ ops.push({t:'=',v:a[i]}); i++; j++; }
+      else if(dp[i+1][j] >= dp[i][j+1]){ ops.push({t:'-',v:a[i]}); i++; }
+      else { ops.push({t:'+',v:b[j]}); j++; }
+    }
+    while(i<n) ops.push({t:'-',v:a[i++]});
+    while(j<m) ops.push({t:'+',v:b[j++]});
+    return ops;
+  }
+  function wordDiff(oldLine, newLine){
+    var ops = diffSeq(oldLine.split(/(\s+)/), newLine.split(/(\s+)/));
+    var del = '', add = '';
+    ops.forEach(function(o){
+      if(o.t === '='){ del += esc(o.v); add += esc(o.v); }
+      else if(o.t === '-'){ if(o.v.trim()) del += '<mark class="w-del">'+esc(o.v)+'</mark>'; else del += esc(o.v); }
+      else { if(o.v.trim()) add += '<mark class="w-add">'+esc(o.v)+'</mark>'; else add += esc(o.v); }
+    });
+    return {del:del, add:add};
+  }
+  // 바뀐 줄만 낸다. 그대로인 줄은 "변경 없음 N줄" 로 접는다
+  function renderBodyDiff(oldText, newText){
+    var ops = diffSeq(oldText.split('\n'), newText.split('\n'));
+    var html = '', same = 0, i = 0;
+    function flushSame(){ if(same){ html += '<div class="d-skip">변경 없음 '+same+'줄</div>'; same = 0; } }
+    while(i < ops.length){
+      if(ops[i].t === '='){ if(ops[i].v.trim()) same++; i++; continue; }
+      flushSame();
+      var dels = [], adds = [];
+      while(i<ops.length && ops[i].t === '-'){ if(ops[i].v.trim()) dels.push(ops[i].v); i++; }
+      while(i<ops.length && ops[i].t === '+'){ if(ops[i].v.trim()) adds.push(ops[i].v); i++; }
+      if(dels.length && dels.length === adds.length){
+        // 같은 수로 짝지어지면 줄 안에서 무엇이 달라졌는지까지 보여준다
+        dels.forEach(function(d, k){
+          var w = wordDiff(d, adds[k]);
+          html += '<div class="dline del">'+w.del+'</div><div class="dline add">'+w.add+'</div>';
+        });
+      } else {
+        dels.forEach(function(d){ html += '<div class="dline del">'+esc(d)+'</div>'; });
+        adds.forEach(function(a){ html += '<div class="dline add">'+esc(a)+'</div>'; });
+      }
+    }
+    flushSame();
+    return html || '<div class="empty-note">본문 변화 없음</div>';
   }
 
+  /* ── Capsule: 현재 상태 ── */
   function renderCapsule(c){
     var corr = c.corrections || [];
-    var h = '';
-    h += '<article class="capsule">';
-    h +=   '<div class="cap-head">';
-    h +=     '<div class="cap-id">' + esc(c.skill_id) + '</div>';
-    h +=     '<h3>' + esc(c.name || c.skill_id) + '</h3>';
-    if(c.description) h += '<p class="cap-desc">' + esc(c.description) + '</p>';
-    h +=     '<div class="cap-meta">';
-    h +=       '<span class="chip ver">v' + esc(c.version) + '</span>';
-    h +=       '<span class="chip nag">잔소리 ' + corr.length + '건</span>';
-    h +=       '<span class="chip">등록 ' + when(c.created_at) + '</span>';
-    h +=       '<span class="chip">최종 갱신 ' + when(c.updated_at) + '</span>';
-    if((c.refs_children||[]).length) h += '<span class="chip">자식 ' + c.refs_children.length + '</span>';
-    if((c.assets||[]).length) h += '<span class="chip">에셋 ' + c.assets.length + '</span>';
-    h +=     '</div>';
+    var h = '<article class="capsule">';
+    h += '<div class="cap-head">';
+    h +=   '<div class="cap-id">'+esc(c.skill_id)+'</div>';
+    h +=   '<h3>'+esc(c.name || c.skill_id)+'</h3>';
+    if(c.description) h += '<p class="cap-desc">'+esc(c.description)+'</p>';
+    h +=   '<div class="cap-meta">';
+    h +=     '<span class="chip ver">v'+esc(c.version)+'</span>';
+    h +=     '<span class="chip '+(corr.length?'pend':'zero')+'">대기 중 잔소리 '+corr.length+'건</span>';
+    h +=     '<span class="chip">등록 '+when(c.created_at)+'</span>';
+    h +=     '<span class="chip">최종 갱신 '+when(c.updated_at)+'</span>';
     h +=   '</div>';
-    h +=   '<div class="cap-body">';
-    h +=     '<div class="sub">Body — 현재 유효한 절차</div>';
-    h +=     '<div class="body-pre">' + bodyHtml(c.body || '') + '</div>';
+    h += '</div>';
+    h += '<div class="cap-body">';
+    h +=   '<div class="sub">Body — 지금 주입되는 절차</div>';
+    h +=   '<div class="body-pre">'+bodyHtml(c.body || '')+'</div>';
 
+    h +=   '<div class="sub" style="margin-top:28px">Corrections — 아직 본문에 안 접힌 잔소리</div>';
     if(corr.length){
-      h += '<ul class="corr-list">';
-      h +=   '<li class="sub" style="list-style:none;margin-top:28px">Corrections — 이 캡슐에 박힌 잔소리</li>';
       corr.forEach(function(x){
-        h += '<li class="corr">';
-        h +=   '<div class="corr-seq">' + esc(x.seq) + '</div>';
-        h +=   '<div>';
-        h +=     '<div class="corr-text">' + esc(x.instruction_text) + '</div>';
-        h +=     '<div class="corr-foot">' + when(x.created_at) + ' · id ' + esc(x.id) + ' · request ' + esc(x.request_id) + '</div>';
-        h +=   '</div>';
-        h += '</li>';
+        h += '<div class="corr"><div class="corr-seq">'+esc(x.seq)+'</div><div>'
+          +  '<div>'+esc(x.instruction_text)+'</div>'
+          +  '<div class="corr-foot">'+when(x.created_at)+' · request '+esc(x.request_id)+'</div>'
+          +  '</div></div>';
       });
-      h += '</ul>';
+    } else {
+      h += '<div class="empty-note">비어 있습니다. 쌓였던 잔소리는 normalize에서 본문에 반영되어 목록이 정리된 상태입니다.</div>';
     }
 
     if((c.protected_fields||[]).length){
       h += '<div class="sub" style="margin-top:28px">Protected fields — 잔소리로도 못 바꾸는 칸</div>';
       h += '<div class="cap-meta" style="margin-top:0">';
-      c.protected_fields.forEach(function(f){ h += '<span class="chip">' + esc(f) + '</span>'; });
+      c.protected_fields.forEach(function(f){ h += '<span class="chip">'+esc(f)+'</span>'; });
       h += '</div>';
     }
-
-    h +=   '</div>';
-    h += '</article>';
+    h += '</div></article>';
     return h;
   }
 
-  function renderHistory(skillId, rows){
-    var h = '';
-    h += '<div class="hist">';
-    h +=   '<div class="hist-head">' + esc(skillId) + ' — ' + rows.length + ' versions</div>';
-    rows.forEach(function(r){
-      h += '<div class="hist-row">';
-      h +=   '<div class="hist-top">';
-      h +=     '<span class="hist-no">#' + esc(r.number) + '</span>';
-      h +=     '<span class="origin ' + (r.origin === 'nag' ? 'nag' : 'register') + '">' + esc(r.origin) + '</span>';
-      h +=     '<span class="hist-when">' + when(r.created_at) + '</span>';
-      h +=   '</div>';
-      h +=   '<details class="snap"><summary>body 스냅샷 보기</summary>';
-      h +=     '<div class="body-pre">' + bodyHtml(r.body_snapshot || '') + '</div>';
-      h +=   '</details>';
-      h += '</div>';
+  /* ── History: 각 단계에서 바뀐 것만 ── */
+  function renderHistory(skillId, rows, capsule){
+    // nag 는 request_id 로 캡슐에 남아 있는 correction 을 되찾는다
+    var byReq = {};
+    (capsule && capsule.corrections || []).forEach(function(x){ byReq[x.request_id] = x; });
+
+    var h = '<div class="hist"><div class="hist-head">'+esc(skillId)+' — '+rows.length+' events</div>';
+    rows.forEach(function(r, i){
+      var prev = i > 0 ? rows[i-1] : null;
+      var changed = prev ? (r.body_snapshot !== prev.body_snapshot) : true;
+      var origin = r.origin || 'other';
+      var cls = ['register','nag','normalize'].indexOf(origin) >= 0 ? origin : 'other';
+
+      var what, block;
+      if(origin === 'register'){
+        what = '캡슐 최초 등록 — 본문이 처음 만들어졌습니다';
+        block = '<div class="change"><div class="sub">등록된 Body</div>'
+              + '<div class="body-pre">'+bodyHtml(r.body_snapshot||'')+'</div></div>';
+      } else if(origin === 'nag'){
+        var c = byReq[r.request_id];
+        what = '잔소리 적립 — 본문은 그대로입니다';
+        block = '<div class="change"><div class="sub">추가된 Correction</div>';
+        if(c){
+          block += '<div class="nag-text">'+esc(c.instruction_text)+'</div>';
+        } else {
+          block += '<div class="empty-note">이 잔소리의 원문은 캡슐에 남아 있지 않습니다. 이후 normalize에서 본문에 반영되면서 corrections 목록이 비워졌기 때문입니다.</div>';
+        }
+        if(changed){
+          block += '<div class="sub" style="margin-top:16px">본문도 함께 바뀜</div>' + renderBodyDiff(prev.body_snapshot, r.body_snapshot);
+        }
+        block += '</div>';
+      } else if(origin === 'normalize'){
+        what = '정리 — 쌓인 잔소리가 본문에 접혀 들어갔습니다';
+        block = '<div class="change"><div class="sub">Body 변경분</div>'
+              + (prev ? renderBodyDiff(prev.body_snapshot, r.body_snapshot)
+                      : '<div class="body-pre">'+bodyHtml(r.body_snapshot||'')+'</div>')
+              + '<details class="more"><summary>정리된 본문 전체 보기</summary>'
+              + '<div class="body-pre">'+bodyHtml(r.body_snapshot||'')+'</div></details></div>';
+      } else {
+        what = changed ? '본문이 바뀌었습니다' : '본문 변화 없음';
+        block = '<div class="change">'
+              + (changed ? renderBodyDiff(prev.body_snapshot, r.body_snapshot)
+                         : '<div class="empty-note">기록만 남고 본문은 그대로입니다.</div>')
+              + '</div>';
+      }
+
+      h += '<div class="hist-row">'
+        +    '<div class="hist-top">'
+        +      '<span class="hist-no">#'+esc(r.number)+'</span>'
+        +      '<span class="origin '+cls+'">'+esc(origin)+'</span>'
+        +      '<span class="what">'+what+'</span>'
+        +      '<span class="hist-when">'+when(r.created_at)+'</span>'
+        +    '</div>'
+        +    block
+        +    '<div class="hist-req">request '+esc(r.request_id)+'</div>'
+        +  '</div>';
     });
-    h += '</div>';
-    return h;
+    return h + '</div>';
   }
 
   function render(data){
-    var capsules = data.capsules || [];
-    var history = data.history || {};
-    var totalCorr = capsules.reduce(function(n,c){ return n + (c.corrections||[]).length; }, 0);
-    var totalVer = Object.keys(history).reduce(function(n,k){ return n + history[k].length; }, 0);
+    var capsules = data.capsules || [], history = data.history || {};
+    var byId = {}; capsules.forEach(function(c){ byId[c.skill_id] = c; });
+    var events = Object.keys(history).reduce(function(n,k){ return n + history[k].length; }, 0);
+    // 누적 잔소리는 corrections 가 아니라 history 의 nag 이벤트로 센다(정리 뒤에도 남으므로)
+    var nags = Object.keys(history).reduce(function(n,k){
+      return n + history[k].filter(function(r){ return r.origin === 'nag'; }).length; }, 0);
+    var ver = capsules.length ? capsules[0].version : '—';
 
-    var h = '';
-    h += '<div class="metrics">';
-    h +=   '<div class="metric"><div class="k">snapshot version</div><div class="v">' + esc(data.snapshot_version) + '</div></div>';
-    h +=   '<div class="metric"><div class="k">capsules</div><div class="v">' + capsules.length + '</div></div>';
-    h +=   '<div class="metric hl"><div class="k">쌓인 잔소리</div><div class="v">' + totalCorr + '</div></div>';
-    h +=   '<div class="metric"><div class="k">기록된 버전</div><div class="v">' + totalVer + '</div></div>';
+    var h = '<div class="metrics">';
+    h +=   '<div class="metric"><div class="k">capsules</div><div class="v">'+capsules.length+'</div></div>';
+    h +=   '<div class="metric"><div class="k">현재 버전</div><div class="v">v'+esc(ver)+'</div></div>';
+    h +=   '<div class="metric hl"><div class="k">누적 잔소리</div><div class="v">'+nags+'</div></div>';
+    h +=   '<div class="metric"><div class="k">기록된 변화</div><div class="v">'+events+'</div></div>';
     h += '</div>';
 
-    h += '<section id="capsules">';
-    h +=   '<div class="sec-title"><h2>Capsules</h2><span class="cnt">' + capsules.length + '</span></div>';
+    h += '<section id="capsule">';
+    h +=   '<div class="sec-title"><h2>Capsule</h2><span class="cnt">현재 상태</span></div>';
+    h +=   '<p class="sec-note">지금 이 캡슐이 들고 있는 값입니다. 새 세션에 주입되는 것은 아래 Body입니다.</p>';
     h +=   (capsules.length ? capsules.map(renderCapsule).join('') : '<div class="load-msg">캡슐이 없습니다.</div>');
     h += '</section>';
 
     var keys = Object.keys(history);
     h += '<section id="history">';
-    h +=   '<div class="sec-title"><h2>History</h2><span class="cnt">' + totalVer + ' versions</span></div>';
-    h +=   (keys.length ? keys.map(function(k){ return renderHistory(k, history[k]); }).join('') : '<div class="load-msg">히스토리가 없습니다.</div>');
-    h += '</section>';
-
-    h += '<section id="raw">';
-    h +=   '<details class="raw"><summary>원본 JSON 보기</summary><pre>' + esc(JSON.stringify(data, null, 2)) + '</pre></details>';
+    h +=   '<div class="sec-title"><h2>History</h2><span class="cnt">'+events+' events</span></div>';
+    h +=   '<p class="sec-note">각 단계에서 <strong>바뀐 것만</strong> 보여줍니다. register는 등록된 본문을, nag는 적립된 잔소리를, normalize는 본문의 변경분을 냅니다.</p>';
+    h +=   (keys.length ? keys.map(function(k){ return renderHistory(k, history[k], byId[k]); }).join('')
+                        : '<div class="load-msg">기록이 없습니다.</div>');
     h += '</section>';
 
     app.innerHTML = h;
   }
 
-  function fallback(){
-    try{
-      return JSON.parse(document.getElementById('embedded-data').textContent);
-    }catch(e){
-      return null;
-    }
+  function setSync(state, text){
+    syncEl.className = 'sync' + (state ? ' ' + state : '');
+    syncText.textContent = text;
+  }
+  function flashUpdated(){
+    setSync('hit', '방금 갱신됨 · ' + clock());
+    clearTimeout(hitTimer);
+    hitTimer = setTimeout(function(){ setSync('', '연동 중 · 마지막 확인 ' + clock()); }, 2500);
   }
 
-  // 서버로 열면 파일을 그대로 읽고, file:// 로 열면 내장 스냅샷으로 떨어진다
-  fetch('jansori-data.json', {cache:'no-store'})
-    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
-    .then(render)
-    .catch(function(){
-      var d = fallback();
-      if(d) render(d);
-      else app.innerHTML = '<div class="load-msg">jansori-data.json 을 불러오지 못했습니다.</div>';
-    });
+  // jansori-data.json 을 주기적으로 다시 읽어 바뀌면 그 자리에서 갱신한다.
+  // file:// 로 열어 fetch 가 막히면 내장 스냅샷으로 한 번만 그린다.
+  function poll(first){
+    fetch('jansori-data.json', {cache:'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function(txt){
+        live = true;
+        if(txt !== lastRaw){
+          var data = JSON.parse(txt);
+          lastRaw = txt;
+          render(data);
+          if(first) setSync('', '연동 중 · 마지막 확인 ' + clock());
+          else flashUpdated();
+        } else if(syncEl.className.indexOf('hit') === -1){
+          setSync('', '연동 중 · 마지막 확인 ' + clock());
+        }
+      })
+      .catch(function(){
+        if(first){
+          try{
+            render(JSON.parse(document.getElementById('embedded-data').textContent));
+            setSync('off', '내장 스냅샷 (파일 연동 불가)');
+          }catch(e){
+            app.innerHTML = '<div class="load-msg">jansori-data.json 을 불러오지 못했습니다.</div>';
+            setSync('off', '불러오기 실패');
+          }
+        }
+      })
+      .then(function(){ if(live || first) setTimeout(function(){ poll(false); }, POLL_MS); });
+  }
+  poll(true);
 })();
 </script>
 <script>

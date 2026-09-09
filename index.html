@@ -70,7 +70,13 @@ header{
   padding:9px 24px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .nav-sub::-webkit-scrollbar{display:none}
 .nav-sub a{text-decoration:none;color:inherit;white-space:nowrap;transition:color .2s}
+.nav-main{flex:none}
 .nav-main a{white-space:nowrap}
+@media(max-width:860px){
+  .nav-inner{flex-direction:column;align-items:flex-start;gap:10px}
+  .nav-main{width:100%;overflow-x:auto;scrollbar-width:none}
+  .nav-main::-webkit-scrollbar{display:none}
+}
 @media(max-width:560px){.nav-main{gap:2px;font-size:.8rem}.nav-main a{padding:4px 7px}
   .logo{font-size:1.02rem;gap:6px}.logo span.badge{font-size:.62rem;padding:2px 5px}}
 /* ---------- Hero ---------- */
@@ -719,7 +725,7 @@ header{padding:0}
     <div class="logo">⚡ Jansori <span class="badge">NDD Engine</span></div>
     <nav class="nav-main">
       <a href="index.html" class="here">소개글</a>
-      <a href="db.html">DB</a>
+      <a href="db.html">잔소리는 어디에 쌓이는가</a>
       <a href="demo.html">시연 영상</a>
     </nav>
   </div>
