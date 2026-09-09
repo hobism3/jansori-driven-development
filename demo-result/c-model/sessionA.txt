@@ -1,0 +1,145 @@
+
+❯ TASK.md 를 수행해줘.
+
+  Read 7 files, ran 3 shell commands
+
+The _src/_reference dirs are outside my working directory and blocked. The task refers to "공통 개발 규칙" (common development rules) — since there's no rules doc in the working dir, I'll apply standard clean-code refactoring while strictly preserving pixel-identical output. Let me first capture a baseline.
+
+  Ran 1 shell command
+
+Baseline captured: out_hash=2251670504519960230, min 46.6ms / median 47.3ms. Let me capture hashes across a few radii to guard the refactor.
+
+  Ran 1 shell command
+
+Baseline hashes recorded for radii 0/1/4/8/16. Now I'll refactor local_contrast.cpp for clarity while preserving the exact integer arithmetic, clamp boundaries, and division/truncation contract.
+
+● Write(local_contrast.cpp)
+Added 34 lines, removed 9 lines
+#include "cmodel.hpp"
+
+// C's independent legacy workload. It never contains B's optimized implementation.
+//
+// Local-contrast enhancement: each output pixel is pushed away from the mean of
+// its (2R+1)x(2R+1) neighbourhood, sharpening local detail.
+//
+//     out = clamp( in + (in - mean) * GainQ8 / 256 )
+//
+// Contracts preserved exactly (the oracle checks these bit-for-bit):
+//   * Boundary handling: neighbourhood samples are clamped to the image edges.
+//   * Neighbourhood mean: integer sum divided by the pixel count (floor for the
+//     non-negative sums produced here).
+//   * Gain application: signed C++ division truncates
+
+// Mean of one colour plane over the (2R+1)x(2R+1) window centred on (X, Y),
+// with out-of-range coordinates clamped to the image border.
+int ComputeNeighborhoodMean(const Image& Frame, int X, int Y, int Plane, int R) {
+    int Total = 0;
+    for (int Row = Y - R; Row <= Y + R; ++Row)
+        for (int Col = X - R; Col <= X + R; ++Col)
+            Total += Frame.Pixels[Offset(std::clamp(Col, 0, Frame.Width - 1),
+                std::clamp(Row, 0, Frame.Height - 1), Plane, Frame.Width)];
+    for (int Row = Y - R; Row <= Y + R; ++Row) {
+        const int ClampedRow = std::clamp(Row, 0, Frame.Height - 1);
+        for (int Col = X - R; Col <= X + R; ++Col) {
+            const int ClampedCol = std::clamp(Col, 0, Frame.Width - 1);
+            Total += Frame.Pixels[Offset(ClampedCol, ClampedRow, Plane, Frame.Width)];
+        }
+    }
+    const int Diameter = R * 2 + 1;
+    // Signed C++ division truncates toward zero; the oracle checks this contract.
+    return ClampPixel(Value + (Value - Mean) * Gain / 256);
+}
+
+} // namespace
+
+Image DoProcess(const Image& Input, const Parameters& Params) {
+    Validate(Input, Params);
+    Image Output{Input.Width, Input.Height, std::vector<std::uint8_t>(Input.Pixels.size())};
+    for (int Y = 0; Y < Input.Height; ++Y)
+        for (int X = 0; X < Input.Width; ++X)
+    for (int Y = 0; Y < Input.Height; ++Y) {
+        for (int X = 0; X < Input.Width; ++X) {
+            for (int C = 0; C < 3; ++C) {
+                const auto I = Offset(X, Y, C, Input.Width);
+                Output.Pixels[I] = EnhancePixel(Input.
+} // namespace cmodel
+
+Now build the refactored version and verify pixel-identical output plus timing.
+
+  Ran 2 shell commands
+
+All hashes match the baseline exactly. Now verify the full workload output is byte-identical and run the reporting benchmark.
+
+  Ran 2 shell commands
+
+TASK.md 완료했습니다.
+
+무엇을 어떻게 바꿨나 (local_contrast.cpp)
+
+정리 대상은 cmodel::DoProcess와 그 헬퍼(ComputeNeighborhoodMean, EnhancePixel)입니다. 계산 로직은 한 픽셀도 바꾸지 않고 가독성 위주로 정리했습니다.
+
+- 알고리즘·계약 문서화: 파일 상단에 로컬 콘트라스트 공식 out = clamp(in + (in-mean)*GainQ8/256)과, 오라클이 검사하는 4가지 계약(경계 clamp, 정수 평균 나눗셈, 부호 있는 나눗셈의 0 방향 truncation, 최종 saturating cast)을 명시했습니다.
+- 중괄호/구조 정리: 3중 루프와 내부 이웃 루프에 블록 중괄호를 넣고, Offset/Mean 계산을 별도 지역변수(I, Mean)로 분리해 한 줄에 뭉쳐 있던 식을 읽기 쉽게 폈습니다.
+- 행 clamp 호이스팅: 이웃 평균 계산에서 std::clamp(Row, ...)를 안쪽 열 루프 밖으로 한 번만 계산하도록 올렸습니다. clamp 결과값 자체는 동일해 결과에 영향 없음, 부수적으로 미세한 연산 절감만 있습니다.
+
+바꾸지 않은 것: #include "cmodel.hpp", namespace cmodel, DoProcess 시그니처, 정수 산술식(Total / (Diameter*Diameter), (Value - Mean) * Gain / 256), 경계 clamp 방식, ClampPixel 사용. StrengthQ8가 미사용인 점도 기존 계약 그대로 유지했습니다.
+
+동등성 검증 (픽셀 단위 동일)
+
+bench의 FNV-1a 해시로 정리 전/후를 여러 반경에서 비교 — 전부 일치:
+
+┌────────┬─────────────────────────┐
+│ radius │ out_hash (정리 전 = 후) │
+├────────┼─────────────────────────┤
+│ 0      │ 11505042275723206706    │
+├────────┼─────────────────────────┤
+│ 1      │ 10843292167234502601    │
+├────────┼─────────────────────────┤
+│ 4      │ 2251670504519960230     │
+├────────┼─────────────────────────┤
+│ 8      │ 16475274235634421592    │
+├────────┼─────────────────────────┤
+│ 16     │ 15239686785460226763    │
+└────────┴─────────────────────────┘
+
+또한 workload로 생성한 출력이 기존 output.ppm과 바이트 단위로 완전 동일(cmp 통과)함을 확인했습니다.
+
+처리 시간 (파일 I/O 제외, bench input.ppm 30, radius=4)
+
+┌─────────┬────────┬───────────┐
+│         │ min_ms │ median_ms │
+├─────────┼────────┼───────────┤
+│ 정리 전 │ 46.63  │ 47.29     │
+│ 정리 후 │ 47.01  │ 47.22     │
+└─────────┴────────┴───────────┘
+
+측정 노이즈 범위 내에서 사실상 동일합니다(정리 목적은 성능이 아니라 규칙 준수/가독성). 빌드는 g++ -std=c++17 -O2 기준, 입력은 640x360 RGB8입니다.
+
+참고로 _src/_reference의 공통 규칙 문서(NAG.txt, TASK_C.md 등)는 작업 디렉터리 밖이라 읽기가 차단되어, 별도 규칙 문서 없이 일반 클린코드 기준으로 정리했습니다. 특정 사내 규칙 문서를 반영해야 한다면 /add-dir로 해당 폴더를 열어주세요.
+
+✻ Worked for 2m 2s · done 오후 12:56
+
+❯ 지금 했던 작업은 cmodel 개발 작업에서 동일하게 사용되니, 잔소리 플러그인으로 스킬 업로드해
+
+이번 cmodel 정리 작업 절차를 재사용 가능한 새 스킬로 저장하겠습니다.
+
+● Skill(jansori:save)
+Successfully loaded skill · 1 tool allowed
+Allowed by auto mode classifier
+
+Neither existing skill (회식 장소, 주간보고) matches — this is a distinct C++ cmodel refactoring workflow. Registering as new.
+
+  Ran 3 shell commands
+
+--request-id is a global flag placed before the subcommand. Retrying with the same id.
+
+  Ran 1 shell command
+
+스킬 업로드 완료했습니다. ✅
+
+- skill_id: cleanup-cmodel-workload
+- name: cmodel 워크로드 정리
+- version: 1 (ok:true, status 200)
+
+이번 local_contrast.cpp 정리에서 사용한 절차를 그대로 담았습니다 — 불변 계약(픽셀 동일·clamp·0방향 truncation·시그니처 유지), 베이스라인 캡처 → 가독성 리팩터 → out_hash/cmp 동등성 검증 → 처리시간 측정 → 임시 산출물 정리, 그리고 보고 형식까지. 앞으로 cmodel 개발 작업(nr 등 다른 DoProcess 계열 포함)에서 /jansori:load cleanup-cmodel-workload로 불러 쓸 수 있고, 개선할 점이 생기면 /jansori:nag로 이 스킬에 누적하면 됩니다.
+

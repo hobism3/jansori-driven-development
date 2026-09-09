@@ -76,10 +76,10 @@ a.logo:hover span.badge{background:#111}
 .legend i.t{background:var(--accent-purple)}
 .legend i.s{background:var(--accent-emerald)}
 
-/* ---------- 터미널 3분할 ---------- */
-.term-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:8px 0 40px}
+/* ---------- 터미널: 위아래로 쌓기 ---------- */
+.term-wrap{display:flex;flex-direction:column;gap:22px;margin:8px 0 40px}
 .term{border:3px solid #111;box-shadow:6px 6px 0 #111;background:#0d0f14;display:flex;flex-direction:column;min-width:0;
-  height:calc(100vh - var(--hdr-h) - 250px);min-height:440px}
+  height:min(560px,70vh);min-height:360px}
 .term-bar{display:flex;align-items:center;gap:10px;background:#1c1f27;border-bottom:2px solid #000;padding:9px 13px;flex:none}
 .term-bar .dots{display:flex;gap:6px;flex:none}
 .term-bar .dots i{width:11px;height:11px;border-radius:50%;display:inline-block}
@@ -133,6 +133,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:20px;color:var(--text
       <span class="lbl">예시 선택</span>
       <button class="scn on" data-scenario="business-dinner">🍖 회식 장소 고르기</button>
       <button class="scn" data-scenario="weekly">🗂️ 주간보고 정리</button>
+      <button class="scn" data-scenario="c-model">⚙️ C-model 리팩터링</button>
     </nav>
   </div>
 </header>
@@ -141,7 +142,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:20px;color:var(--text
   <div class="page-head">
     <span class="eyebrow">Live Terminal Examples</span>
     <h1>예시 — <span class="scn-name" id="scn-name">회식 장소 고르기</span></h1>
-    <p id="scn-desc">서로 다른 세 사람의 터미널(Session A · B · C)입니다. 한 사람이 <strong>스킬을 저장</strong>하고, 다른 사람이 <strong>잔소리(nag)</strong>로 고치면, 그 교정이 캡슐에 쌓여 <strong>다음 사람의 첫 답</strong>을 바꿉니다.</p>
+    <p id="scn-desc">서로 다른 세 사람의 터미널 <strong>Session A → B → C</strong>. 한 사람의 <strong>잔소리(nag)</strong>가 캡슐에 쌓여 다음 사람의 첫 답을 바꿉니다.</p>
     <div class="legend">
       <span><i class="u"></i> 사용자 입력</span>
       <span><i class="t"></i> plugin 동작 (skill / nag / normalize)</span>
@@ -149,7 +150,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:20px;color:var(--text
     </div>
   </div>
 
-  <p class="hint">↕ 각 터미널 안에서 스크롤하세요. 넓은 표는 좌우로도 스크롤됩니다.</p>
+  <p class="hint">↕ 각 터미널 안에서 스크롤하세요 (A → B → C 순서). 넓은 표는 좌우로도 스크롤됩니다.</p>
   <div class="term-wrap" id="wrap"><div class="load-msg">터미널을 불러오는 중…</div></div>
 </div>
 
@@ -801,6 +802,715 @@ necessary 정보(결제 외부사명, 담당자 등)를 알려주시면 반영�
 ✻
 </script>
 
+<script type="text/plain" id="tx-c-model-A">
+
+❯ TASK.md 를 수행해줘.
+
+  Read 7 files, ran 3 shell commands
+
+The _src/_reference dirs are outside my working directory and blocked. The task refers to "공통 개발 규칙" (common development rules) — since there's no rules doc in the working dir, I'll apply standard clean-code refactoring while strictly preserving pixel-identical output. Let me first capture a baseline.
+
+  Ran 1 shell command
+
+Baseline captured: out_hash=2251670504519960230, min 46.6ms / median 47.3ms. Let me capture hashes across a few radii to guard the refactor.
+
+  Ran 1 shell command
+
+Baseline hashes recorded for radii 0/1/4/8/16. Now I'll refactor local_contrast.cpp for clarity while preserving the exact integer arithmetic, clamp boundaries, and division/truncation contract.
+
+● Write(local_contrast.cpp)
+Added 34 lines, removed 9 lines
+#include "cmodel.hpp"
+
+// C's independent legacy workload. It never contains B's optimized implementation.
+//
+// Local-contrast enhancement: each output pixel is pushed away from the mean of
+// its (2R+1)x(2R+1) neighbourhood, sharpening local detail.
+//
+//     out = clamp( in + (in - mean) * GainQ8 / 256 )
+//
+// Contracts preserved exactly (the oracle checks these bit-for-bit):
+//   * Boundary handling: neighbourhood samples are clamped to the image edges.
+//   * Neighbourhood mean: integer sum divided by the pixel count (floor for the
+//     non-negative sums produced here).
+//   * Gain application: signed C++ division truncates
+
+// Mean of one colour plane over the (2R+1)x(2R+1) window centred on (X, Y),
+// with out-of-range coordinates clamped to the image border.
+int ComputeNeighborhoodMean(const Image& Frame, int X, int Y, int Plane, int R) {
+    int Total = 0;
+    for (int Row = Y - R; Row <= Y + R; ++Row)
+        for (int Col = X - R; Col <= X + R; ++Col)
+            Total += Frame.Pixels[Offset(std::clamp(Col, 0, Frame.Width - 1),
+                std::clamp(Row, 0, Frame.Height - 1), Plane, Frame.Width)];
+    for (int Row = Y - R; Row <= Y + R; ++Row) {
+        const int ClampedRow = std::clamp(Row, 0, Frame.Height - 1);
+        for (int Col = X - R; Col <= X + R; ++Col) {
+            const int ClampedCol = std::clamp(Col, 0, Frame.Width - 1);
+            Total += Frame.Pixels[Offset(ClampedCol, ClampedRow, Plane, Frame.Width)];
+        }
+    }
+    const int Diameter = R * 2 + 1;
+    // Signed C++ division truncates toward zero; the oracle checks this contract.
+    return ClampPixel(Value + (Value - Mean) * Gain / 256);
+}
+
+} // namespace
+
+Image DoProcess(const Image& Input, const Parameters& Params) {
+    Validate(Input, Params);
+    Image Output{Input.Width, Input.Height, std::vector<std::uint8_t>(Input.Pixels.size())};
+    for (int Y = 0; Y < Input.Height; ++Y)
+        for (int X = 0; X < Input.Width; ++X)
+    for (int Y = 0; Y < Input.Height; ++Y) {
+        for (int X = 0; X < Input.Width; ++X) {
+            for (int C = 0; C < 3; ++C) {
+                const auto I = Offset(X, Y, C, Input.Width);
+                Output.Pixels[I] = EnhancePixel(Input.
+} // namespace cmodel
+
+Now build the refactored version and verify pixel-identical output plus timing.
+
+  Ran 2 shell commands
+
+All hashes match the baseline exactly. Now verify the full workload output is byte-identical and run the reporting benchmark.
+
+  Ran 2 shell commands
+
+TASK.md 완료했습니다.
+
+무엇을 어떻게 바꿨나 (local_contrast.cpp)
+
+정리 대상은 cmodel::DoProcess와 그 헬퍼(ComputeNeighborhoodMean, EnhancePixel)입니다. 계산 로직은 한 픽셀도 바꾸지 않고 가독성 위주로 정리했습니다.
+
+- 알고리즘·계약 문서화: 파일 상단에 로컬 콘트라스트 공식 out = clamp(in + (in-mean)*GainQ8/256)과, 오라클이 검사하는 4가지 계약(경계 clamp, 정수 평균 나눗셈, 부호 있는 나눗셈의 0 방향 truncation, 최종 saturating cast)을 명시했습니다.
+- 중괄호/구조 정리: 3중 루프와 내부 이웃 루프에 블록 중괄호를 넣고, Offset/Mean 계산을 별도 지역변수(I, Mean)로 분리해 한 줄에 뭉쳐 있던 식을 읽기 쉽게 폈습니다.
+- 행 clamp 호이스팅: 이웃 평균 계산에서 std::clamp(Row, ...)를 안쪽 열 루프 밖으로 한 번만 계산하도록 올렸습니다. clamp 결과값 자체는 동일해 결과에 영향 없음, 부수적으로 미세한 연산 절감만 있습니다.
+
+바꾸지 않은 것: #include "cmodel.hpp", namespace cmodel, DoProcess 시그니처, 정수 산술식(Total / (Diameter*Diameter), (Value - Mean) * Gain / 256), 경계 clamp 방식, ClampPixel 사용. StrengthQ8가 미사용인 점도 기존 계약 그대로 유지했습니다.
+
+동등성 검증 (픽셀 단위 동일)
+
+bench의 FNV-1a 해시로 정리 전/후를 여러 반경에서 비교 — 전부 일치:
+
+┌────────┬─────────────────────────┐
+│ radius │ out_hash (정리 전 = 후) │
+├────────┼─────────────────────────┤
+│ 0      │ 11505042275723206706    │
+├────────┼─────────────────────────┤
+│ 1      │ 10843292167234502601    │
+├────────┼─────────────────────────┤
+│ 4      │ 2251670504519960230     │
+├────────┼─────────────────────────┤
+│ 8      │ 16475274235634421592    │
+├────────┼─────────────────────────┤
+│ 16     │ 15239686785460226763    │
+└────────┴─────────────────────────┘
+
+또한 workload로 생성한 출력이 기존 output.ppm과 바이트 단위로 완전 동일(cmp 통과)함을 확인했습니다.
+
+처리 시간 (파일 I/O 제외, bench input.ppm 30, radius=4)
+
+┌─────────┬────────┬───────────┐
+│         │ min_ms │ median_ms │
+├─────────┼────────┼───────────┤
+│ 정리 전 │ 46.63  │ 47.29     │
+│ 정리 후 │ 47.01  │ 47.22     │
+└─────────┴────────┴───────────┘
+
+측정 노이즈 범위 내에서 사실상 동일합니다(정리 목적은 성능이 아니라 규칙 준수/가독성). 빌드는 g++ -std=c++17 -O2 기준, 입력은 640x360 RGB8입니다.
+
+참고로 _src/_reference의 공통 규칙 문서(NAG.txt, TASK_C.md 등)는 작업 디렉터리 밖이라 읽기가 차단되어, 별도 규칙 문서 없이 일반 클린코드 기준으로 정리했습니다. 특정 사내 규칙 문서를 반영해야 한다면 /add-dir로 해당 폴더를 열어주세요.
+
+✻ Worked for 2m 2s · done 오후 12:56
+
+❯ 지금 했던 작업은 cmodel 개발 작업에서 동일하게 사용되니, 잔소리 플러그인으로 스킬 업로드해
+
+이번 cmodel 정리 작업 절차를 재사용 가능한 새 스킬로 저장하겠습니다.
+
+● Skill(jansori:save)
+Successfully loaded skill · 1 tool allowed
+Allowed by auto mode classifier
+
+Neither existing skill (회식 장소, 주간보고) matches — this is a distinct C++ cmodel refactoring workflow. Registering as new.
+
+  Ran 3 shell commands
+
+--request-id is a global flag placed before the subcommand. Retrying with the same id.
+
+  Ran 1 shell command
+
+스킬 업로드 완료했습니다. ✅
+
+- skill_id: cleanup-cmodel-workload
+- name: cmodel 워크로드 정리
+- version: 1 (ok:true, status 200)
+
+이번 local_contrast.cpp 정리에서 사용한 절차를 그대로 담았습니다 — 불변 계약(픽셀 동일·clamp·0방향 truncation·시그니처 유지), 베이스라인 캡처 → 가독성 리팩터 → out_hash/cmp 동등성 검증 → 처리시간 측정 → 임시 산출물 정리, 그리고 보고 형식까지. 앞으로 cmodel 개발 작업(nr 등 다른 DoProcess 계열 포함)에서 /jansori:load cleanup-cmodel-workload로 불러 쓸 수 있고, 개선할 점이 생기면 /jansori:nag로 이 스킬에 누적하면 됩니다.
+
+</script>
+<script type="text/plain" id="tx-c-model-B">
+❯ cmodel nr.cpp 코드를 리팩토링해줘
+
+cmodel 워크로드 정리 관련 skill이 있으니 먼저 로드하고, 대상 파일을 찾아보겠습니다.
+
+● Skill(jansori:load)
+Successfully loaded skill · 1 tool allowed
+
+  Searched for 1 pattern, read 1 file, ran 1 shell command
+
+Skill과 파일을 확인했습니다. 이제 프로젝트 구조와 관련 파일들을 확인하겠습니다.
+
+  Read 3 files, ran 1 shell command
+
+코드와 하니스를 파악했습니다. Skill 절차대로 베이스라인 캡처부터 시작하겠습니다.
+
+  Searched for 1 pattern, ran 4 shell commands
+
+/mingw64는 Git 번들이라 컴파일러가 없습니다. 시스템 전체에서 컴파일러를 찾아보겠습니다.
+
+  Searched for 1 pattern, ran 3 shell commands
+
+bash에서는 g++를 찾지 못했고, cmd.exe /c도 이 환경에서 정상 실행되지 않습니다. 기존 bench.exe/workload.exe는 9/8에 빌드돼 있으니 컴파일러가 어딘가 있었던 것 같은데, 제가 직접 호출할 수 있는 경로가 없네요.
+
+Skill 절차상 동등성 검증(빌드→out_hash 비교) 이 필수라, 빌드 방법을 확인해야 합니다.
+
+● User answered Claude's questions:
+· 리팩터링 후 동등성 검증 빌드를 어떻게 진행할까요? (제 셸에서는 g++/clang++/cl을 찾지 못했습니다) → $env:Path = "C:\Users\WoongbumHwang\Desktop\tools\w64devkit\bin;" + $env:Path   # g++ 이거하면 되는
+
+The user gave me the compiler path: C:\Users\WoongbumHwang\Desktop\tools\w64devkit\bin. Let me add it and build the baseline.
+
+  Ran 1 shell command
+
+g++ 확인됐습니다. 이제 베이스라인을 캡처합니다.
+
+    return static_cast<std::uint8_t>(
+        (Original * (256 - Strength) + Mean * Strength + 128) / 256);
+    const int Blended =
+        Original * (kQ8One - Strength) + Mean * Strength + kQ8Round;
+    return static_cast<std::uint8_t>(Blended / kQ8One);
+}
+
+} // namespace
+
+Image DoProcess(const Image& Input, const Parameters& Params) {
+    Validate(Input, Params);
+    const int W = Input.Width, H = Input.Height, R = Params.Radius;
+
+    const int Area = Side * Side;
+    Image Output{W, H, std::vector<std::uint8_t>(Input.Pixels.size())};
+
+    // Clamp a column/row index to the valid image range; the box window reuses
+    // the edge sample once an index runs past the border.
+    const auto ClampX = [W](int X) { return std::clamp(X, 0, W - 1); };
+    const auto ClampY = [H](int Y) { return std::clamp(Y, 0, H - 1); };
+
+    // Pass 1: horizontal box sums. HSum[x,y,c] = sum over the clamped columns
+    // [x-R, x+R] of Input at row y. Built with a sliding window per (y,c) row.
+    std::vector<int> HSum(Input.Pixels.size());
+    for (int Y = 0; Y < H; ++Y)
+    for (int Y = 0; Y < H; ++Y) {
+        for (int C = 0; C < 3; ++C) {
+                Sum -= Input.Pixels[Offset(std::clamp(X - 1 - R, 0, W - 1), Y, C, W)];
+                Sum += Input.Pixels[Offset(ClampX(X + R), Y, C, W)];
+                Sum -= Input.Pixels[Offset(ClampX(X - 1 - R), Y, C, W)];
+                HSum[Offset(X, Y, C, W)] = Sum;
+            }
+        }
+    }
+
+    // Pass 2: vertical box sums over HSum give the full 2D neighborhood sum,
+    // then divide once (truncating) and mix. Slides one row at a time per (x,c).
+    for (int X = 0; X < W; ++X)
+    for (int X = 0; X < W; ++X) {
+        for (int C = 0; C < 3; ++C) {
+            // Seed the window at row 0 with the full clamped [-R, R] span.
+            int Sum = 0;
+            for (int Dy = -R; Dy <= R; ++Dy)
+                Sum += HSum[Offset(X, std::clamp(Dy, 0, H - 1), C, W)];
+                Sum += HSum[Offset(X, ClampY(Dy), C, W)];
+            const auto I0 = Offset(X, 0, C, W);
+            Output.Pixels[I0] = mix_pixel(Input.Pixels[I0], Sum / Area, Params.StrengthQ8);
+            Output.Pixels[I0] =
+                mix_pixel(Input.Pixels[I0], Sum / Area, Params.StrengthQ8);
+
+            // Slide down: add the entering row (y+R), drop the leaving one
+            // (y-1-R), then take the single truncating divide + mix per pixel.
+            for (int Y = 1; Y < H; ++Y) {
+                Sum += HSum[Offset(X, std::clamp(Y + R
+                Sum -= HSum[Offset(X, std::clamp(Y - 1 - R, 0, H - 1), C, W)];
+                Sum += HSum[Offset(X, ClampY(Y + R), C, W)];
+                Sum -= HSum[Offset(X, ClampY(Y - 1 - R), C, W)];
+                const auto I = Offset(X, Y, C, W);
+                Output.Pixels[I] = mix_pixel(Input.Pixels[I], Sum / Area, Params.StrengthQ8);
+                Output.Pixels[I] =
+                    mix_pixel(Input.Pixels[I], Sum / Area, Params.StrengthQ8);
+            }
+        }
+    }
+    return Output;
+}
+
+} // namespace cmodel
+
+가독성 리팩터 완료. 이제 동등성 검증(재빌드 → out_hash 비교)을 진행합니다.
+
+  Ran 1 shell command
+
+모든 해시 일치, 바이트 동일. 임시 산출물을 정리합니다.
+
+  Ran 1 shell command
+
+리팩터링 완료했습니다. 픽셀 결과는 정리 전과 완전히 동일합니다.
+
+무엇을 왜 바꿨나 (가독성 위주)
+
+- mix_pixel: 매직넘버 256/128을 의미 있는 상수 kQ8One/kQ8Round  Blended 지역변수로 분리. 연산자·피연산자 순서, 정수나눗셈(/256), 반올림(+128)은 그대로 유지.
+- std::clamp 경계 처리: 반복되던 std::clamp(…, 0, W-1) / H-1를 ClampX/ClampY 람다로 묶어 "슬라이딩 윈도우가 경계에서 edge 샘플을 재사용한다"는 계약을 읽기 쉽게 표현. 반환값은 동일.
+- 루프 구조: 중괄호 없던 이중 for 헤더에 블록 중괄호 추가, 윈도우 시드/슬라이드(진입 열·행 더하기, 이탈 열·행 빼기) 구간마다 계약 주석 정리.
+- 불변 계약 유지: 공개 시그니처·DoProcess 계약·#include·namespace 그대로. 미사용 파라미터(StrengthQ8은 사용, GainQ8은 계약상 미사용)도 제거하지 않음. 루프 순서·정수 연산 미변경.
+
+결과
+
+┌────────┬─────────────────────────┬────────────┐
+│ radius │      out_hash 일치      │ cmp 바이트 │
+├────────┼─────────────────────────┼────────────┤
+│ 0      │ ✅ 12706936200452186272 │ identical  │
+├────────┼─────────────────────────┼────────────┤
+│ 1      │ ✅ 5033858332124578745  │ —          │
+├────────┼─────────────────────────┼────────────┤
+│ 4      │ ✅ 9943091995268150032  │ identical  │
+├────────┼─────────────────────────┼────────────┤
+│ 8      │ ✅ 845333029561691211   │ —          │
+├────────┼─────────────────────────┼────────────┤
+│ 16     │ ✅ 15156807893438391854 │ identical  │
+└────────┴─────────────────────────┴────────────┘
+
+처리시간 (min / median ms, 30회, 파일 I/O 제외)
+
+┌────────┬───────────────────┬───────────────────┐
+│ radius │ 정리 전 (min/med) │ 정리 후 (min/med) │
+├────────┼───────────────────┼───────────────────┤
+│ 0      │ 3.355 / 3.886     │ 3.533 / 3.844     │
+├────────┼───────────────────┼───────────────────┤
+│ 1      │ 3.385 / 3.891     │ 3.265 / 3.741     │
+├────────┼───────────────────┼───────────────────┤
+│ 4      │ 3.507 / 3.839     │ 3.318 / 3.910     │
+├────────┼───────────────────┼───────────────────┤
+│ 8      │ 3.490 / 3.822     │ 3.471 / 3.876     │
+├────────┼───────────────────┼───────────────────┤
+│ 16     │ 3.900 / 4.169     │ 3.699 / 4.027     │
+└────────┴───────────────────┴───────────────────┘
+
+모든 라디우스에서 out_hash 일치 + cmp 바이트 동일. 처리시간은 측정 노이즈 범위 내로 동등합니다. 임시 산출물(*_baseline.exe, *.ppm)은 삭제했습니다.
+
+(참고: 이번 세션에서 컴파일러 경로 Desktop\tools\w64devkit\bin을 알려주셨는데, 이건 이 프로젝트 검증 절차에 반복적으로 필요한 정보라 메모리에 저장해둘까요? 원하시면 저장하겠습니다.)
+
+✻ Baked for 3m 57s · done 오후 1:05
+
+❯ 야 이름과 구조만 정리하지 말고, 반복되는 주변 픽셀 합산 같은
+
+사용자가 이 작업 방식을 refine하는 지시(가독성뿐 아니라 중복 계산 축소도 하라)를 주셨습니다. 이건 cmodel 정리 skill에 대한 nag이므로 먼저 반영하고, 실제
+코드 최적화를 진행하겠습니다.
+
+● Skill(jansori:nag)
+Successfully loaded skill · 1 tool allowed
+
+  Ran 3 shell commands
+
+Nag가 skill v2로 반영됐습니다 (normalize_due: false). 이제 실
+
+● Bash(export PATH="/c/Users/WoongbumHwang/Desktop/tools/w64devkit/bin:$PATH"; cd "C:/Users/WoongbumHwang/Desktop/hackathon_demo/cmodel_development/B" && g++ -std=c++17 -O2 -I. bench.cpp nr.cpp -o bench_baseline.exe && g++ -std=c++17 -O2 -I. runner.cpp nr.cpp -o workload_baseline.exe && echo "== baseline ==" && for R in 0 1 4 8 16; do ./bench_baseline.exe input.ppm 30 $R; done && for R in 0 4 16; do ./workload_baseline.exe input.ppm base_r$R.ppm $R >/dev/null; done && echo "baseline outputs written")
+== baseline ==
+iters=30 radius=0 min_ms=3.803 median_ms=4.373 out_hash=12706936200452186272
+iters=30 radius=1 min_ms=3.892 median_ms=4.289 out_hash=5033858332124578745
+iters=30 radius=4 min_ms=3.777 median_ms=4.241 out_hash=9943091995268150032
+iters=30 radius=8 min_ms=4.016 median_ms=4.292 out_hash=845333029561691211
+iters=30 radius=16 min_ms=4.25 median_ms=4.565 out_hash=15156807893438391854
+baseline outputs written
+
+
+Now the optimization: strength-reduce the per-pixel Offset index arithmetic (hoist row/column bases, increment write/pixel indices) while keeping the sliding-window sums and all arithmetic bit-identical.
+
+● Write(nr.cpp)
+Added 27 lines, removed 14 lines
+// scratch. The pre-division integer sum is bit-identical to the naive nested
+// loop, so output pixels, boundary clamping, and the single truncating divide
+// are all preserved.
+//
+// Indexing note: Offset(x,y,c) == y*(W*3) + x*3 + c. Rather than recompute that
+// product per pixel, each loop hoists the constant part of the address (the row
+// or column base) and advances the moving index by a
+// loops carry only adds. The values fed to the box sums and the divide are
+// identical to calling Offset() every time.
+namespace cmodel {
+namespace {
+
+
+    const int W = Input.Width, H = Input.Height, R = Params.Radius;
+    const int Side = 2 * R + 1;
+    const int Area = Side * Side;
+    const int Stride = W * 3; // element distance between vertically adjacent pixels
+    Image Output{W, H, std::vector<std::uint8_t>(Input.Pixels.size())};
+
+    // Clamp a column/row index to the valid image range; the box window reuses
+
+
+    // Pass 1: horizontal box sums. HSum[x,y,c] = sum over the clamped columns
+    // [x-R, x+R] of Input at row y. Built with a sliding window per (y,c) row.
+    // RowBase pins the row (+ Y*Stride) so the window only adds x*3 + c offsets.
+    std::vector<int> HSum(Input.Pixels.size());
+    for (int Y = 0; Y < H; ++Y) {
+        const int RowBase = Y * Stride;
+        for (int C = 0; C < 3; ++C) {
+            // Seed the window at column 0 with the full clamped [-R, R] span.
+            int Sum = 0;
+            for (int Dx = -R; Dx <= R; ++Dx)
+                Sum += Input.Pixels[Offset(ClampX(Dx), Y, C, W)];
+            HSum[Offset(0, Y, C, W)] = Sum;
+                Sum += Input.Pixels[RowBase + ClampX(Dx) * 3 + C];
+            int Write = RowBase + C; // == Offset(0, Y, C, W); advances by 3 per column
+            HSum[Write] = Sum;
+
+            // Slide right: add the entering column (x+R), drop the leaving one
+            // (x-1-R). Both are clamped, so edges repeat the border sample.
+            for (int X = 1; X < W; ++X) {
+                Sum += Input.Pixels[Offset(ClampX(X + R), Y, C, W)];
+                Sum -= Input.Pixels[Offset(ClampX(X - 1 - R), Y, C, W)];
+                HSum[Offset(X, Y, C, W)] = Sum;
+                Sum += Input.Pixels[RowBase + ClampX(X + R) * 3 + C];
+                Sum -= Input.Pixels[RowBase + ClampX(X - 1 - R) * 3 + C];
+                Write += 3;
+                HSum[Write] = Sum;
+            }
+        }
+    }
+
+    // Pass 2: vertical box sums over HSum give the full 2D neighborhood sum,
+    // then divide once (truncating) and mix. Slides one row at a time per (x,c).
+    // ColBase pins the column (+ X*3) so the window only adds y*Stride offsets.
+    for (int X = 0; X < W; ++X) {
+        const int ColBase = X * 3;
+        for (int C = 0; C < 3; ++C) {
+            // Seed the window at row 0 with the full clamped [-R, R] span.
+            int Sum = 0;
+            for (int Dy = -R; Dy <= R; ++Dy)
+                Sum += HSum[Offset(X, ClampY(Dy), C, W)];
+            const auto I0 = Offset(X, 0, C, W);
+            Output.Pixels[I0] =
+                mix_pixel(Input.Pixels[I0], Sum / Area, Params.StrengthQ8);
+                Sum += HSum[ClampY(Dy) * Stride + ColBase + C];
+            int Pixel = ColBase + C; // == Offset(X, 0er row
+            Output.Pixels[Pixel] =
+                mix_pixel(Input.Pixels[Pixel], Sum / Area, Params.StrengthQ8);
+
+            // Slide down: add the entering row (y+R), drop the leaving one
+            // (y-1-R), then take the single truncating divide + mix per pixel.
+            for (int Y = 1; Y < H; ++Y) {
+                Sum += HSum[Offset(X, ClampY(Y + R), C
+                Sum -= HSum[Offset(X, ClampY(Y - 1 - R), C, W)];
+                const auto I = Offset(X, Y, C, W);
+                Output.Pixels[I] =
+                    mix_pixel(Input.Pixels[I], Sum / Area, Params.StrengthQ8);
+                Sum += HSum[ClampY(Y + R) * Stride + C
+                Sum -= HSum[ClampY(Y - 1 - R) * Stride + ColBase + C];
+                Pixel += Stride;
+                Output.Pixels[Pixel] =
+                    mix_pixel(Input.Pixels[Pixel], Sum / Area, Params.StrengthQ8);
+            }
+        }
+    }
+
+이제 동등성 + 성능을 검증합니다.
+
+  Ran 1 shell command
+
+해시·바이트 모두 동일합니다. 다만 처리시간이 줄기는커녕 오히려 커 보입니다. 측정 노이즈인지 확인하기 위해 베이스라인과 최적화본을 번갈아 여러 번 측정합니다.
+
+  Ran 1 shell command
+
+측정을 교차로 보면 베이스라인과 최적화본이 노이즈 범위 내에서 동일합니다. 임시 산출물을 정리합니다.
+
+  Ran 1 shell command
+
+완료했습니다. (skill에도 "중복 계산 축소" 지침을 nag로 반영 → v2)
+
+무엇을 왜 바꿨나 (이번엔 중복 계산 축소)
+
+핵심은 내부 루프에서 매 픽셀 재계산되던 Offset 인덱스 산술 제 W*3) + x*3 + c 인데, 기존엔 픽셀마다 이 곱셈을 다시 했습니다.
+├────────┼─────────────────────────┼────────────┤
+│ 4      │ ✅ 9943091995268150032  │ identical  │
+├────────┼─────────────────────────┼────────────┤
+│ 8      │ ✅ 845333029561691211   │ —          │
+├────────┼─────────────────────────┼────────────┤
+│ 16     │ ✅ 15156807893438391854 │ identical  │
+└────────┴─────────────────────────┴────────────┘
+
+처리시간 (교차 측정, 60회, min/median ms)
+
+┌────────┬───────────────────────┬───────────────────────┐
+│ radius │    정리 전 (대표)     │   최적화 후 (대표)    │
+├────────┼───────────────────────┼───────────────────────┤
+│ 4      │ 3.69–3.85 / 4.24–4.36 │ 3.71–3.84 / 4.12–4.49 │
+├────────┼───────────────────────┼───────────────────────┤
+│ 16     │ 4.16–4.37 / 4.72–4.78 │ 4.19–4.40 / 4.57–4.80 │
+└────────┴───────────────────────┴───────────────────────┘
+
+솔직한 성능 결론
+
+출력은 bit-identical이지만, 측정 wall-time은 개선되지 않았습니다(노이즈 범위 내 동일). 이유는 이 코드가 -O2로 컴파일되는데, Offset이 사소한 inline 함수라 GCC가 이미 동일한 strength-reduction/loop-invariant hoisting을 자동으로 수행하고 있기 때문입니다. 즉 이번 변경은 소스 레벨의 중복 계산을 명시적으로 제거했지만 최적화 컴파일러 산출물은 이전과 사실상 같습니다.
+
+체감 속도 향상이 목표라면 실효 있는 다음 후보는:
+- 채널 루프(C=0..2) 언롤 / 채널 인터리브 활용,
+- Pass 1 결과를 int 대신 short로 담아 캐시 트래픽 감소(값 범위 검토 필요),
+- 경계 밖에서 clamp가 상수로 saturate되는 구간을 내부(clamp 없호출 자체를 제거.
+
+이 중 진행할 방향이 있으면 말씀해 주세요. 참고로 컴파일러 경로(Desktop\tools\w64devkit\bin)를 메모리에 저장해둘지 여쭤봤는데, 원하시면 저장하겠습니다.
+
+✻ Sautéed for 2m 50s · done 오후 1:09
+
+❯ 성능은 알겠고,
+ Top에서 새로 작성하거나 이름을 변경하는 자체 함수는 UpperCamelCase로 작성하라. 예시는 DoRunNoiseReduction, DoRunHal이다. 생성자·소멸자·연산자와 외부 인터페이스를 재정의하는 함수는 해당 언어·인터페이스 계약을 우선하라.
+  이것도 추가해
+
+naming convention 규칙도 cmodel 정리 skill에 대한 refine이므로 nag로 반영하고, 현재 코드에도 적용하겠습니다.
+
+먼저 현재 nr.cpp에서 이 규칙에 걸리는 것은 익명 네임스페이스의 헬퍼 mix_pixel(snake_case) → MixPixel로 변경 대상입니다. DoProcess/Validate/Offset/ClampPixel은 cmodel.hpp의 외부 인터페이스 계약이라 유지합니다.
+
+nag를 먼저 등록합니다.
+
+  Ran 2 shell commands
+
+Nag가 skill v3로 반영됐습니다. 이제 mix_pixel → MixPixel 적용 후 검증합니다. 먼저 현재 코드로 베이스라인을 잡습니다.
+
+  Ran 1 shell command
+
+● Update(nr.cpp)
+Added 1 line, removed 1 line
+constexpr int kQ8One = 256;   // Q8 fixed-point "1.0"
+constexpr int kQ8Round = 128; // +0.5 in Q8, for round-to-nearest on the /256
+
+std::uint8_t mix_pixel(int Original, int Mean, int Strength) {
+std::uint8_t MixPixel(int Original, int Mean, int Strength) {
+    const int Blended =
+        Original * (kQ8One - Strength) + Mean * Strength + kQ8Round;
+    return static_cast<std::uint8_t>(Blended / kQ8One);
+
+  Ran 1 shell command
+
+Rename applied everywhere. Now verify equivalence.
+
+  Ran 1 shell command
+
+완료했습니다.
+
+적용 내용
+
+- 명명 규칙 반영: 익명 네임스페이스의 내부 헬퍼 mix_pixel → MixPixel (UpperCamelCase). 호출부 2곳도 함께 변경.
+- 계약 우선 함수는 유지: cmodel::DoProcess, Validate, Offset, ClampPixel은 cmodel.hpp에 선언된 외부 인터페이스 계약이라 그대로 둠. 로컬 람다
+  ClampX/ClampY는 이미 UpperCamelCase.
+- skill에 이 명명 규칙을 nag로 추가 → v3.
+
+검증 (라디우스별)
+
+┌────────┬─────────────────────────┬────────────┐
+│ radius │      out_hash 일치      │ cmp 바이트 │
+├────────┼─────────────────────────┼────────────┤
+│ 0      │ ✅ 12706936200452186272 │ identical  │
+├────────┼─────────────────────────┼────────────┤
+│ 1      │ ✅ 5033858332124578745  │ —          │
+├────────┼─────────────────────────┼────────────┤
+│ 4      │ ✅ 9943091995268150032  │ identical  │
+├────────┼─────────────────────────┼────────────┤
+│ 8      │ ✅ 845333029561691211   │ —          │
+├────────┼─────────────────────────┼────────────┤
+│ 16     │ ✅ 15156807893438391854 │ identical  │
+└────────┴─────────────────────────┴────────────┘
+
+이름 변경만이라 처리시간 영향은 없고(min ~3.3–3.5ms), 픽셀 결과는 bit-identical입니다.
+
+지금까지 세 번의 refine(중복 계산 축소, 함수 명명 규칙)이 이 프로젝트 검증 워크플로우와 함께 반복적으로 쓰일 것 같은데, 컴파일러 경로(Desktop\tools\w64devkit\bin)를 메모리에 저장해둘까요? 원하시면 저장하겠습니다.
+</script>
+<script type="text/plain" id="tx-c-model-C">
+❯ TASK.md 를 수행해줘.
+
+  Read 1 file
+
+This task matches the cleanup-cmodel-workload jansori skill. Let me load it and explore the files.
+
+● Skill(jansori:load)
+Successfully loaded skill · 1 tool allowed
+
+  Read 2 files, ran 1 shell command
+
+Skill loaded. Let me look at the rest of the project and set up a baseline.
+
+  Read 2 files, ran 1 shell command
+
+g++ isn't on PATH. Let me locate a compiler.
+
+  Searched for 2 patterns, listed 2 directories
+
+Found w64devkit. Let me set up baseline builds with it.
+
+  Ran 1 shell command
+
+Baseline captured. Let me also generate reference outputs for byte-comparison, then write the refactored implementation.
+
+  Ran 1 shell command
+
+Now I'll write the refactored implementation — a separable sliding-window box sum that produces a bit-identical Total (addition is associative; division stays a single per-pixel operation), plus clearer structure and comments.
+
+● Write(local_contrast.cpp)
+Added 86 lines, removed 16 lines
+// C's independent legacy workload. It never contains B's optimized implementation.
+namespace cmodel {
+    for (int Row = Y - R; Row <= Y + R; ++Row)
+        for (int Col = X - R; Col <= X + R; ++Col)
+            Total += Frame.Pixels[Offset(std::clamp(Col, 0, Frame.Width - 1),
+                std::clamp(Row, 0, Frame.Height - 1), Plane, Frame.Width)];
+    const int Diameter = R * 2 + 1;
+    return Total / (Diameter * Diameter);
+}
+
+// Local-contrast enhancement of a single pixel.
+// Signed C++ division truncates toward zero; the oracle checks this contract.
+std::uint8_t EnhancePixel(int Value, int Mean, int Gain) {
+    // Signed C++ division truncates toward zero; the oracle checks this contract.
+    return ClampPixel(Value + (Value - Mean) * Gain / 256);
+}
+
+// Horizontal box su
+    const int ClampedRow = std::clamp(Row, 0, Frame.Height - 1);
+    const std::size_t RowBase = Offset(0, ClampedRow, Plane, Width);
+
+    // Pixel value at a (possibly out-of-range) column, border-replicated.
+    const auto ColumnValue = [&](int Col) -> int {
+        const int ClampedCol = std::clamp(Col, 0, Width - 1);
+        return Frame.Pixels[RowBase + static_cast<std::size_t>(ClampedCol) * 3U];
+    };
+
+    // Seed the window for X = 0: columns [-R, R].
+    int WindowSum = 0;
+    for (int Col = -R; Col <= R; ++Col)
+        WindowSum += ColumnValue(Col);
+    RowSums[0] = WindowSum;
+
+    // Slide the window one column at a time.
+    for (int X = 1; X < Width; ++X) {
+        WindowSum += ColumnValue(X + R) - ColumnValue(X - R - 1);
+        RowSums[X] =
+            for (int C = 0; C < 3; ++C) {
+                const auto I = Offset(X, Y, C, Input.Width);
+                Output.Pixels[I] = EnhancePixel(Input.Pixels[I],
+                    ComputeNeighborhoodMean(Input, X, Y, C, Params.Radius), Params.GainQ8);
+
+    const int Width = Input.Width;
+    const int Height = Input.Height;
+    const int R = Params.Radius;
+    const int Diameter = R * 2 + 1;
+    const int Area = Diameter * Diameter;
+
+    // Horizontal box sums for every row of the current plane.
+    std::vector<int> HorizontalSums(static_cast<std::size_t>(Width) * Height);
+    // Vertical accumulator: ColumnSum[X] holds the full neighborhood sum for the
+    // pixel currently being written in this column.
+    std::vector<int> ColumnSum(Width);
+
+    for (int Plane =
+        // Seed the vertical window for Y = 0: rows [-R, R].
+        for (int X = 0; X < Width; ++X)
+            ColumnSum[X] = 0;
+        for (int Row = -R; Row <= R; ++Row)
+            for (int X = 0; X < Width; ++X)
+                ColumnSum[X] += HorizontalSumAt(Row, X);
+
+        // Pass 2: slide the vertical window down the image and emit pixels.
+        for (int Y = 0; Y < Height; ++Y) {
+            if (Y > 0) {
+                // Window [Y-1-R, Y-1+R] -> [Y-R, Y+R]: drop top, add bottom.
+                for (int X = 0; X < Width; ++X)
+                    ColumnSum[X] += HorizontalSumAt(Y + R, X) - HorizontalSumAt(Y - 1 - R, X);
+            }
+            for (int X = 0; X < Width; ++X) {
+                const std::size_t I = Offset(X, Y, Plane, Width);
+                const int Mean = ColumnSum[X] / Area;
+                Output.Pixels[I] = EnhancePixel(Input.Pixels[I], Mean, Params.GainQ8);
+            }
+        }
+    }
+    return Output;
+}
+} // namespace cmodel
+
+Let me eliminate the per-row temporary allocation by writing directly into the grid.
+
+● Update(local_contrast.cpp)
+Added 1 line, removed 2 lines
+// of 2R+1, so as X advances it slides: drop the clamped left edge, add the clamped
+// right edge. This yields the exact same integer sum as recomputing the whole
+// window, but in O(1) per pixel instead of O(R).
+void ComputeRowBoxSums(const Image& Frame, int Row, int Plane, int R,
+                       std::vector<int>& RowSums) {
+void ComputeRowBoxSums(const Image& Frame, int Row, int Plane, int R, int* RowSums) {
+    const int Width = Frame.Width;
+    const int ClampedRow
+            std::copy(RowSums.begin(), RowSums.end(), RowStart);
+        }
+        for (int Row = 0; Row < Height; ++Row)
+            ComputeRowBoxSums(Input, Row, Plane, R,
+                              HorizontalSums.data() + static_cast<std::size_t>(Row) * Width);
+
+        // Convenience accessor into the horizontal-sum grid, with row clamping.
+        const auto HorizontalSumAt = [&](int Row, int X) -> int {
+
+Now build and verify equivalence across radii, plus byte-compare outputs.
+
+  Ran 1 shell command
+
+All hashes match baseline exactly and outputs are byte-identical. The sliding-window separable sum also makes runtime independent of radius (r=16: 634ms → 2.15ms). Let me clean up temporary artifacts.
+
+  Ran 1 shell command
+
+TASK.md 완료했습니다.
+
+무엇을, 왜 바꿨나
+
+local_contrast.cpp(cmodel::DoProcess)를 공통 규칙에 맞춰 정리하면서, 가독성 정리와 함께 중복 계산 제거까지 수행했습니다.
+
+가독성
+- ComputeNeighborhoodMean의 한 줄짜리 clamp+Offset 중첩식을 풀어 의도가 드러나는 헬퍼(ComputeRowBoxSums, HorizontalSumAt)와 알고리즘·계약 주석으로 분리.
+- 헬퍼는 UpperCamelCase로 명명. 헤더 계약(DoProcess, Validate, Offset, ClampPixel), #include, namespace, 공개 시그니처, 미사용 파라미터(StrengthQ8)는 그대로 유지.
+
+중복 계산 제거 (핵심)
+- 기존은 픽셀마다 (2R+1)² 이웃을 매번 재합산 → O(R²)/픽셀.
+- 이를 분리형 슬라이딩 윈도우로 교체: (1) 행별 수평 박스합을 O(1)/픽셀로 누적, (2) 열 누적기로 수직 방향을 아래로 슬라이딩. 덧셈은 결합법칙이 성립하므로 Total 정수합이 완전히 동일하고, 나눗셈(Total/Area)과 (Value-Mean)*Gain/256의 0방향 truncation·ClampPixel 경계 계약은 그대로. 윈도우 밖은 원본과 동일하게 edge-replicate clamp.
+
+검증 (정리 전/후, -O2, input=640×360)
+
+라디우스별 out_hash가 베이스라인과 전부 일치, cmp 바이트 동일:
+
+┌────────┬───────────────┬─────┬─────────────────────┬────────────────────┐
+│ radius │ out_hash 일치 │ cmp │ before min/med (ms) │ after min/med (ms) │
+├────────┼───────────────┼─────┼─────────────────────┼────────────────────┤
+│ 0      │ ✅            │ –   │ 3.07 / 3.26         │ 2.17 / 2.51        │
+├────────┼───────────────┼─────┼─────────────────────┼────────────────────┤
+│ 1      │ ✅            │ –   │ 7.63 / 8.07         │ 2.16 / 2.43        │
+├────────┼───────────────┼─────┼─────────────────────┼────────────────────┤
+│ 4      │ ✅            │ ✅  │ 47.18 / 48.75       │ 2.20 / 2.54        │
+├────────┼───────────────┼─────┼─────────────────────┼────────────────────┤
+│ 8      │ ✅            │ –   │ 167.0 / 189.9       │ 2.12 / 2.44        │
+├────────┼───────────────┼─────┼─────────────────────┼────────────────────┤
+│ 16     │ ✅            │ ✅  │ 634.0 / 701.9       │ 2.15 / 2.45        │
+└────────┴───────────────┴─────┴─────────────────────┴────────────────────┘
+
+(파일 I/O 제외, bench 30회 반복. out_hash는 5개 라디우스 전부 베이스라인과 동일값, cmp는 r0/r4/r16 바이트 동일 확인.)
+
+처리시간이 라디우스에 거의 무관해져 r=16 기준 약 290배 빨라졌습니다. 검증용 임시 산출물(baseline 바이너리·비교 ppm)은 삭제했습니다.
+
+참고로 이 환경엔 g++가 PATH에 없어 C:\Users\WoongbumHwang\Desktop\tools\w64devkit\bin\g++.exe(GCC 16.2.0)로 빌드했습니다.
+
+</script>
 <script>
 (function(){
   var wrap = document.getElementById('wrap');
@@ -822,6 +1532,14 @@ necessary 정보(결제 외부사명, 담당자 등)를 알려주시면 반영�
         {s:'B', cap:'형식을 다듬는 잔소리 · nag'},
         {s:'C', cap:'학습된 형식으로 바로 정리'}
       ]
+    },
+    'c-model': {
+      name: 'C-model 리팩터링',
+      sessions: [
+        {s:'A', cap:'스킬로 저장 · register'},
+        {s:'B', cap:'성능·명명 잔소리 · nag ×2'},
+        {s:'C', cap:'학습된 스킬로 TASK 수행'}
+      ]
     }
   };
   var active = 'business-dinner';
@@ -839,7 +1557,7 @@ necessary 정보(결제 외부사명, 담당자 등)를 알려주시면 반영�
     return html;
   }
 
-  var SYS_RE = /(Successfully loaded skill|Allowed by |Backgrounded agent|Ran \d+ shell command|nag 저장됨)/;
+  var SYS_RE = /(Successfully loaded skill|Allowed by |Backgrounded agent|[Rr]an \d+ shell command|Read \d+ file|nag 저장됨)/;
 
   function classify(line){
     var t = line.replace(/^\s+/, '');
