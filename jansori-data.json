@@ -53,6 +53,41 @@
       ],
       "created_at": 1788923125.690246,
       "updated_at": 1788923291.0949373
+    },
+    {
+      "skill_id": "cleanup-cmodel-workload",
+      "name": "cmodel 워크로드 정리",
+      "description": "cmodel 처리 코드(DoProcess 등)를 픽셀 단위 결과·계약을 유지한 채 가독성 위주로 정리하고 동등성/처리시간을 검증·보고하는 절차",
+      "body": "cmodel 개발 작업(local_contrast, nr 등 DoProcess 계열)을 공통 개발 규칙에 맞게 정리할 때 따르는 절차.\n\n## 불변 계약 (절대 변경 금지)\n- 픽셀 단위 결과가 정리 전과 반드시 동일해야 한다.\n- 경계 처리(clamp), 정수 나눗셈·반올림, 부호 있는 나눗셈의 0 방향 truncation 계약을 그대로 유지한다.\n- 공개 함수 시그니처와 cmodel::DoProcess 계약, #include, namespace를 바꾸지 않는다.\n- 미사용 파라미터(예: StrengthQ8)라도 계약이면 제거하지 않는다.\n\n## 정리 절차\n1. 베이스라인 캡처: 정리 전 코드를 bench로 빌드해 여러 파라미터(예: radius 0/1/4/8/16)에서 out_hash와 min/median ms를 기록한다.\n   g++ -std=c++17 -O2 -I. bench.cpp <impl>.cpp -o bench_baseline.exe\n2. 가독성 위주 리팩터: 산술식/루프 순서/정수 연산은 그대로 두고 블록 중괄호, 지역변수 분리, 알고리즘·계약 주석을 정리한다. 루프 불변식(예: 행 단위 clamp)을 안쪽 루프 밖으로 호이스팅하는 것은 결과값이 동일할 때만 허용.\n3. 동등성 검증: 정리 후 재빌드해 같은 파라미터들에서 out_hash가 베이스라인과 전부 일치하는지 확인. workload로 실제 출력을 만들어 기존 출력과 cmp로 바이트 동일 확인.\n4. 처리시간 측정: bench INPUT N 으로 파일 I/O 제외 처리시간을 반복 측정(기본 30회), 정리 전/후 min·median ms 비교.\n5. 정리용 임시 산출물(bench_baseline.exe, *_new.ppm 등)은 삭제.\n\n## 보고\n무엇을 왜 바꿨는지, 라디우스별 out_hash 일치표, cmp 바이트 동일 여부, 정리 전/후 처리시간(min·median)을 표로 남긴다. 해시가 하나라도 다르면 정리 실패로 보고하고 되돌린다.\n\n빌드/관측 명령:\n  g++ -std=c++17 -O2 -I. runner.cpp <impl>.cpp -o workload && ./workload input.ppm output.ppm\n  g++ -std=c++17 -O2 -I. bench.cpp <impl>.cpp -o bench && ./bench input.ppm 30",
+      "version": 3,
+      "corrections": [
+        {
+          "id": "7c5fb204-6c11-417c-b129-ad3ae26d6210",
+          "target": "cleanup-cmodel-workload",
+          "instruction_text": "가독성(이름·구조) 정리에 그치지 말고 중복 계산도 함께 줄인다. 특히 내부 루프에서 매 픽셀 재계산되는 Offset 인덱스 산술(Y*W+X 곱셈 등)을 행/열 베이스 포인터·인덱스 증분으로 strength-reduction 하는 등, 픽셀 단위 결과와 불변 계약(클램프, 정수/truncating 나눗셈, 시그니처, 미사용 파라미터)을 유지하는 선에서 불필요한 반복 연산을 제거한다. 주변 픽셀 합산은 이미 슬라이딩 윈도우로 증분 처리되어 있으므로 그 외 재계산 지점을 찾아 줄인다. 최적화 결과도 라디우스별 out_hash 일치 + cmp 바이트 동일 + 처리시간(min·median) 비교로 반드시 검증한다.",
+          "request_id": "e24078ba-3a29-49f7-929e-1803b09a3268",
+          "seq": 1,
+          "created_at": 1788926799.2777822
+        },
+        {
+          "id": "3692f1e9-7b81-4d7a-8292-b6cd5c9c22b8",
+          "target": "cleanup-cmodel-workload",
+          "instruction_text": "함수 명명 규칙: 새로 작성하거나 이름을 변경하는 자체 함수(익명 네임스페이스의 내부 헬퍼 포함)는 UpperCamelCase로 작성한다. 예: DoRunNoiseReduction, DoRunHal, MixPixel. 단, 생성자·소멸자·연산자 오버로드와 외부 인터페이스(헤더에 선언된 공개 계약, 표준/프레임워크가 요구하는 시그니처)를 재정의하는 함수는 이 규칙보다 해당 언어·인터페이스 계약을 우선한다(예: cmodel::DoProcess, Validate, Offset, ClampPixel은 헤더 계약이므로 그대로 둔다). 이름 변경도 코드 변경이므로 라디우스별 out_hash 일치와 cmp 바이트 동일로 검증한다.",
+          "request_id": "2356d25c-54f8-4847-aaad-f537f619f30d",
+          "seq": 2,
+          "created_at": 1788926991.809633
+        }
+      ],
+      "refs_children": [],
+      "assets": [],
+      "protected_fields": [
+        "skill_id",
+        "name",
+        "refs_children",
+        "protected_fields"
+      ],
+      "created_at": 1788926293.2468553,
+      "updated_at": 1788926991.809633
     }
   ],
   "history": {
@@ -114,6 +149,29 @@
         "request_id": "c86d957d-9eb5-4c1c-a066-792c0231c1e4",
         "origin": "nag",
         "created_at": 1788923291.0949373
+      }
+    ],
+    "cleanup-cmodel-workload": [
+      {
+        "number": 1,
+        "body_snapshot": "cmodel 개발 작업(local_contrast, nr 등 DoProcess 계열)을 공통 개발 규칙에 맞게 정리할 때 따르는 절차.\n\n## 불변 계약 (절대 변경 금지)\n- 픽셀 단위 결과가 정리 전과 반드시 동일해야 한다.\n- 경계 처리(clamp), 정수 나눗셈·반올림, 부호 있는 나눗셈의 0 방향 truncation 계약을 그대로 유지한다.\n- 공개 함수 시그니처와 cmodel::DoProcess 계약, #include, namespace를 바꾸지 않는다.\n- 미사용 파라미터(예: StrengthQ8)라도 계약이면 제거하지 않는다.\n\n## 정리 절차\n1. 베이스라인 캡처: 정리 전 코드를 bench로 빌드해 여러 파라미터(예: radius 0/1/4/8/16)에서 out_hash와 min/median ms를 기록한다.\n   g++ -std=c++17 -O2 -I. bench.cpp <impl>.cpp -o bench_baseline.exe\n2. 가독성 위주 리팩터: 산술식/루프 순서/정수 연산은 그대로 두고 블록 중괄호, 지역변수 분리, 알고리즘·계약 주석을 정리한다. 루프 불변식(예: 행 단위 clamp)을 안쪽 루프 밖으로 호이스팅하는 것은 결과값이 동일할 때만 허용.\n3. 동등성 검증: 정리 후 재빌드해 같은 파라미터들에서 out_hash가 베이스라인과 전부 일치하는지 확인. workload로 실제 출력을 만들어 기존 출력과 cmp로 바이트 동일 확인.\n4. 처리시간 측정: bench INPUT N 으로 파일 I/O 제외 처리시간을 반복 측정(기본 30회), 정리 전/후 min·median ms 비교.\n5. 정리용 임시 산출물(bench_baseline.exe, *_new.ppm 등)은 삭제.\n\n## 보고\n무엇을 왜 바꿨는지, 라디우스별 out_hash 일치표, cmp 바이트 동일 여부, 정리 전/후 처리시간(min·median)을 표로 남긴다. 해시가 하나라도 다르면 정리 실패로 보고하고 되돌린다.\n\n빌드/관측 명령:\n  g++ -std=c++17 -O2 -I. runner.cpp <impl>.cpp -o workload && ./workload input.ppm output.ppm\n  g++ -std=c++17 -O2 -I. bench.cpp <impl>.cpp -o bench && ./bench input.ppm 30",
+        "request_id": "e847fdfb-2bdf-438d-b6b1-b3cf4edd9e9e",
+        "origin": "register",
+        "created_at": 1788926293.2468553
+      },
+      {
+        "number": 2,
+        "body_snapshot": "cmodel 개발 작업(local_contrast, nr 등 DoProcess 계열)을 공통 개발 규칙에 맞게 정리할 때 따르는 절차.\n\n## 불변 계약 (절대 변경 금지)\n- 픽셀 단위 결과가 정리 전과 반드시 동일해야 한다.\n- 경계 처리(clamp), 정수 나눗셈·반올림, 부호 있는 나눗셈의 0 방향 truncation 계약을 그대로 유지한다.\n- 공개 함수 시그니처와 cmodel::DoProcess 계약, #include, namespace를 바꾸지 않는다.\n- 미사용 파라미터(예: StrengthQ8)라도 계약이면 제거하지 않는다.\n\n## 정리 절차\n1. 베이스라인 캡처: 정리 전 코드를 bench로 빌드해 여러 파라미터(예: radius 0/1/4/8/16)에서 out_hash와 min/median ms를 기록한다.\n   g++ -std=c++17 -O2 -I. bench.cpp <impl>.cpp -o bench_baseline.exe\n2. 가독성 위주 리팩터: 산술식/루프 순서/정수 연산은 그대로 두고 블록 중괄호, 지역변수 분리, 알고리즘·계약 주석을 정리한다. 루프 불변식(예: 행 단위 clamp)을 안쪽 루프 밖으로 호이스팅하는 것은 결과값이 동일할 때만 허용.\n3. 동등성 검증: 정리 후 재빌드해 같은 파라미터들에서 out_hash가 베이스라인과 전부 일치하는지 확인. workload로 실제 출력을 만들어 기존 출력과 cmp로 바이트 동일 확인.\n4. 처리시간 측정: bench INPUT N 으로 파일 I/O 제외 처리시간을 반복 측정(기본 30회), 정리 전/후 min·median ms 비교.\n5. 정리용 임시 산출물(bench_baseline.exe, *_new.ppm 등)은 삭제.\n\n## 보고\n무엇을 왜 바꿨는지, 라디우스별 out_hash 일치표, cmp 바이트 동일 여부, 정리 전/후 처리시간(min·median)을 표로 남긴다. 해시가 하나라도 다르면 정리 실패로 보고하고 되돌린다.\n\n빌드/관측 명령:\n  g++ -std=c++17 -O2 -I. runner.cpp <impl>.cpp -o workload && ./workload input.ppm output.ppm\n  g++ -std=c++17 -O2 -I. bench.cpp <impl>.cpp -o bench && ./bench input.ppm 30",
+        "request_id": "e24078ba-3a29-49f7-929e-1803b09a3268",
+        "origin": "nag",
+        "created_at": 1788926799.2777822
+      },
+      {
+        "number": 3,
+        "body_snapshot": "cmodel 개발 작업(local_contrast, nr 등 DoProcess 계열)을 공통 개발 규칙에 맞게 정리할 때 따르는 절차.\n\n## 불변 계약 (절대 변경 금지)\n- 픽셀 단위 결과가 정리 전과 반드시 동일해야 한다.\n- 경계 처리(clamp), 정수 나눗셈·반올림, 부호 있는 나눗셈의 0 방향 truncation 계약을 그대로 유지한다.\n- 공개 함수 시그니처와 cmodel::DoProcess 계약, #include, namespace를 바꾸지 않는다.\n- 미사용 파라미터(예: StrengthQ8)라도 계약이면 제거하지 않는다.\n\n## 정리 절차\n1. 베이스라인 캡처: 정리 전 코드를 bench로 빌드해 여러 파라미터(예: radius 0/1/4/8/16)에서 out_hash와 min/median ms를 기록한다.\n   g++ -std=c++17 -O2 -I. bench.cpp <impl>.cpp -o bench_baseline.exe\n2. 가독성 위주 리팩터: 산술식/루프 순서/정수 연산은 그대로 두고 블록 중괄호, 지역변수 분리, 알고리즘·계약 주석을 정리한다. 루프 불변식(예: 행 단위 clamp)을 안쪽 루프 밖으로 호이스팅하는 것은 결과값이 동일할 때만 허용.\n3. 동등성 검증: 정리 후 재빌드해 같은 파라미터들에서 out_hash가 베이스라인과 전부 일치하는지 확인. workload로 실제 출력을 만들어 기존 출력과 cmp로 바이트 동일 확인.\n4. 처리시간 측정: bench INPUT N 으로 파일 I/O 제외 처리시간을 반복 측정(기본 30회), 정리 전/후 min·median ms 비교.\n5. 정리용 임시 산출물(bench_baseline.exe, *_new.ppm 등)은 삭제.\n\n## 보고\n무엇을 왜 바꿨는지, 라디우스별 out_hash 일치표, cmp 바이트 동일 여부, 정리 전/후 처리시간(min·median)을 표로 남긴다. 해시가 하나라도 다르면 정리 실패로 보고하고 되돌린다.\n\n빌드/관측 명령:\n  g++ -std=c++17 -O2 -I. runner.cpp <impl>.cpp -o workload && ./workload input.ppm output.ppm\n  g++ -std=c++17 -O2 -I. bench.cpp <impl>.cpp -o bench && ./bench input.ppm 30",
+        "request_id": "2356d25c-54f8-4847-aaad-f537f619f30d",
+        "origin": "nag",
+        "created_at": 1788926991.809633
       }
     ]
   }
