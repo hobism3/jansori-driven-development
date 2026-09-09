@@ -522,3 +522,35 @@ Local Python 3.12.7 (target 3.10-3.11; code uses future annotations + X|None, 3.
 **Timestamp**: 2026-09-09T00:40:00Z
 **AI Response**: "Implemented persist-by-default JSON snapshot. NEW server/store/persistence.py (serialize/atomic_write/load_state fail-safe); CapsuleStore(data_file) hydrate + _commit_locked persist hook; Container.build(data_file=None) in-memory default; main() resolves JANSORI_DATA_FILE (default jansori-data.json, :memory: opt-out) and builds persistent app; tests/unit/u1/test_persistence.py (6). .gitignore + README + build-instructions + persistence-summary.md updated. RAN pytest tests -q -> 144 passed (138+6), Python 3.12.7. END-TO-END: seed 3 skills + nag->v2, kill server, reboot same file -> 3 skills + cmodel-refactoring v2 + correction survived (snapshot 5740B). Persist scoped to main() so all prior tests stay in-memory/isolated. Q9 superseded (user-authorized)."
 **Context**: CONSTRUCTION — U1 persistence complete & verified.
+
+## Bug Fix — normalize commit partial-write (U1 reopen)
+**Timestamp**: 2026-09-09T00:00:00Z
+**User Input**: "야 normalize 에서 버그 발생했고, 원인 규명한 내용이야. ai dlc 활용해서 버그 고처야할거같아. [full diagnosis pasted: (1) _commit_locked commits in-memory (steps 2-4) before disk (step 5) with NO rollback; os.replace fails WinError 5 when file locked by another process. (2) Two server processes (PID 1996, 9576) both hold jansori-data.json → intermittent os.replace failure. (3) partial commit advances in-memory v5 while disk stays v4 → PRESERVATION_FAILED cascade on retry. (4) GET/load 500 from corrupted in-memory state. (5) disk data safe at v4. Remedy: kill both processes + single instance; fix commit to disk-first or rollback on persist failure + single-instance lock.]"
+**AI Response**: "Confirmed diagnosis against source (capsule_store._commit_locked ordering + persistence.atomic_write os.replace + main.py persist-by-default). Entering AI-DLC brownfield bug-fix flow (U1 reopen). Displaying welcome, minimal Requirements Analysis + clarifying questions."
+**Context**: CONSTRUCTION / U1 reopen — persistence commit atomicity bug
+
+---
+
+## Requirements Analysis decisions — bug fix
+**Timestamp**: 2026-09-09T00:05:00Z
+**User Input**: "[AskUserQuestion answers] Fix approach = 디스크 먼저 → 인메모리 (persist prospective state first, reflect in-memory only on durable-write success). Single-instance = PID/파일 락 추가. Recover now = 코드 수정 후 함께 (fix+test, then kill 1996/9576 + single restart)."
+**AI Response**: "Recorded. Proceeding to Workflow Planning + Code Generation plan (single approval gate, minimal bug-fix depth)."
+**Context**: CONSTRUCTION / U1 reopen — commit atomicity = persist-first; add single-instance lock
+
+## Code Generation plan approval — bug fix
+**Timestamp**: 2026-09-09T00:10:00Z
+**User Input**: "승인"
+**AI Response**: "Approved. Executing steps 1-6 (persist-first _commit_locked, instance_lock.py, main.py wiring, regression+PBT tests, summary, full suite). Step 7 (process cleanup) will be re-confirmed before execution."
+**Context**: CONSTRUCTION / U1 reopen — Code Generation Part 2
+
+## Code Generation Part 2 complete — bug fix
+**Timestamp**: 2026-09-09T00:30:00Z
+**User Input**: "[N/A - AI execution]"
+**AI Response**: "Implemented: (1) capsule_store._commit_locked = persist-first (prospective snapshot written+durable before live-map mutation; failure raises with memory untouched); (2) NEW server/store/instance_lock.py (OS advisory lock on <data_file>.lock, msvcrt/fcntl, auto-release on exit); (3) main.py acquires lock when persisting, SystemExit with clear message if busy; (4) tests: +2 persist-failure/retry in test_persistence.py, NEW test_instance_lock.py (4); (5) persistence-summary.md §Bug fix + aidlc-state.md updated. pytest tests -q => 150 passed (144+6), Python 3.12.7."
+**Context**: CONSTRUCTION / U1 reopen 2nd pass — Code Generation Part 2 done
+
+## Operations — process cleanup + single-instance restart
+**Timestamp**: 2026-09-09T00:45:00Z
+**User Input**: "kill은 니가 해줘"
+**AI Response**: "Inspected live procs: PID 9576 = 'python -m server.app.main' (leftover jansori server, killed); PID 16016 = 'inspect_skills.py --watch 2' (user's monitor, LEFT untouched); PID 1996 (prior restart) already gone. Killed 9576. Restarted ONE instance (PID 16356) with fixed code -> LISTENING 127.0.0.1:8765, persisting, lock file created. Verified: disk = pick-team-dinner-venue v4 corr=3 (data safe, as diagnosed); GET /skills/index -> 200 (previously 500, now healthy after clean reload); second `python -m server.app.main` REFUSED by single-instance lock with clear message. Full suite 150 passed."
+**Context**: CONSTRUCTION / U1 reopen 2nd pass — Operations recovery complete

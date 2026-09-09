@@ -16,6 +16,11 @@ Locking discipline (to avoid deadlock, locks are ALWAYS acquired in this order):
 version-history append, and request-log record as ONE atomic unit while holding BOTH
 locks, so a concurrent nag + background normalization (same skill) and any same
 request_id across skills can never observe a partial or duplicated write (I-05/I-12).
+
+Durability ordering (U1 reopen 2026-09-09): when a data file is configured the commit is
+PERSIST-FIRST — the on-disk snapshot is written and confirmed durable BEFORE the live
+in-memory maps change. A failed disk write raises with the in-memory state untouched, so
+disk and memory never diverge (fixes the partial-commit / PRESERVATION_FAILED cascade).
 """
 from __future__ import annotations
 
@@ -152,15 +157,32 @@ class CapsuleStore:
         return prior
 
     def _commit_locked(self, capsule: Capsule, request_id: str, origin: str) -> None:
+        # PERSIST-FIRST commit (U1 reopen 2026-09-09): the on-disk snapshot is written and
+        # confirmed durable BEFORE any live in-memory state changes. If the disk write fails
+        # (e.g. WinError 5 when another process holds the file), we raise WITHOUT touching the
+        # live maps, so a retry observes the unchanged prior version instead of an in-memory
+        # state that has silently run ahead of disk (the partial-commit / PRESERVATION_FAILED
+        # cascade this fixes). In-memory-only stores (data_file is None) skip step 1 entirely.
+        #
         # 1) build immutable snapshot for the new version (I-01)
         snapshot = capsule.snapshot_version(request_id=request_id, origin=origin)
-        # 2) atomic pointer swap
-        self._capsules[capsule.skill_id] = capsule
-        # 3) append version history
-        self._history.setdefault(capsule.skill_id, []).append(snapshot)
+        # 2) persist a PROSPECTIVE snapshot first, built from copies so the live maps are never
+        #    mutated until the write is durable (atomic temp+replace, D-P4). dump_state only reads
+        #    its arguments, so shallow copies (with this skill's entry replaced/extended) are safe.
+        if self._data_file is not None:
+            prospective_capsules = dict(self._capsules)
+            prospective_capsules[capsule.skill_id] = capsule
+            prospective_history = dict(self._history)
+            prospective_history[capsule.skill_id] = (
+                self._history.get(capsule.skill_id, []) + [snapshot]
+            )
+            # If this raises, none of the live state below has changed (atomicity preserved).
+            persistence.atomic_write(
+                self._data_file, persistence.dump_state(prospective_capsules, prospective_history)
+            )
+        # 3) durable (or in-memory-only): reflect in the live maps. These are plain dict ops that
+        #    cannot fail, so once we reach here the on-disk and in-memory states stay in lockstep.
+        self._capsules[capsule.skill_id] = capsule           # atomic pointer swap
+        self._history.setdefault(capsule.skill_id, []).append(snapshot)  # version history
         # 4) record idempotency with the EXACT produced capsule (same atomic unit, I-05/I-12/M1)
         self._request_log[request_id] = capsule
-        # 5) persist the whole snapshot (write-through) if a data file is configured. Runs under
-        #    both locks so the on-disk snapshot is never torn; atomic temp+replace (D-P4).
-        if self._data_file is not None:
-            persistence.atomic_write(self._data_file, persistence.dump_state(self._capsules, self._history))

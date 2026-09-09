@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from server.app.routes import Container
 from server.store import persistence
 
@@ -72,3 +74,54 @@ def test_in_memory_default_writes_nothing(tmp_path, monkeypatch):
     c = Container.build()  # data_file=None
     _register_and_nag(c, n=1)
     assert list(tmp_path.iterdir()) == []  # no snapshot file created
+
+
+# ----- persist-first commit atomicity (U1 reopen 2026-09-09) --------------------
+# Regression for the partial-commit bug: a disk-write failure (e.g. WinError 5 when the
+# snapshot is locked by another process) must NOT advance in-memory state ahead of disk.
+
+def test_persist_failure_leaves_memory_and_disk_at_prior_version(tmp_path, monkeypatch):
+    f = tmp_path / "data.json"
+    c = Container.build(data_file=str(f))
+    _register_and_nag(c, n=2)  # v3 on disk + memory
+
+    # Inject a disk-write failure on the NEXT commit (simulates os.replace WinError 5).
+    def boom(*_a, **_k):
+        raise OSError("simulated WinError 5: access denied")
+
+    monkeypatch.setattr(persistence, "atomic_write", boom)
+    with pytest.raises(OSError):
+        c.nags.apply_nag("sk", correction_text="willfail", base_version=3, request_id="nfail")
+
+    # In-memory state did NOT run ahead of disk.
+    assert c.store.get_latest("sk").version == 3
+    assert len(c.store.history("sk")) == 3
+    # Disk is still the clean prior version.
+    assert Container.build(data_file=str(f)).store.get_latest("sk").version == 3
+
+
+def test_retry_after_persist_failure_commits_cleanly(tmp_path, monkeypatch):
+    f = tmp_path / "data.json"
+    c = Container.build(data_file=str(f))
+    _register_and_nag(c, n=2)  # v3
+
+    calls = {"n": 0}
+    real = persistence.atomic_write
+
+    def fail_once(path, state):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise OSError("simulated WinError 5: access denied")
+        return real(path, state)
+
+    monkeypatch.setattr(persistence, "atomic_write", fail_once)
+
+    # First attempt fails at the disk write; nothing recorded (not even the request_id).
+    with pytest.raises(OSError):
+        c.nags.apply_nag("sk", correction_text="rule3", base_version=3, request_id="nfail")
+
+    # A genuine retry (same request_id, same base_version) now succeeds — no stale replay,
+    # no PRESERVATION_FAILED, because the failed attempt left no trace.
+    res = c.nags.apply_nag("sk", correction_text="rule3", base_version=3, request_id="nfail")
+    assert res["new_version"] == 4
+    assert Container.build(data_file=str(f)).store.get_latest("sk").version == 4

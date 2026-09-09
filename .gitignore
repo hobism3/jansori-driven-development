@@ -10,3 +10,6 @@ venv/
 .coverage
 htmlcov/
 .DS_store
+
+# runtime single-instance lock (per-process artifact)
+jansori-data.json.lock

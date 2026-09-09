@@ -21,6 +21,7 @@ from fastapi import FastAPI
 
 from ..domain.errors import DomainError
 from ..security.guard import assert_loopback
+from ..store import instance_lock
 from .errors import domain_error_handler, unhandled_error_handler
 from .routes import Container, register_routes
 
@@ -71,11 +72,21 @@ def main() -> None:
     assert_loopback(host)  # SPEC 5: refuse non-loopback bind before serving
     # Build a persistent app (default) or in-memory (:memory:) for the actual server run.
     data_file = configured_data_file()
-    application = create_app(Container.build(data_file=data_file))
     if data_file:
+        # Single-instance guard: refuse to start a SECOND process against the same data file,
+        # so two servers can never race os.replace on the shared snapshot (U1 reopen). The lock
+        # is held for the process lifetime via `_lock` and released automatically on exit.
+        try:
+            _lock = instance_lock.acquire_for(data_file)  # noqa: F841 (held until process exit)
+        except instance_lock.InstanceLockError as exc:
+            raise SystemExit(
+                f"[jansori] refusing to start: {exc}. "
+                f"Stop the other server (or use JANSORI_DATA_FILE=:memory:) and retry."
+            )
         print(f"[jansori] persisting store to {data_file}")
     else:
         print("[jansori] in-memory store (JANSORI_DATA_FILE=:memory:)")
+    application = create_app(Container.build(data_file=data_file))
     uvicorn.run(application, host=host, port=port, log_level="info")
 
 
