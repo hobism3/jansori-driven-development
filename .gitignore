@@ -9,6 +9,3 @@ venv/
 *.log
 .coverage
 htmlcov/
-
-# runtime snapshot store (persist-by-default server)
-jansori-data.json
