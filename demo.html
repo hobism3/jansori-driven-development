@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>시연 영상 — Jansori Plugin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#fdf6e3;
+  --card-bg:#ffffff;
+  --text-main:#111111;
+  --text-muted:#4b4b4b;
+  --primary:#ff5a1f;
+  --accent-purple:#6d28d9;
+  --accent-cyan:#0891b2;
+  --accent-emerald:#15803d;
+  --font-sans:'Pretendard','Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --font-mono:'Fira Code',monospace;
+  --font-display:'Archivo Black','Pretendard','Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:17px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text-main);font-family:var(--font-sans);line-height:1.6;overflow-x:hidden}
+::selection{background:#111;color:#fdf6e3}
+:focus-visible{outline:3px solid #111;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+.container{max-width:1120px;margin:0 auto;padding:0 24px}
+h1,h2,.logo{font-family:var(--font-display);font-weight:900;letter-spacing:-1.5px}
+
+header{padding:20px 0;background:var(--bg);border-bottom:4px solid #111;position:sticky;top:0;z-index:100}
+.nav-inner{display:flex;justify-content:space-between;align-items:center;gap:16px}
+a.logo{display:flex;align-items:center;gap:10px;font-size:1.25rem;text-decoration:none;color:inherit;white-space:nowrap}
+.logo span.badge{font-size:.7rem;background:var(--primary);color:#fff;border:2px solid #111;padding:3px 8px;font-weight:700;letter-spacing:0}
+a.logo:hover span.badge{background:#111}
+.nav-links{display:flex;gap:22px;font-size:.9rem;color:var(--text-muted);font-weight:600}
+.nav-links a{text-decoration:none;color:inherit;padding-bottom:3px;border-bottom:3px solid transparent}
+.nav-links a:hover{color:#111;border-bottom-color:#111}
+.nav-links a.here{color:#111;border-bottom-color:var(--primary)}
+@media(max-width:760px){.nav-links{gap:14px;font-size:.82rem}}
+
+.page-head{padding:44px 0 30px}
+.eyebrow{font-family:var(--font-mono);font-size:.8rem;color:var(--primary);display:block;margin-bottom:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.page-head h1{font-size:clamp(2rem,4.6vw,3rem);line-height:1.1;margin-bottom:14px}
+.page-head p{color:var(--text-muted);max-width:760px}
+
+/* ---------- 플레이어 ---------- */
+.stage{border:3px solid #111;box-shadow:8px 8px 0 var(--primary);background:#111;margin-bottom:56px}
+.stage-bar{background:#000;border-bottom:3px solid #333;display:flex;align-items:center;gap:10px;padding:9px 14px}
+.dot{width:12px;height:12px;border:2px solid #444;flex:none}
+.dot.r{background:#e11d48}.dot.y{background:#f59e0b}.dot.g{background:#15803d}
+.stage-name{font-family:var(--font-mono);font-size:.76rem;color:#94a3b8;margin-left:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frame{position:relative;width:100%;aspect-ratio:16/9;background:#111}
+.frame iframe,.frame video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:32px;color:#e2e8f0}
+.placeholder .big{font-family:var(--font-display);font-size:clamp(1.1rem,2.6vw,1.6rem);letter-spacing:-1px}
+.placeholder .hint{font-family:var(--font-mono);font-size:.8rem;color:#94a3b8;max-width:560px;line-height:1.8}
+.placeholder code{background:#000;border:1px solid #333;padding:2px 7px;color:var(--primary)}
+
+/* ---------- 관전 포인트 ---------- */
+section{margin-bottom:72px}
+.sec-title{display:flex;align-items:baseline;gap:14px;border-bottom:3px solid #111;padding-bottom:10px;margin-bottom:28px;flex-wrap:wrap}
+.sec-title h2{font-size:1.5rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.card{background:var(--card-bg);border:3px solid #111;box-shadow:6px 6px 0 #111;padding:22px 24px}
+.card .tagline{font-family:var(--font-mono);font-size:.74rem;border:2px solid #111;padding:2px 8px;display:inline-block;margin-bottom:12px;font-weight:600}
+.card.a .tagline{background:var(--accent-cyan);color:#fff}
+.card.b .tagline{background:var(--primary);color:#fff}
+.card.c .tagline{background:var(--accent-emerald);color:#fff}
+.card h3{font-family:var(--font-display);font-size:1.15rem;letter-spacing:-.8px;margin-bottom:8px}
+.card p{color:var(--text-muted);font-size:.95rem}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;border:3px solid #111;background:#fff;box-shadow:5px 5px 0 #111;padding:16px 20px;margin-bottom:16px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+.steps li::before{content:counter(s);font-family:var(--font-display);font-size:1.3rem;background:#111;color:#fdf6e3;width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.steps b{display:block}
+.steps span{color:var(--text-muted);font-size:.92rem}
+footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text-muted);font-size:.88rem}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav-inner">
+    <a class="logo" href="index.html">⚡ Jansori <span class="badge">NDD Engine</span></a>
+    <nav class="nav-links">
+      <a href="index.html">← 홈</a>
+      <a href="intro.html">소개글</a>
+      <a href="db.html">DB</a>
+      <a href="demo.html" class="here">시연 영상</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <div class="page-head">
+    <span class="eyebrow">Live Demo</span>
+    <h1>말로 하면 길고, 보면 30초입니다</h1>
+    <p>같은 원본 코드, 같은 요청, 같은 입력으로 <strong>교정 전 → 교정 후 → 정리 후</strong> 세 상태를 나란히 돌립니다. 잔소리 한 번이 다음 세션의 첫 결과를 어떻게 바꾸는지 그대로 보입니다.</p>
+  </div>
+
+  <div class="stage">
+    <div class="stage-bar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="stage-name">jansori — demo.mp4</span>
+    </div>
+    <div class="frame" id="frame"></div>
+  </div>
+
+  <section>
+    <div class="sec-title"><h2>무엇을 보게 되나</h2></div>
+    <div class="grid">
+      <div class="card a">
+        <span class="tagline">A · 증거</span>
+        <h3>빈 인덱스에서 시작</h3>
+        <p>관련 스킬이 하나도 없는 정상 서버에서 업무를 끝내고, 제안 → 수락 → 캡슐 등록까지 갑니다. 잔소리가 자산이 되는 첫 순간입니다.</p>
+      </div>
+      <div class="card b">
+        <span class="tagline">B · 교정</span>
+        <h3>선배가 옆자리에 앉는다</h3>
+        <p>결과를 보고 던지는 한 줄의 잔소리가 <code>correction</code>으로 캡슐에 박히고, 캡슐 버전이 올라갑니다. 같은 말을 두 번 할 필요가 없어집니다.</p>
+      </div>
+      <div class="card c">
+        <span class="tagline">C · 세 상태</span>
+        <h3>교정 전 / 후 / 정리 후</h3>
+        <p>C0·C1·C2는 각각 새 세션입니다. 대화를 이어받지 않고도 결과가 달라지는지 — 즉 잔소리가 정말 전파됐는지를 확인합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title"><h2>직접 돌려보기</h2></div>
+    <ol class="steps">
+      <li><div><b>make run</b><span>터미널 1에서 로컬 Jansori 서버를 띄웁니다. 한 번에 한 인스턴스만 운영합니다.</span></div></li>
+      <li><div><b>make seed</b><span>터미널 2에서 시연용 캡슐을 등록합니다. 같은 ID가 이미 있으면 덮어쓰지 않습니다.</span></div></li>
+      <li><div><b>Plugin 활성화</b><span>B/C 작업 공간에서 Claude Code Plugin을 켜고, <code>/nag</code> 와 <code>/save</code> 로 잔소리를 남깁니다.</span></div></li>
+      <li><div><b>make verify</b><span>실제 구현을 검증하고, 결과 스냅샷은 <a href="db.html" style="color:#111">DB 탭</a>에서 그대로 확인합니다.</span></div></li>
+    </ol>
+  </section>
+</div>
+
+<footer>
+  <div class="container">
+    Jansori Plugin — Claude Code Plugin + 로컬 Python 서버 · Amazon AI-DLC 기반 1일 해커톤
+  </div>
+</footer>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   ▼ 영상 주소를 여기 한 줄만 바꾸면 됩니다.
+     · YouTube  : "https://youtu.be/XXXXXXXXXXX" 또는 watch?v= 주소
+     · 로컬 파일: "assets/demo.mp4"  (파일을 그 경로에 두세요)
+     · 비워두면 아래 안내 화면이 뜹니다.
+   ───────────────────────────────────────────────────────────── */
+var VIDEO_URL = "";
+
+(function(){
+  var frame = document.getElementById('frame');
+  var url = (VIDEO_URL || '').trim();
+
+  if(!url){
+    frame.innerHTML =
+      '<div class="placeholder">' +
+        '<div class="big">시연 영상을 넣을 자리입니다</div>' +
+        '<div class="hint">demo.html 의 <code>VIDEO_URL</code> 에 유튜브 링크를 넣거나,<br>영상 파일을 <code>assets/demo.mp4</code> 로 두세요.</div>' +
+      '</div>';
+    return;
+  }
+
+  // 유튜브 주소는 embed 형태로 바꿔 iframe 으로, 그 외는 <video> 로 재생한다
+  var yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
+  if(yt){
+    var f = document.createElement('iframe');
+    f.src = 'https://www.youtube.com/embed/' + yt[1] + '?rel=0';
+    f.title = 'Jansori 시연 영상';
+    f.allow = 'accelerometer; clipboard-write; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    frame.appendChild(f);
+    document.querySelector('.stage-name').textContent = 'jansori — demo (YouTube)';
+    return;
+  }
+
+  var v = document.createElement('video');
+  v.src = url;
+  v.controls = true;
+  v.playsInline = true;
+  v.preload = 'metadata';
+  frame.appendChild(v);
+  document.querySelector('.stage-name').textContent = 'jansori — ' + url.split('/').pop();
+})();
+</script>
+</body>
+</html>

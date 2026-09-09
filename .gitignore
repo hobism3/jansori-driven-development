@@ -9,3 +9,4 @@ venv/
 *.log
 .coverage
 htmlcov/
+.DS_store
