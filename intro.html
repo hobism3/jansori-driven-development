@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Jansori Plugin — 잔소리 주도 개발</title>
+<title>소개글 — Jansori Plugin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
@@ -850,37 +850,26 @@ header{padding:0}
   }
   .run-fab:hover,.run-fab:active{transform:none;box-shadow:5px 5px 0 #111}
 }
-
-/* ============ 소개 동영상 (랜딩) ============ */
-.intro-video{margin:26px auto 96px}
-.iv-media{border:3px solid #111;box-shadow:8px 8px 0 var(--primary);background:#111;line-height:0}
-.iv-media video{width:100%;height:auto;display:block}
-.iv-actions{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:30px}
-.iv-btn{
-  display:inline-block;font-weight:800;text-decoration:none;color:#111;
-  background:#fff;border:3px solid #111;box-shadow:4px 4px 0 #111;padding:12px 22px;
-  transition:transform .1s,box-shadow .1s;
-}
-.iv-btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 #111}
-.iv-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #111}
-.iv-btn.primary{background:var(--primary);color:#fff}
-@media(max-width:860px){
-  .intro-video{margin:12px auto 70px}
-  .iv-media{box-shadow:5px 5px 0 var(--primary)}
-  .iv-actions{flex-direction:column}
-  .iv-btn{text-align:center}
-}
 </style>
 </head>
 <body>
 
 <header>
   <div class="container nav-inner">
-    <div class="logo">💊 Jansori <span class="badge">JDD Plugin</span></div>
+    <a class="logo" href="index.html" style="text-decoration:none;color:inherit">💊 Jansori <span class="badge">JDD Plugin</span></a>
     <nav class="nav-main">
-      <a href="intro.html">소개글</a>
+      <a href="intro.html" class="here">소개글</a>
       <a href="examples.html">실 사용 사례</a>
       <a href="db.html">잔소리는 어디에 쌓이는가</a>
+    </nav>
+  </div>
+  <div class="nav-sub-bar">
+    <nav class="container nav-sub">
+      <a href="#intro">신입의 첫 PR</a>
+      <a href="#architecture">아키텍처</a>
+      <a href="#howdid">C-model 개발 과정</a>
+      <a href="#evolve">잔소리가 쌓일 때</a>
+      <a href="#loop">회식 장소든, C-model 룰이든</a>
     </nav>
   </div>
 </header>
@@ -899,19 +888,443 @@ header{padding:0}
   </h1>
 </div>
 
-<!-- ============ 소개 동영상 ============ -->
-<section class="container intro-video">
-  <div class="iv-media">
-    <video src="intro_video.mp4" controls playsinline preload="metadata">
-      브라우저가 비디오 태그를 지원하지 않습니다. <a href="intro_video.mp4">동영상 내려받기</a>
-    </video>
+<!-- ============ 1. 신입의 첫 PR ============ -->
+<section class="container" id="firstpr">
+  <div class="section-title">
+    <h2>신입도 할 수 있습니다. 선배가 옆자리에 3번 앉으면요.</h2>
+    <p>
+      <strong style="font-size: 1.2em; display: inline-block; margin-bottom: 8px;">얼마나 불렀습니까? 얼마나 불려갔습니까? </strong><br>
+      Jansori Plugin과 함께라면, 더 빨리 일하고, 규칙을 자연스럽게 전파하고 관리할 수 있습니다.
+    </p>
   </div>
-  <div class="iv-copy">
-    <div class="iv-actions">
-      <a class="iv-btn primary" href="intro.html">소개글 자세히 보기 →</a>
-      <a class="iv-btn" href="examples.html">실 사용 사례</a>
-      <a class="iv-btn" href="db.html">잔소리는 어디에 쌓이는가</a>
+
+  <div class="pr-grid">
+    <div class="pr-card fail">
+      <span class="arch-badge badge-fail">플러그인 없이</span>
+      <h3>👶 PR 지뢰밭</h3>
+      <div class="meta">C0 · 로드된 캡슐 없음</div>
+      <div class="thread">
+        <div class="rvw"><i>review #1</i>이름이랑 구조만 다듬으셨네요. 반복되는 주변 픽셀 합산 같은 <code>중복 계산</code>도 같이 줄여주세요.</div>
+        <div class="rvw"><i>review #2</i>새로 만들거나 이름 바꾼 함수는 <code>UpperCamelCase</code>로 통일합니다 (예: <code>DoRunNoiseReduction</code>). 생성자·연산자처럼 계약이 있는 건 예외고요.</div>
+      </div>
+      <div class="stat-row"><b>2</b><span>회 리뷰 왕복 끝에 Merge</span></div>
+      <div class="meter">
+        <div class="lab"><span>첫 제출 규칙 준수</span><b>4 / 6</b></div>
+        <div class="bar"><i></i></div>
+      </div>
     </div>
+
+    <div class="pr-card win">
+      <span class="arch-badge badge-win">Jansori와 함께</span>
+      <h3>🚀 무혈입성</h3>
+      <div class="meta">C1 · development v1 + refactoring v2 + code-rule v3</div>
+      <div class="thread">
+        <div class="merged">리뷰 코멘트 0개 · 첫 제출에서 바로 Merge ✅</div>
+      </div>
+      <div class="stat-row"><b>0</b><span>회 · 첫 제출에서 통과</span></div>
+      <div class="meter">
+        <div class="lab"><span>첫 제출 규칙 준수</span><b>6 / 6</b></div>
+        <div class="bar"><i></i></div>
+      </div>
+    </div>
+  </div>
+
+  <details class="rules-fold">
+    <summary>
+      <span>C-model 개발 규칙 6개 — 무엇을 지켰고 무엇을 놓쳤는지</span>
+      <span class="fold-hint"><i class="lbl-open">접기</i><i class="lbl-shut">펼치기</i></span>
+    </summary>
+    <div class="table-container">
+      <table class="tbl-score">
+        <thead><tr><th>C-model 개발 규칙</th><th>플러그인 없이</th><th>Jansori와 함께</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>기존 출력과 픽셀 단위 결과가 반드시 동일</strong>
+              <em>정리 전/후의 <code>out_hash</code>를 여러 반경에서 비교. 정리하다 영상이 한 픽셀이라도 달라지면 리팩토링이 아닙니다. TASK.md에 박혀 있는 계약입니다.</em>
+            </td>
+            <td class="o">✓</td><td class="o">✓</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>경계 <code>clamp</code>·정수 나눗셈·반올림 계약 유지</strong>
+              <em>경계 처리와 정수 나눗셈, 부호 있는 나눗셈의 0 방향 truncation까지 그대로. 오라클이 비트 단위로 검사하는 항목입니다.</em>
+            </td>
+            <td class="o">✓</td><td class="o">✓</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>파일 I/O를 제외한 처리 시간을 반복 측정·보고</strong>
+              <em>입출력을 뺀 처리 시간을 여러 번 재서 <code>min</code>/<code>median</code>으로 보고. 명세에 적힌 대로만 하면 되는 항목입니다.</em>
+            </td>
+            <td class="o">✓</td><td class="o">✓</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>공개 함수 시그니처와 <code>cmodel::DoProcess</code> 계약 불변</strong>
+              <em>공개 API의 이름·반환형과 <code>DoProcess</code> 계약은 손대지 않습니다. TASK.md에 명시돼 있어 판단할 여지가 없습니다.</em>
+            </td>
+            <td class="o">✓</td><td class="o">✓</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>이름·구조만이 아니라 중복 계산도 줄인다</strong>
+              <em>반복되는 주변 픽셀 합산 같은 중복 계산을 걷어냅니다. TASK.md엔 없고, 선배의 잔소리로만 캡슐에 쌓인 규칙입니다. <span class="tag nag">잔소리 1</span></em>
+            </td>
+            <td class="x">✕</td><td class="o">✓</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>새로 만들거나 이름 바꾼 함수는 <code>UpperCamelCase</code></strong>
+              <em>예: <code>DoRunNoiseReduction</code>, <code>DoRunHal</code>. 단 생성자·소멸자·연산자와 외부 인터페이스 재정의는 해당 언어·인터페이스 계약을 우선합니다. <span class="tag nag">잔소리 2</span></em>
+            </td>
+            <td class="x">✕</td><td class="o">✓</td>
+          </tr>
+          <tr class="total"><td>첫 제출 합계</td><td>4 / 6</td><td>6 / 6</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <div class="callout">
+    <h4>🧪 "그거 그냥 모델이 원래 잘하는 거 아닌가요?"</h4>
+    <p>
+      같은 세션, 같은 프롬프트, 같은 원본 코드에서 <strong>캡슐만 빼고</strong> 다시 돌리면 <code>4 / 6</code>으로 돌아갑니다.
+      바꾼 변수는 캡슐 하나뿐입니다.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 1-1. 아키텍처 ============ -->
+<section class="container" id="architecture">
+  <div class="section-title">
+    <h2>한 사람의 잔소리가, 모든 터미널의 다음 작업에 반영됩니다</h2>
+    <p>
+      CLI마다 플러그인을 한 번만 설치하면, 잔소리는 로컬 서버의 <strong>버전 캡슐</strong>에 쌓이고
+      다음에 켜지는 세션의 첫 프롬프트로 자동 전파됩니다. 대화·프롬프트·소스는 서버가 수집하지 않습니다.
+    </p>
+  </div>
+
+  <div class="ax-flow">
+    <div class="ax-top">
+      <span class="ax-kicker">JDD Plugin · Claude Code Plugin</span>
+      <b>모든 분산 조직(본사·해외·인접 그룹)의 CLI에 단일 설치</b>
+      <em>캡슐의 단일 원천은 중앙 캡슐 서버 — 재시작에도 살아남도록 스냅샷으로 영속됩니다.</em>
+    </div>
+
+    <div class="ax-split"><span></span><span></span></div>
+
+    <div class="ax-cols">
+      <div class="ax-card">
+        <span class="ax-num">1</span>
+        <h3>표준 인덱스, 매 프롬프트에 자동 주입</h3>
+        <div class="ax-mech">UserPromptSubmit Hook</div>
+        <ul>
+          <li>스킬 <strong>인덱스(name·description)</strong>만 붙입니다 — 본문·교정 없이, LLM 호출 없이 순수 HTTP GET</li>
+          <li>필요한 스킬만 <code>load</code>로 온디맨드 로드 · 부모 + <strong>depth-1 자식</strong>까지 펼침</li>
+          <li><strong>Fail-open</strong> — 서버가 죽어도 프롬프트를 막지 않습니다 (2초 타임아웃)</li>
+        </ul>
+      </div>
+      <div class="ax-card">
+        <span class="ax-num">2</span>
+        <h3>고수의 잔소리, 실시간으로 흡수</h3>
+        <div class="ax-mech">/jansori:nag → capsule-normalizer</div>
+        <ul>
+          <li>작업 중 던진 자연어 지적을 <code>correction</code>으로 축적</li>
+          <li><strong>불변 버전 v1 → v2</strong> — copy-on-write로 원본을 보존</li>
+          <li>교정 3건에 닿으면 배경 서브에이전트가 <strong>Normalization(압축)</strong>으로 본문에 접습니다 — 규칙은 그대로, 길이만 줄임 (비차단)</li>
+          <li><strong>10,000자 상한</strong> 초과 시 거부·보존 후 자식 분리를 권고</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ax-merge"><span></span><span></span></div>
+
+    <div class="ax-bottom">
+      <span class="ax-num win">3</span>
+      <h3>다음 작업자, 무혈입성</h3>
+      <p>
+        새 터미널을 켠 뉴커머·해외 동료가 <strong>첫 프롬프트만 쳐도</strong> 최신 캡슐이 자동으로 로드됩니다.
+        어제 누적된 잔소리가 오늘 새 세션의 기본값이 됩니다.
+      </p>
+      <div class="ax-quote">"어제 미국 시니어가 친 잔소리가, 오늘 내 코드에 자동으로 반영된다"</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 1-2. 어떻게 알았나 ============ -->
+<section class="container" id="howdid">
+  <div class="section-title">
+    <h2>C-model 개발 과정</h2>
+    <div class="hd-tl">
+      <span class="hd-tl-item"><i>어제 18:03</i>선배의 리팩토링 중 잔소리</span>
+      <span class="hd-tl-line"><em>캡슐에 잔소리 2건</em></span>
+      <span class="hd-tl-item"><i>오늘 09:22</i>신입의 뚝딱뚝딱 업무 수행</span>
+    </div>
+  </div>
+
+  <p class="hd-note">
+    세션도, 작업 폴더도, 프롬프트도 공유하지 않습니다. 사이에 있는 건 캡슐 하나뿐입니다.<br>
+    오른쪽 창 어디에도 <code>중복 계산을 줄여라</code>·<code>UpperCamelCase</code>를 시킨 문장은 없습니다.
+    <strong>왼쪽 창의 잔소리 두 마디 말고는 알 수 있는 경로가 없습니다.</strong>
+  </p>
+
+  <div class="hd-grid">
+  <div class="terminal-wrapper">
+    <div class="terminal-header">
+      <div class="win-tabs">
+        <div class="win-tab active">
+          <span class="win-tab-ico">&gt;_</span>
+          <span class="win-tab-name">선배님의 멋짐 모먼트@B — noise_reduction.cpp</span>
+        </div>
+        <button class="win-chrome-btn" tabindex="-1" aria-hidden="true">&#65291;</button>
+      </div>
+      <div class="win-controls" aria-hidden="true"><span>&#9472;</span><span>&#9723;</span><span class="close">&#10005;</span></div>
+    </div>
+    <div class="terminal-body">
+      <div class="cli-line cli-dim"># NR 리팩토링 중, claude 의 작업을 검토합니다.</div>
+      <div class="cli-line"><span class="cli-prompt">Senior@B:~$</span> claude "TASK.md대로 noise_reduction 정리해줘"</div>
+      <div class="cli-line cli-ver">✔ 완료 · 이름·구조 정리 · 빌드 통과 · 출력 이미지 동일</div>
+      <div class="cli-line cli-dim">  edited src/noise_reduction.cpp</div>
+      <div class="cli-line cli-dim" style="margin-top:10px"># 결과를 열어봅니다.</div>
+      <div class="cli-line"><span class="cli-prompt">Senior@B:~$</span> cat src/noise_reduction.cpp</div>
+      <div class="cli-box"><span class="cli-dim">// 픽셀마다 (2R+1)² 이웃을 매번 다시 더한다</span>
+<span class="cli-dim">int</span> mean = 0;
+<span class="cli-dim">for</span> (<span class="cli-dim">int</span> dy=-R; dy&lt;=R; ++dy)
+  <span class="cli-dim">for</span> (<span class="cli-dim">int</span> dx=-R; dx&lt;=R; ++dx)
+    mean += at(x+dx, y+dy);   <span class="cli-warn">// O(R²)/픽셀 · 중복 합산</span>
+mean /= (2*R+1)*(2*R+1);</div>
+      <div class="cli-line cli-dim" style="margin-top:14px"># 이름은 깔끔해졌지만, 중복 계산은 그대로입니다.</div>
+      <div class="cli-line"><span class="cli-prompt">Senior@B:~$</span> /jansori:nag</div>
+      <div class="cli-nag">"야 이름과 구조만 정리하지 말고, 반복되는 주변 픽셀 합산 같은 중복 계산도 줄여."</div>
+      <div class="cli-line"><span class="cli-highlight">[Jansori]</span> Correction 저장 · <span class="cli-ver">cleanup-cmodel-workload v1 → v2</span></div>
+      <div class="cli-line"><span class="cli-prompt">Senior@B:~$</span> /jansori:nag</div>
+      <div class="cli-nag">"새로 작성하거나 이름 바꾸는 자체 함수는 UpperCamelCase로. 예: DoRunNoiseReduction, DoRunHal.<br>단 생성자·소멸자·연산자·외부 인터페이스 재정의는 언어·인터페이스 계약을 우선."</div>
+      <div class="cli-line"><span class="cli-highlight">[Jansori]</span> Correction 저장 · <span class="cli-ver">v2 → v3</span> <span class="cli-dim">(원본 보존)</span></div>
+    </div>
+  </div>
+
+  <div class="terminal-wrapper">
+    <div class="terminal-header">
+      <div class="win-tabs">
+        <div class="win-tab active">
+          <span class="win-tab-ico">&gt;_</span>
+          <span class="win-tab-name">우리의 뚝딱이@C — local_contrast.cpp (새 세션)</span>
+        </div>
+        <button class="win-chrome-btn" tabindex="-1" aria-hidden="true">&#65291;</button>
+      </div>
+      <div class="win-controls" aria-hidden="true"><span>&#9472;</span><span>&#9723;</span><span class="close">&#10005;</span></div>
+    </div>
+    <div class="terminal-body">
+      <div class="cli-line cli-dim"># 어제 그 대화를 본 적도, 들은 적도 없는 새 세션입니다.</div>
+      <div class="cli-line"><span class="cli-prompt">Newcomer@C:~$</span> claude "TASK.md 수행해줘"</div>
+      <div class="cli-line cli-ver">✔ Injected: cleanup-cmodel-workload v3 <span class="cli-dim">(UserPromptSubmit Hook)</span></div>
+      <div class="cli-box"><span class="cli-dim">// 분리형 슬라이딩 윈도우 — 이웃 합을 재사용</span>
+<span class="cli-dim">int</span> <span class="cli-hit">ComputeRowBoxSums</span>(<span class="cli-dim">const</span> Image&amp; f, ...);   <span class="cli-hit">// UpperCamelCase</span>
+<span class="cli-dim">int</span> <span class="cli-hit">HorizontalSumAt</span>(<span class="cli-dim">int</span> x, <span class="cli-dim">int</span> r);
+
+<span class="cli-dim">// 행 박스합 O(1)/픽셀 + 열 누적기로 수직 슬라이딩</span>
+mean = <span class="cli-hit">ColumnAccumulator</span>(x) / Area;   <span class="cli-hit">// 중복 합산 제거</span>
+<span class="cli-dim">// Total 정수합·0방향 truncation·clamp 계약은 그대로</span></div>
+      <div class="cli-line cli-ver" style="margin-top:14px">✔ out_hash 5개 반경 전부 일치 · cmp 바이트 동일</div>
+      <div class="cli-line cli-ver">✔ r=16: 634ms → 2.15ms <span class="cli-dim">(약 290배)</span></div>
+      <div class="cli-line cli-dim" style="margin-top:6px"># 중복 계산 제거도, UpperCamelCase도 시킨 사람이 없습니다.</div>
+    </div>
+  </div>
+  </div>
+
+</section>
+
+<!-- ============ 2. 잔소리가 쌓일 때 ============ -->
+<section class="container" id="evolve">
+  <div class="section-title">
+    <h2>jansori는 계속 쌓입니다. 주입량은 오히려 줄어듭니다</h2>
+    <p>
+      교정이 무한정 쌓이면 캡슐이 터집니다. 임계값에 닿으면 별도 서브에이전트가
+      교정을 본문으로 압축합니다. <strong>규칙은 그대로 두고 길이만 줄입니다.</strong>
+    </p>
+  </div>
+
+  <div class="tl-wrapper">
+    <span class="eyebrow tl-cap">cleanup-cmodel-workload · 한 스킬에 잔소리가 누적되는 흐름</span>
+    <div class="tl-grid">
+      <div class="tl-name">cleanup-cmodel-workload</div>
+      <div class="tl-row">
+        <span class="v">v1</span><span class="seg nag"><em>중복 계산 줄이기</em></span>
+        <span class="v">v2</span><span class="seg nag"><em>UpperCamelCase 명명</em></span>
+        <span class="v now">v3</span><span class="seg pack"><em>임계값 · 정규화</em></span>
+        <span class="v now">v4</span>
+      </div>
+    </div>
+    <div class="tl-runs">
+      <div class="tl-name">실행 시점</div>
+      <div class="tl-runbar">
+        <span>A · v1 등록</span>
+        <span>B · 잔소리 2건 → v3</span>
+        <span>C · 압축된 v4로 실행</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card same">
+      <h4>출력 픽셀</h4>
+      <div class="metric-val">동일 <small>out_hash 일치</small></div>
+      <p>r=0·1·4·8·16 다섯 개 반경 전부 베이스라인과 out_hash가 일치하고 cmp 바이트도 동일합니다. 코드 품질만 올리고 결과는 한 픽셀도 건드리지 않습니다.</p>
+    </div>
+    <div class="metric-card down">
+      <h4>처리 시간</h4>
+      <div class="metric-val">48.8 → 2.5 <small>ms</small></div>
+      <p>반복되던 이웃 픽셀 합산을 분리형 슬라이딩 윈도우로 바꾼 효과(r=4 median). 반경이 커질수록 격차도 벌어져 r=16에서는 634ms → 2.15ms, 약 290배입니다. 같은 호스트·컴파일러·입력, DoProcess 구간만 측정.</p>
+    </div>
+    <div class="metric-card down">
+      <h4>주입 길이</h4>
+      <div class="metric-val">교정 → 0 <small>corrections</small></div>
+      <p>교정이 임계값에 닿으면 정규화 서브에이전트가 이를 본문으로 흡수하고 corrections를 비웁니다. 규칙은 그대로, 매번 프롬프트에 주입되는 텍스트만 짧아집니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. 동작 방식 ============ -->
+<section class="container" id="loop">
+  <div class="section-title">
+    <h2>회식 장소든, C-model 룰이든</h2>
+  </div>
+
+  <div class="lp-tabs">
+    <input type="radio" name="lp-domain" id="dom-dinner" checked>
+    <input type="radio" name="lp-domain" id="dom-weekly">
+    <input type="radio" name="lp-domain" id="dom-code">
+
+    <div class="lp-tabbar">
+      <label for="dom-dinner"><span class="lp-ico">🍖</span><span><b>팀 회식 장소</b><em>pick-team-dinner-venue</em></span></label>
+      <label for="dom-weekly"><span class="lp-ico">📝</span><span><b>주간 보고서</b><em>organize-weekly-report</em></span></label>
+      <label for="dom-code"><span class="lp-ico">⚡</span><span><b>C-model 정리</b><em>cleanup-cmodel-workload</em></span></label>
+    </div>
+
+    <div class="lp-panel p-dinner">
+      <div class="v3-node lead">
+        <a class="v3-cta" href="examples.html#business-dinner">실제 터미널 보러가기 →</a>
+        <b>SESSION A · 만든다</b><span>총무가 회식 장소 선정 절차를 정리합니다</span>
+        <q>회식 장소 고르는 절차, 나만 알고 있으면 안 되지</q>
+        <em>업무를 마치면 Stop 훅이 저장을 제안하고, 사람이 수락해야 <code>pick-team-dinner-venue</code> v1이 만들어집니다.</em>
+      </div>
+      <div class="v3-down"><em>저장 · v1 생성</em></div>
+      <div class="v3-mid">
+        <div class="v3-node">
+          <b>SESSION B · 고친다</b><span>잔소리 2연타</span>
+          <ol class="v3-nags">
+            <li><i>1타</i>야, 정확한 상호명이 있어야 할 거 아니야.</li>
+            <li><i>2타</i>우리 회사 회의비 인당 4만 5천원이야. 해당 사항도 고려해.</li>
+          </ol>
+        </div>
+        <div class="v3-arm"><em>v1 → v3</em></div>
+        <div class="v3-core">
+          <i>💊</i>
+          <b>pick-team-dinner-venue</b>
+          <span class="v3-ver">v3</span>
+          <div class="v3-corr">corrections: 2
+            <span>· 후보는 정확한 상호명으로 (예: 백년옥 판교점)</span>
+            <span>· 회의비 규정(인당 4.5만) 대비 여유/경계선/초과 명시</span>
+          </div>
+        </div>
+        <div class="v3-arm out"><em>주입</em></div>
+        <div class="v3-node win">
+          <b>SESSION C · 받는다</b><span>회식 장소를 찾는 다른 팀원</span>
+          <div class="v3-prompt">💬 "회식 장소 고르기 스킬로 골라줘. 팀 12명, 강남."</div>
+          <ul class="v3-out">
+            <li>후보마다 <strong>정확한 상호명</strong>으로 제시 (하남돼지집·우대포 등)</li>
+            <li>인당 비용을 <strong>예산 4.5만 대비 여유/경계선</strong>으로 표시</li>
+            <li>이 팀원은 회의비 규정을 <strong>들은 적이 없습니다</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="lp-panel p-weekly">
+      <div class="v3-node lead">
+        <a class="v3-cta" href="examples.html#weekly">실제 터미널 보러가기 →</a>
+        <b>SESSION A · 만든다</b><span>파트장이 주간보고 정리 절차를 저장합니다</span>
+        <q>주간보고 정리 방식, 팀에 공유해두자</q>
+        <em>업무를 마치면 Stop 훅이 저장을 제안하고, 사람이 수락해야 <code>organize-weekly-report</code> v1이 만들어집니다.</em>
+      </div>
+      <div class="v3-down"><em>저장 · v1 생성</em></div>
+      <div class="v3-mid">
+        <div class="v3-node">
+          <b>SESSION B · 고친다</b><span>잔소리 2연타</span>
+          <ol class="v3-nags">
+            <li><i>1타</i>다음 주 계획은 우선순위 순으로. 내가 봐줘야 할 건 따로 빼.</li>
+            <li><i>2타</i>이슈는 그냥 나열하지 말고 리스크·대응방안·담당자/기한 표로 정리해.</li>
+          </ol>
+          <em>몇 번이든 상관없습니다. 잔소리 한 건이 버전 하나입니다.</em>
+        </div>
+        <div class="v3-arm"><em>v1 → v3</em></div>
+        <div class="v3-core">
+          <i>💊</i>
+          <b>organize-weekly-report</b>
+          <span class="v3-ver">v3</span>
+          <div class="v3-corr">corrections: 2
+            <span>· 다음 주 계획은 우선순위 순 · 에스컬레이션 항목 분리</span>
+            <span>· 이슈는 리스크·대응방안·담당자/기한 표로</span>
+          </div>
+        </div>
+        <div class="v3-arm out"><em>주입</em></div>
+        <div class="v3-node win">
+          <b>SESSION C · 받는다</b><span>이번 주 보고를 정리하는 팀원</span>
+          <div class="v3-prompt">💬 "주간보고 정리 스킬로 이번 주 보고 정리해줘."</div>
+          <ul class="v3-out">
+            <li>다음 주 계획을 <strong>우선순위 순</strong>으로 (결제 마무리 → 대시보드)</li>
+            <li>이슈를 <strong>리스크·대응방안·담당자/기한 표</strong>로 정리</li>
+            <li>외부사 지연을 <strong>도움 필요/에스컬레이션</strong>으로 분리</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="lp-panel p-code">
+      <div class="v3-node lead">
+        <a class="v3-cta" href="examples.html#c-model">실제 터미널 보러가기 →</a>
+        <b>SESSION A · 만든다</b><span>선임이 cmodel 정리 절차를 스킬로 등록합니다</span>
+        <q>이 정리 작업은 cmodel 개발마다 똑같이 쓰이니, 스킬로 올려두자</q>
+        <em>local_contrast 정리 절차를 <code>cleanup-cmodel-workload</code> v1로 저장합니다. 유사 스킬을 먼저 재검색합니다.</em>
+      </div>
+      <div class="v3-down"><em>저장 · v1 생성</em></div>
+      <div class="v3-mid">
+        <div class="v3-node">
+          <b>SESSION B · 고친다</b><span>잔소리 2연타</span>
+          <ol class="v3-nags">
+            <li><i>1타</i>이름과 구조만 정리하지 말고, 반복되는 주변 픽셀 합산 같은 중복 계산도 줄여.</li>
+            <li><i>2타</i>새로 만들거나 이름 바꾸는 함수는 UpperCamelCase로 (예: DoRunNoiseReduction). 생성자·연산자·인터페이스 재정의는 예외.</li>
+          </ol>
+        </div>
+        <div class="v3-arm"><em>v1 → v3</em></div>
+        <div class="v3-core">
+          <i>💊</i>
+          <b>cleanup-cmodel-workload</b>
+          <span class="v3-ver">v3</span>
+          <div class="v3-corr">corrections: 2
+            <span>· 이름·구조만이 아니라 중복 계산도 줄인다</span>
+            <span>· 새 함수는 UpperCamelCase · 계약 함수는 예외</span>
+          </div>
+        </div>
+        <div class="v3-arm out"><em>주입</em></div>
+        <div class="v3-node win">
+          <b>SESSION C · 받는다</b><span>TASK.md를 받은 신입</span>
+          <div class="v3-prompt">💬 "TASK.md 수행해줘." <span style="opacity:.7">(cleanup-cmodel-workload 주입)</span></div>
+          <ul class="v3-out">
+            <li>반복 이웃 합산을 <strong>분리형 슬라이딩 윈도우</strong>로 → r=16 <strong>634ms → 2.15ms</strong></li>
+            <li>새 헬퍼는 <strong>UpperCamelCase</strong> (ComputeRowBoxSums 등)</li>
+            <li><code>out_hash</code> 전 반경 일치 · cmp 바이트 동일</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============ CLOSING ============ -->
+<section class="container" id="closing">
+  <div class="close-box">
+    <h2><span class="starlight">당신의 잔소리는 자산입니다</span></h2>
   </div>
 </section>
 
