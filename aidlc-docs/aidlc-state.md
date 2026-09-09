@@ -3,7 +3,7 @@
 ## Project Information
 - **Project Type**: Greenfield (Jansori product) — see Workspace State note
 - **Start Date**: 2026-09-08T00:00:00Z
-- **Current Stage**: OPERATIONS (placeholder) — **AI-DLC construction workflow COMPLETE**. All INCEPTION + CONSTRUCTION stages CLOSED (U1/U2/U3/U4 + Build and Test approved 2026-09-08T15:35:00Z; 138 passed). Operations is a workflow placeholder (no deployment/monitoring stages defined). Outstanding = user deliverables + F-04 residuals only.
+- **Current Stage**: CONSTRUCTION — **U1 persistence DONE 2026-09-09** (JSON snapshot, persist-by-default; supersedes Q9, user-authorized). Server persists to `jansori-data.json`; opt-out `JANSORI_DATA_FILE=:memory:`. **144 passed** (138 + 6 persistence); end-to-end restart-survival verified. Persist scoped to main() so tests stay in-memory. Prior AI-DLC workflow complete (U1/U2/U3/U4 + Build and Test 2026-09-08). See code/persistence-summary.md.
 
 ## Workspace State
 - **Existing Code**: Yes, but NOT product code. Sample fixtures (C++ workloads, seed/acceptance/golden JSON) + Python sample-evaluator tooling + AI-DLC rule details + SPEC/reference docs.

@@ -38,8 +38,11 @@ class Container:
     normalization: NormalizationService
 
     @classmethod
-    def build(cls) -> "Container":
-        store = CapsuleStore()
+    def build(cls, data_file: "str | None" = None) -> "Container":
+        # data_file=None => in-memory (test / TestClient / module-app default, keeps tests
+        # isolated). The server entrypoint (main()) resolves the env and passes a path so a
+        # running instance persists across restarts (U1 reopen 2026-09-09).
+        store = CapsuleStore(data_file=data_file)
         sessions = SessionService()
         return cls(
             store=store,
