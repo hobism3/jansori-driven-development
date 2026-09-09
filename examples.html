@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>예시 — Jansori Plugin</title>
+<title>실 사용 사례 — Jansori Plugin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
@@ -137,13 +137,12 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:20px;color:var(--text
     <nav class="nav-main">
       <a href="index.html">소개글</a>
       <a href="db.html">잔소리는 어디에 쌓이는가</a>
-      <a href="examples.html" class="here">예시</a>
-      <a href="demo.html">시연 영상</a>
+      <a href="examples.html" class="here">실 사용 사례</a>
     </nav>
   </div>
   <div class="nav-sub-bar">
     <nav class="nav-sub">
-      <span class="lbl">예시 선택</span>
+      <span class="lbl">사례 선택</span>
       <button class="scn on" data-scenario="business-dinner">🍖 회식 장소 고르기</button>
       <button class="scn" data-scenario="weekly">🗂️ 주간보고 정리</button>
       <button class="scn" data-scenario="c-model">⚙️ C-model 리팩터링</button>
@@ -154,7 +153,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:20px;color:var(--text
 <div class="container">
   <div class="page-head">
     <span class="eyebrow">Live Terminal Examples</span>
-    <h1>예시 — <span class="scn-name" id="scn-name">회식 장소 고르기</span></h1>
+    <h1>실 사용 사례 — <span class="scn-name" id="scn-name">회식 장소 고르기</span></h1>
     <p id="scn-desc">서로 다른 세 사람의 터미널 <strong>Session A → B → C</strong>. 한 사람의 <strong>잔소리(nag)</strong>가 캡슐에 쌓여 다음 사람의 첫 답을 바꿉니다.</p>
     <div class="legend">
       <span><i class="u"></i> 사용자 입력</span>
@@ -1556,6 +1555,9 @@ local_contrast.cpp(cmodel::DoProcess)를 공통 규칙에 맞춰 정리하면서
     }
   };
   var active = 'business-dinner';
+  // 소개글의 "실제 터미널 보러가기" 버튼이 #business-dinner / #weekly / #c-model 로 넘긴다
+  var fromHash = (location.hash || '').replace('#', '');
+  if(SCENARIOS[fromHash]) active = fromHash;
 
   function esc(s){
     return String(s).replace(/[&<>]/g, function(c){
@@ -1662,6 +1664,22 @@ local_contrast.cpp(cmodel::DoProcess)를 공통 규칙에 맞춰 정리하면서
       });
       renderScenario(active);
     });
+  });
+
+  // 진입 시 해시로 지정된 시나리오면 해당 버튼을 활성화
+  Array.prototype.forEach.call(document.querySelectorAll('.scn'), function(b){
+    b.classList.toggle('on', b.getAttribute('data-scenario') === active);
+  });
+
+  // 다른 페이지에서 #scenario 로 들어오거나 해시가 바뀌면 따라간다
+  addEventListener('hashchange', function(){
+    var h = (location.hash || '').replace('#', '');
+    if(!SCENARIOS[h] || h === active) return;
+    active = h;
+    Array.prototype.forEach.call(document.querySelectorAll('.scn'), function(b){
+      b.classList.toggle('on', b.getAttribute('data-scenario') === active);
+    });
+    renderScenario(active);
   });
 
   renderScenario(active);
