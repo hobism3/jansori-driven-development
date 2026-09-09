@@ -119,6 +119,7 @@ section{margin-bottom:100px}
 }
 .tag.exp{border:1px dashed rgba(148,163,184,.5);color:var(--text-muted)}
 .tag.act{background:rgba(16,185,129,.15);border:1px solid var(--accent-emerald);color:var(--accent-emerald)}
+.tag.nag{background:rgba(255,90,31,.15);border:1px solid var(--primary);color:var(--primary)}
 .legend{
   display:flex;gap:26px;flex-wrap:wrap;justify-content:center;
   font-size:.93rem;color:var(--text-muted);margin-top:28px;
@@ -237,7 +238,7 @@ section{margin-bottom:100px}
 .meter .lab b{font-family:var(--font-mono);font-size:1.05rem;color:var(--text-main);font-weight:700}
 .bar{height:10px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden}
 .bar i{display:block;height:100%;border-radius:999px}
-.pr-card.fail .bar i{background:linear-gradient(90deg,#f43f5e,#fb7185);width:50%}
+.pr-card.fail .bar i{background:linear-gradient(90deg,#f43f5e,#fb7185);width:66.6667%}
 .pr-card.win .bar i{background:linear-gradient(90deg,#10b981,#34d399);width:100%}
 
 /* ---------- tables ---------- */
@@ -765,13 +766,12 @@ header{padding:0}
       <h3>👶 PR 지뢰밭</h3>
       <div class="meta">C0 · 로드된 캡슐 없음</div>
       <div class="thread">
-        <div class="rvw"><i>review #1</i>포인터로 받으셨네요. 돌아는 가는데, 우리 팀은 프레임 버퍼를 <code>const&amp;</code>로 통일했습니다.</div>
-        <div class="rvw"><i>review #2</i><code>m_parameters</code>에 직접 넣으셨네요. 값은 맞는데 Setter로 받으세요. 범위 검사가 흩어지면 나중에 못 찾습니다.</div>
-        <div class="rvw"><i>review #3</i><code>31.984f</code> 결과는 맞습니다. 근데 이 숫자 어디서 왔는지 6개월 뒤에 아실 수 있어요? IP 버전이랑 레지스터 필드 주석 달아주세요.</div>
+        <div class="rvw"><i>review #1</i>이름이랑 구조만 다듬으셨네요. 반복되는 주변 픽셀 합산 같은 <code>중복 계산</code>도 같이 줄여주세요.</div>
+        <div class="rvw"><i>review #2</i>새로 만들거나 이름 바꾼 함수는 <code>UpperCamelCase</code>로 통일합니다 (예: <code>DoRunNoiseReduction</code>). 생성자·연산자처럼 계약이 있는 건 예외고요.</div>
       </div>
-      <div class="stat-row"><b>3</b><span>회 리뷰 왕복 끝에 Merge</span></div>
+      <div class="stat-row"><b>2</b><span>회 리뷰 왕복 끝에 Merge</span></div>
       <div class="meter">
-        <div class="lab"><span>첫 제출 규칙 준수</span><b>3 / 6</b></div>
+        <div class="lab"><span>첫 제출 규칙 준수</span><b>4 / 6</b></div>
         <div class="bar"><i></i></div>
       </div>
     </div>
@@ -802,47 +802,47 @@ header{padding:0}
         <tbody>
           <tr>
             <td>
-              <strong>고정 공개 API 시그니처 보존</strong>
-              <em><code>IsReady()</code> / <code>GetFrameCount()</code>의 이름과 반환형. TASK.md에 박혀 있어서 판단할 여지가 없습니다.</em>
+              <strong>기존 출력과 픽셀 단위 결과가 반드시 동일</strong>
+              <em>정리 전/후의 <code>out_hash</code>를 여러 반경에서 비교. 정리하다 영상이 한 픽셀이라도 달라지면 리팩토링이 아닙니다. TASK.md에 박혀 있는 계약입니다.</em>
             </td>
             <td class="o">✓</td><td class="o">✓</td>
           </tr>
           <tr>
             <td>
-              <strong>파라미터는 직접 대입 대신 Setter를 거친다</strong>
-              <em>멤버에 그냥 넣어도 값은 똑같이 들어갑니다. 유효 범위 검사를 한 곳에 모으려고 입구를 하나로 정한 것뿐입니다.</em>
-            </td>
-            <td class="x">✕</td><td class="o">✓</td>
-          </tr>
-          <tr>
-            <td>
-              <strong>출력 픽셀·경계·반올림 동작 보존</strong>
-              <em>연산식이 WORKLOAD-SPEC에 있습니다. 정리하다 영상이 달라지면 그건 리팩토링이 아닙니다.</em>
+              <strong>경계 <code>clamp</code>·정수 나눗셈·반올림 계약 유지</strong>
+              <em>경계 처리와 정수 나눗셈, 부호 있는 나눗셈의 0 방향 truncation까지 그대로. 오라클이 비트 단위로 검사하는 항목입니다.</em>
             </td>
             <td class="o">✓</td><td class="o">✓</td>
           </tr>
           <tr>
             <td>
-              <strong>프레임 버퍼는 포인터가 아니라 <code>const&amp;</code>로 받는다</strong>
-              <em>포인터로 받아도 똑같이 돌아갑니다. 널 검사와 소유권 논쟁이 리뷰마다 반복돼서 한쪽으로 통일한 겁니다.</em>
-            </td>
-            <td class="x">✕</td><td class="o">✓</td>
-          </tr>
-          <tr>
-            <td>
-              <strong>잘못된 입력의 오류 반환 계약 준수</strong>
-              <em>해상도·포맷이 안 맞으면 정해진 예외로 반환. 명세대로만 하면 되는 항목입니다.</em>
+              <strong>파일 I/O를 제외한 처리 시간을 반복 측정·보고</strong>
+              <em>입출력을 뺀 처리 시간을 여러 번 재서 <code>min</code>/<code>median</code>으로 보고. 명세에 적힌 대로만 하면 되는 항목입니다.</em>
             </td>
             <td class="o">✓</td><td class="o">✓</td>
           </tr>
           <tr>
             <td>
-              <strong>HW에서 온 상수에는 출처 주석을 단다</strong>
-              <em><code>31.984f</code>라고만 써도 결과는 동일합니다. 다음 IP 리비전에서 이 값을 누가 왜 정했는지 아무도 못 찾은 뒤에 생긴 규칙입니다.</em>
+              <strong>공개 함수 시그니처와 <code>cmodel::DoProcess</code> 계약 불변</strong>
+              <em>공개 API의 이름·반환형과 <code>DoProcess</code> 계약은 손대지 않습니다. TASK.md에 명시돼 있어 판단할 여지가 없습니다.</em>
+            </td>
+            <td class="o">✓</td><td class="o">✓</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>이름·구조만이 아니라 중복 계산도 줄인다</strong>
+              <em>반복되는 주변 픽셀 합산 같은 중복 계산을 걷어냅니다. TASK.md엔 없고, 선배의 잔소리로만 캡슐에 쌓인 규칙입니다. <span class="tag nag">잔소리 1</span></em>
             </td>
             <td class="x">✕</td><td class="o">✓</td>
           </tr>
-          <tr class="total"><td>첫 제출 합계 <span class="tag exp">기대</span></td><td>3 / 6</td><td>6 / 6</td></tr>
+          <tr>
+            <td>
+              <strong>새로 만들거나 이름 바꾼 함수는 <code>UpperCamelCase</code></strong>
+              <em>예: <code>DoRunNoiseReduction</code>, <code>DoRunHal</code>. 단 생성자·소멸자·연산자와 외부 인터페이스 재정의는 해당 언어·인터페이스 계약을 우선합니다. <span class="tag nag">잔소리 2</span></em>
+            </td>
+            <td class="x">✕</td><td class="o">✓</td>
+          </tr>
+          <tr class="total"><td>첫 제출 합계 <span class="tag exp">기대</span></td><td>4 / 6</td><td>6 / 6</td></tr>
         </tbody>
       </table>
     </div>
@@ -851,7 +851,7 @@ header{padding:0}
   <div class="callout">
     <h4>🧪 "그거 그냥 모델이 원래 잘하는 거 아닌가요?"</h4>
     <p>
-      같은 세션, 같은 프롬프트, 같은 원본 코드에서 <strong>캡슐만 빼고</strong> 다시 돌리면 <code>3 / 6</code>으로 돌아갑니다. 
+      같은 세션, 같은 프롬프트, 같은 원본 코드에서 <strong>캡슐만 빼고</strong> 다시 돌리면 <code>4 / 6</code>으로 돌아갑니다.
       바꾼 변수는 캡슐 하나뿐입니다. <span class="tag exp">기대</span>
     </p>
   </div>
