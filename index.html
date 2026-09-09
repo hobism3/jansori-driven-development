@@ -814,6 +814,42 @@ header{padding:0}
   .ax-merge::before{display:none}
   .ax-merge span{display:none}
 }
+
+/* ============ "클로드에서 실행해보기" 좌측 강조 버튼 ============ */
+.run-fab{
+  position:fixed;left:0;top:130px;z-index:200;
+  display:flex;align-items:center;gap:11px;cursor:pointer;text-align:left;
+  background:var(--primary);color:#fff;border:3px solid #111;border-left:none;
+  box-shadow:5px 5px 0 #111;padding:15px 18px 15px 15px;
+  font-family:var(--font-sans);font-weight:900;font-size:.98rem;line-height:1.18;letter-spacing:-.2px;
+  transition:transform .12s,box-shadow .12s,background .12s;
+}
+.run-fab:hover{transform:translateX(3px);box-shadow:8px 8px 0 #111}
+.run-fab:active{transform:translateX(1px);box-shadow:2px 2px 0 #111}
+.run-fab-ico{
+  flex:none;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;background:#111;color:var(--primary);
+}
+.run-fab-txt small{display:block;font-weight:700;font-size:.68rem;opacity:.9;margin-top:2px;letter-spacing:0}
+.run-fab.copied{background:var(--accent-emerald)}
+.run-fab.copied .run-fab-ico{color:var(--accent-emerald)}
+/* 복사 완료 토스트 */
+.run-toast{
+  position:fixed;left:22px;bottom:22px;z-index:210;
+  background:#111;color:#fdf6e3;border:3px solid #111;box-shadow:5px 5px 0 var(--accent-emerald);
+  padding:13px 18px;font-weight:700;font-size:.9rem;max-width:340px;line-height:1.5;
+  opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s,transform .2s;
+}
+.run-toast.show{opacity:1;transform:translateY(0)}
+.run-toast code{background:#000;color:var(--primary);border:1px solid #333;padding:1px 6px;font-family:var(--font-mono);font-size:.82rem}
+/* 좁은 화면: 좌측 고정 대신 히어로 안 흐름으로 내려 전체폭 버튼 */
+@media(max-width:1080px){
+  .run-fab{
+    position:static;transform:none;width:100%;max-width:420px;margin:0 auto 26px;
+    justify-content:center;border-left:3px solid #111;box-shadow:5px 5px 0 #111;
+  }
+  .run-fab:hover,.run-fab:active{transform:none;box-shadow:5px 5px 0 #111}
+}
 </style>
 </head>
 <body>
@@ -840,6 +876,11 @@ header{padding:0}
 
 <!-- ============ HERO ============ -->
 <div class="hero container" id="intro">
+  <button id="runBtn" class="run-fab" type="button" aria-label="클로드에서 실행해보기 — 설치 프롬프트 복사">
+    <span class="run-fab-ico" aria-hidden="true">▶</span>
+    <span class="run-fab-txt">클로드에서 실행해보기<small>설치 프롬프트 복사 → Claude Code에 붙여넣기</small></span>
+  </button>
+  <div id="runToast" class="run-toast" role="status" aria-live="polite">설치 프롬프트를 복사했어요. Claude Code에 붙여넣기(<code>Ctrl/⌘+V</code>) 하세요.</div>
   <div class="pill-tag">💡 Claude Code Plugin · 잔소리 주도 개발(Jansori-Driven Development)</div>
   <h1>
     <span class="gradient-text">"이거 저번에도 말했던 건데..."</span><br>
@@ -1309,6 +1350,79 @@ mean = <span class="cli-hit">ColumnAccumulator</span>(x) / Area;   <span class="
   sync();
   addEventListener('resize', sync);
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(sync);
+})();
+</script>
+
+<!-- 복사될 설치 프롬프트 원문 (렌더되지 않음) -->
+<script type="text/plain" id="runPrompt">Jansori 플러그인을 이 저장소에서 설치하고 실행할 수 있게 셋업해줘. 아래를 순서대로 해줘.
+
+저장소(공개): https://github.com/hobism3/jansori-driven-development
+
+1) 내 OS(Windows/macOS/Linux)를 감지하고 그에 맞는 쉘 명령을 써줘. Python이 3.10~3.12 범위인지, git과 (선택) g++가 있는지 확인해줘.
+2) 저장소를 홈 아래 적당한 폴더(예: ~/jansori-driven-development)에 git clone 해줘. 이미 있으면 git pull.
+3) 클론한 폴더에서 서버 의존성 설치:  python -m pip install -e ".[dev]"
+4) 로컬 서버를 백그라운드로 기동해줘 (loopback 전용, 기본적으로 jansori-data.json 에 지속 저장):
+   - 리눅스/맥:  JANSORI_NORMALIZE_THRESHOLD=3 python -m server.app.main
+   - Windows PowerShell:  $env:JANSORI_NORMALIZE_THRESHOLD="3"; python -m server.app.main
+   기동 후 http://127.0.0.1:8765/health 가 {"status":"ok"} 인지 확인하고, 데모 스킬을 심어줘:  python scripts/seed.py
+   그리고  python plugin/scripts/jansori_client.py index  로 스킬이 뜨는지 확인해줘.
+5) 플러그인은 이 저장소의 plugin/ 폴더에 있어(.claude-plugin/plugin.json + marketplace.json). 슬래시 명령은 네가 대신 못 치니, 내가 직접 입력할 수 있게 "클론된 절대경로"를 넣은 아래 두 줄을 정확히 출력해줘:
+      /plugin marketplace add <클론경로>/plugin
+      /plugin install jansori@jansori-local
+   그리고 활성화 안 되면 /reload-plugins 하라고 안내해줘.
+6) 설치 검증 방법도 알려줘: /hooks (UserPromptSubmit·Stop 등록 확인), /plugin details jansori (commands: nag/save, skill: load 확인).
+7) 서버가 8765 기본 포트로 떠 있으면 클라이언트가 자동으로 붙으니 추가 설정은 필요 없다고 알려줘. 포트를 바꿨다면 JANSORI_URL 로 맞추라고 안내해줘.
+
+주의: 이 서버는 loopback(127.0.0.1) 전용이라 다른 PC에서 원격으로 못 붙어. 각자 자기 PC에서 실행해야 해.
+설치가 끝나면, "회식 장소 고르기" 같은 스킬을 하나 만들어서(save), 다른 새 대화에서 그 스킬이 로드되는지 시험해보라고 3줄로 안내해줘.</script>
+
+<script>
+// "클로드에서 실행해보기" → 설치 프롬프트를 클립보드로 복사
+(function(){
+  var btn = document.getElementById('runBtn');
+  var toast = document.getElementById('runToast');
+  var payload = document.getElementById('runPrompt');
+  if(!btn || !payload) return;
+
+  var toastTimer;
+  function flash(){
+    btn.classList.add('copied');
+    var txt = btn.querySelector('.run-fab-txt');
+    var prev = txt ? txt.firstChild.nodeValue : null;
+    if(txt) txt.firstChild.nodeValue = '복사됐어요! ✓';
+    if(toast){
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 3200);
+    }
+    setTimeout(function(){
+      btn.classList.remove('copied');
+      if(txt && prev !== null) txt.firstChild.nodeValue = prev;
+    }, 2200);
+  }
+
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  btn.addEventListener('click', function(){
+    // 앞뒤 개행만 정리해 원문 그대로 복사
+    var text = payload.textContent.replace(/^\n+/, '').replace(/\s+$/, '');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(flash, function(){ fallbackCopy(text); flash(); });
+    } else {
+      fallbackCopy(text);
+      flash();
+    }
+  });
 })();
 </script>
 </body>
