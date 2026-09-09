@@ -22,6 +22,7 @@
   --font-sans:'Pretendard','Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   --font-mono:'Fira Code',monospace;
   --font-display:'Archivo Black','Pretendard','Inter',sans-serif;
+  --hdr-h:113px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:17px;scroll-behavior:smooth}
@@ -30,18 +31,28 @@ body{background:var(--bg);color:var(--text-main);font-family:var(--font-sans);li
 :focus-visible{outline:3px solid #111;outline-offset:3px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
 .container{max-width:1120px;margin:0 auto;padding:0 24px}
+section[id]{scroll-margin-top:calc(var(--hdr-h) + 20px)}
 h1,h2,.logo{font-family:var(--font-display);font-weight:900;letter-spacing:-1.5px}
 
-header{padding:20px 0;background:var(--bg);border-bottom:4px solid #111;position:sticky;top:0;z-index:100}
-.nav-inner{display:flex;justify-content:space-between;align-items:center;gap:16px}
+header{padding:0;background:var(--bg);border-bottom:4px solid #111;position:sticky;top:0;z-index:100}
+.nav-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 0 13px}
 a.logo{display:flex;align-items:center;gap:10px;font-size:1.25rem;text-decoration:none;color:inherit;white-space:nowrap}
 .logo span.badge{font-size:.7rem;background:var(--primary);color:#fff;border:2px solid #111;padding:3px 8px;font-weight:700;letter-spacing:0}
 a.logo:hover span.badge{background:#111}
-.nav-links{display:flex;gap:22px;font-size:.9rem;color:var(--text-muted);font-weight:600}
-.nav-links a{text-decoration:none;color:inherit;padding-bottom:3px;border-bottom:3px solid transparent}
-.nav-links a:hover{color:#111;border-bottom-color:#111}
-.nav-links a.here{color:#111;border-bottom-color:var(--primary)}
-@media(max-width:760px){.nav-links{gap:14px;font-size:.82rem}}
+/* 1단 = 페이지 전환(소개글/DB/시연 영상), 2단 = 이 페이지 안의 목차 */
+.nav-main{display:flex;gap:10px;font-size:.92rem;font-weight:700}
+.nav-main a{text-decoration:none;color:var(--text-muted);padding:4px 13px;border:2px solid transparent;transition:color .2s}
+.nav-main a:hover{color:#111;border-color:#111}
+.nav-main a.here{background:#111;color:#fdf6e3;border-color:#111}
+.nav-sub-bar{border-top:2px solid #111;background:#fff}
+.nav-sub{display:flex;gap:20px;font-size:.78rem;font-weight:600;color:var(--text-muted);
+  padding:9px 24px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.nav-sub::-webkit-scrollbar{display:none}
+.nav-sub a{text-decoration:none;color:inherit;white-space:nowrap;padding-bottom:2px;border-bottom:2px solid transparent;transition:color .2s}
+.nav-sub a:hover{color:#111;border-bottom-color:#111}
+.nav-main a{white-space:nowrap}
+@media(max-width:560px){.nav-main{gap:2px;font-size:.8rem}.nav-main a{padding:4px 7px}
+  .logo{font-size:1.02rem;gap:6px}.logo span.badge{font-size:.62rem;padding:2px 5px}}
 
 .page-head{padding:44px 0 30px}
 .eyebrow{font-family:var(--font-mono);font-size:.8rem;color:var(--primary);display:block;margin-bottom:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
@@ -86,11 +97,16 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
 <header>
   <div class="container nav-inner">
     <a class="logo" href="index.html">⚡ Jansori <span class="badge">NDD Engine</span></a>
-    <nav class="nav-links">
-      <a href="index.html">← 홈</a>
-      <a href="intro.html">소개글</a>
+    <nav class="nav-main">
+      <a href="index.html">소개글</a>
       <a href="db.html">DB</a>
       <a href="demo.html" class="here">시연 영상</a>
+    </nav>
+  </div>
+  <div class="nav-sub-bar">
+    <nav class="container nav-sub">
+      <a href="#watch">무엇을 보게 되나</a>
+      <a href="#run">직접 돌려보기</a>
     </nav>
   </div>
 </header>
@@ -110,7 +126,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
     <div class="frame" id="frame"></div>
   </div>
 
-  <section>
+  <section id="watch">
     <div class="sec-title"><h2>무엇을 보게 되나</h2></div>
     <div class="grid">
       <div class="card a">
@@ -131,7 +147,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
     </div>
   </section>
 
-  <section>
+  <section id="run">
     <div class="sec-title"><h2>직접 돌려보기</h2></div>
     <ol class="steps">
       <li><div><b>make run</b><span>터미널 1에서 로컬 Jansori 서버를 띄웁니다. 한 번에 한 인스턴스만 운영합니다.</span></div></li>
@@ -190,6 +206,20 @@ var VIDEO_URL = "";
   v.preload = 'metadata';
   frame.appendChild(v);
   document.querySelector('.stage-name').textContent = 'jansori — ' + url.split('/').pop();
+})();
+</script>
+<script>
+// 헤더는 2단이라 높이가 폰트 로딩·화면 폭에 따라 달라진다.
+// 앵커 보정(scroll-margin-top)이 쓰는 --hdr-h 를 실제 높이로 맞춘다.
+(function(){
+  var hdr = document.querySelector('header');
+  if(!hdr) return;
+  var sync = function(){
+    document.documentElement.style.setProperty('--hdr-h', hdr.offsetHeight + 'px');
+  };
+  sync();
+  addEventListener('resize', sync);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(sync);
 })();
 </script>
 </body>
