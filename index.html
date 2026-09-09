@@ -402,7 +402,7 @@ code{font-family:var(--font-mono);font-size:.86em;background:rgba(255,255,255,.0
 .v3-out li::before{content:"\2192";position:absolute;left:0;top:0;color:var(--accent-emerald);font-weight:700}
 .v3-out strong{color:#6ee7b7;font-weight:700}
 /* Session A 는 위쪽 단독이라 좌우로 넓게 쓴다 */
-.v3-node.lead{width:600px;padding:26px 30px}
+.v3-node.lead{width:600px;padding:26px 30px;position:relative}
 .v3-node.lead q{font-size:1.02rem}
 .v3-node b{
   display:block;font-family:var(--font-mono);font-size:.7rem;font-weight:700;
@@ -714,15 +714,20 @@ code{color:#111}
   .close-box{box-shadow:6px 6px 0 #111}
 }
 
-/* 각 시나리오 결과 카드 → 실제 터미널(examples.html) 이동 버튼 */
+/* Session A 카드 우측 상단 → 실제 터미널(examples.html) 이동 버튼 */
 .v3-cta{
-  display:inline-flex;align-items:center;gap:6px;margin-top:16px;
-  font-size:.85rem;font-weight:700;text-decoration:none;color:#111;
+  position:absolute;top:20px;right:22px;z-index:1;
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.8rem;font-weight:700;text-decoration:none;color:#111;
   background:#fff;border:2px solid #111;box-shadow:3px 3px 0 #111;
-  padding:8px 14px;transition:transform .1s,box-shadow .1s;
+  padding:7px 12px;transition:transform .1s,box-shadow .1s;
 }
 .v3-cta:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 #111}
 .v3-cta:active{transform:translate(1px,1px);box-shadow:1px 1px 0 #111}
+/* 좁은 화면에서는 겹치지 않게 흐름 안으로 내린다 */
+@media(max-width:600px){
+  .v3-cta{position:static;margin-top:14px;box-shadow:2px 2px 0 #111}
+}
 
 /* ---------- 2단 헤더 ---------- */
 header{padding:0}
@@ -733,11 +738,11 @@ header{padding:0}
 
 <header>
   <div class="container nav-inner">
-    <div class="logo">⚡ Jansori <span class="badge">NDD Engine</span></div>
+    <div class="logo">💊 Jansori <span class="badge">JDD Plugin</span></div>
     <nav class="nav-main">
       <a href="index.html" class="here">소개글</a>
-      <a href="db.html">잔소리는 어디에 쌓이는가</a>
       <a href="examples.html">실 사용 사례</a>
+      <a href="db.html">잔소리는 어디에 쌓이는가</a>
     </nav>
   </div>
   <div class="nav-sub-bar">
@@ -962,11 +967,12 @@ mean = <span class="cli-hit">ColumnAccumulator</span>(x) / Area;   <span class="
   <div class="tl-wrapper">
     <span class="eyebrow tl-cap">cleanup-cmodel-workload · 한 스킬에 잔소리가 누적되는 흐름</span>
     <div class="tl-grid">
-      <div class="tl-name">등록 · 잔소리 누적</div>
+      <div class="tl-name">cleanup-cmodel-workload</div>
       <div class="tl-row">
         <span class="v">v1</span><span class="seg nag"><em>중복 계산 줄이기</em></span>
         <span class="v">v2</span><span class="seg nag"><em>UpperCamelCase 명명</em></span>
-        <span class="v now">v3</span>
+        <span class="v now">v3</span><span class="seg pack"><em>임계값 · 정규화</em></span>
+        <span class="v now">v4</span>
       </div>
     </div>
     <div class="tl-runs">
@@ -974,7 +980,7 @@ mean = <span class="cli-hit">ColumnAccumulator</span>(x) / Area;   <span class="
       <div class="tl-runbar">
         <span>A · v1 등록</span>
         <span>B · 잔소리 2건 → v3</span>
-        <span>C · 학습된 v3로 첫 실행</span>
+        <span>C · 압축된 v4로 실행</span>
       </div>
     </div>
   </div>
@@ -1017,6 +1023,7 @@ mean = <span class="cli-hit">ColumnAccumulator</span>(x) / Area;   <span class="
 
     <div class="lp-panel p-dinner">
       <div class="v3-node lead">
+        <a class="v3-cta" href="examples.html#business-dinner">실제 터미널 보러가기 →</a>
         <b>SESSION A · 만든다</b><span>총무가 회식 장소 선정 절차를 정리합니다</span>
         <q>회식 장소 고르는 절차, 나만 알고 있으면 안 되지</q>
         <em>업무를 마치면 Stop 훅이 저장을 제안하고, 사람이 수락해야 <code>pick-team-dinner-venue</code> v1이 만들어집니다.</em>
@@ -1049,12 +1056,12 @@ mean = <span class="cli-hit">ColumnAccumulator</span>(x) / Area;   <span class="
             <li>인당 비용을 <strong>예산 4.5만 대비 여유/경계선</strong>으로 표시</li>
             <li>이 팀원은 회의비 규정을 <strong>들은 적이 없습니다</strong></li>
           </ul>
-          <a class="v3-cta" href="examples.html#business-dinner">실제 터미널 보러가기 →</a>
         </div>
       </div>
     </div>
     <div class="lp-panel p-weekly">
       <div class="v3-node lead">
+        <a class="v3-cta" href="examples.html#weekly">실제 터미널 보러가기 →</a>
         <b>SESSION A · 만든다</b><span>파트장이 주간보고 정리 절차를 저장합니다</span>
         <q>주간보고 정리 방식, 팀에 공유해두자</q>
         <em>업무를 마치면 Stop 훅이 저장을 제안하고, 사람이 수락해야 <code>organize-weekly-report</code> v1이 만들어집니다.</em>
@@ -1088,12 +1095,12 @@ mean = <span class="cli-hit">ColumnAccumulator</span>(x) / Area;   <span class="
             <li>이슈를 <strong>리스크·대응방안·담당자/기한 표</strong>로 정리</li>
             <li>외부사 지연을 <strong>도움 필요/에스컬레이션</strong>으로 분리</li>
           </ul>
-          <a class="v3-cta" href="examples.html#weekly">실제 터미널 보러가기 →</a>
         </div>
       </div>
     </div>
     <div class="lp-panel p-code">
       <div class="v3-node lead">
+        <a class="v3-cta" href="examples.html#c-model">실제 터미널 보러가기 →</a>
         <b>SESSION A · 만든다</b><span>선임이 cmodel 정리 절차를 스킬로 등록합니다</span>
         <q>이 정리 작업은 cmodel 개발마다 똑같이 쓰이니, 스킬로 올려두자</q>
         <em>local_contrast 정리 절차를 <code>cleanup-cmodel-workload</code> v1로 저장합니다. 유사 스킬을 먼저 재검색합니다.</em>
@@ -1126,7 +1133,6 @@ mean = <span class="cli-hit">ColumnAccumulator</span>(x) / Area;   <span class="
             <li>새 헬퍼는 <strong>UpperCamelCase</strong> (ComputeRowBoxSums 등)</li>
             <li><code>out_hash</code> 전 반경 일치 · cmp 바이트 동일</li>
           </ul>
-          <a class="v3-cta" href="examples.html#c-model">실제 터미널 보러가기 →</a>
         </div>
       </div>
     </div>
