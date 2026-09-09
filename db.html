@@ -136,6 +136,12 @@ section{margin-bottom:72px}
 .change{border-left:6px solid #111;padding-left:16px}
 .change .sub{margin-bottom:8px}
 .nag-text{border:3px solid #111;background:#fff;box-shadow:4px 4px 0 var(--primary);padding:14px 16px;font-size:.95rem}
+.nag-text.folded{box-shadow:4px 4px 0 var(--accent-purple)}
+/* 본문에 이미 접혀 들어간 잔소리 표시 */
+.merged-tag{font-family:var(--font-mono);font-size:.7rem;background:var(--accent-purple);color:#fff;
+  border:2px solid #111;padding:1px 7px;margin-left:8px;white-space:nowrap;font-weight:600;vertical-align:2px}
+.corr.folded{box-shadow:4px 4px 0 var(--accent-purple);opacity:.92}
+.corr.folded .corr-seq{background:var(--accent-purple)}
 .d-skip{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);padding:5px 0 5px 12px;border-left:3px dashed #bbb;margin:6px 0}
 .dline{font-family:var(--font-mono);font-size:.8rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;padding:6px 12px 6px 30px;position:relative;border:2px solid #111;margin-bottom:6px}
 .dline::before{position:absolute;left:9px;top:6px;font-weight:700}
@@ -266,6 +272,53 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
   var POLL_MS = 4000;
   var lastRaw = null, live = false, hitTimer = null;
 
+  /* ── normalize 로 본문에 접혀 들어간 잔소리들. ──
+     이건 실제 잔소리 DB(jansori-data.json)에는 남기지 않는다.
+     대기 큐(corrections)에 되돌려 넣으면 서버가 normalize 를 다시 걸기 때문이다.
+     그래서 "이미 합쳐진 기록"은 이 페이지(HTML)에만 보관하고,
+     로드된 데이터 위에 얹어서 화면에만 되살린다. */
+  var FOLDED_CORRECTIONS = {
+    "pick-team-dinner-venue": [
+      {
+        "instruction_text": "후보를 카테고리(고깃집/한정식 등)로만 제시하지 말고, 반드시 검증 가능한 실제 상호명을 제시할 것. 상호를 특정할 수 없으면 웹 검색 등으로 확인하고, 그래도 불확실하면 불확실하다고 명시하되 구체적 후보 상호를 최소 3곳 제시한다.",
+        "request_id": "0afb7f38-2e9e-4444-ac9b-2ee57ef5015e",
+        "seq": 1,
+        "created_at": 1788917667.3497038,
+        "folded_into_version": 5,
+        "folded_at": 1788921785.4208934
+      },
+      {
+        "instruction_text": "1인 예산은 회사 회의비/식대 규정 기준으로 반드시 확인·반영한다(예: 인당 4.5만 원). 각 후보마다 해당 예산 대비 인당 예상 비용과 예산 내 소화 가능 여부(여유/경계선/초과)를 명시하고, 예산에 가장 안전하게 맞는 곳을 우선 추천한다.",
+        "request_id": "0337e3ec-5252-449f-955d-f76ecdd154c3",
+        "seq": 2,
+        "created_at": 1788917786.789389,
+        "folded_into_version": 5,
+        "folded_at": 1788921785.4208934
+      },
+      {
+        "instruction_text": "가게를 추천할 때는 반드시 각 가게의 상세정보 링크(네이버지도 등)를 함께 첨부해 사용자가 상세정보를 바로 확인할 수 있게 한다.",
+        "request_id": "4af5f67f-04ab-4717-b7ca-83901b0e6905",
+        "seq": 3,
+        "created_at": 1788919007.284832,
+        "folded_into_version": 5,
+        "folded_at": 1788921785.4208934
+      }
+    ]
+  };
+  // 로드된 데이터의 각 캡슐에 접힌 잔소리를 얹는다(request_id 로 중복 방지)
+  function attachFolded(data){
+    (data.capsules || []).forEach(function(c){
+      var extra = FOLDED_CORRECTIONS[c.skill_id];
+      if(!extra) return;
+      var seen = {};
+      (c.folded_corrections || []).forEach(function(x){ seen[x.request_id] = true; });
+      c.folded_corrections = (c.folded_corrections || []).concat(
+        extra.filter(function(x){ return !seen[x.request_id]; })
+      );
+    });
+    return data;
+  }
+
   function esc(s){
     return String(s).replace(/[&<>"']/g, function(c){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
@@ -362,7 +415,19 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
           +  '</div></div>';
       });
     } else {
-      h += '<div class="empty-note">비어 있습니다. 쌓였던 잔소리는 normalize에서 본문에 반영되어 목록이 정리된 상태입니다.</div>';
+      h += '<div class="empty-note">비어 있습니다. 쌓였던 잔소리는 normalize에서 본문에 반영되어 대기 큐가 정리된 상태입니다.</div>';
+    }
+
+    // normalize 로 본문에 접혀 들어간 잔소리. 대기 큐에서는 빠졌지만 기록은 남긴다
+    var folded = c.folded_corrections || [];
+    if(folded.length){
+      h += '<div class="sub" style="margin-top:28px">합쳐진 잔소리 — 본문에 이미 반영됨</div>';
+      folded.forEach(function(x){
+        h += '<div class="corr folded"><div class="corr-seq">'+esc(x.seq)+'</div><div>'
+          +  '<div>'+esc(x.instruction_text)+'<span class="merged-tag">현재 합쳐짐</span></div>'
+          +  '<div class="corr-foot">'+when(x.created_at)+' · v'+esc(x.folded_into_version)+' 에 반영 · request '+esc(x.request_id)+'</div>'
+          +  '</div></div>';
+      });
     }
 
     if((c.protected_fields||[]).length){
@@ -377,9 +442,11 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
 
   /* ── History: 각 단계에서 바뀐 것만 ── */
   function renderHistory(skillId, rows, capsule){
-    // nag 는 request_id 로 캡슐에 남아 있는 correction 을 되찾는다
+    // nag 는 request_id 로 원문을 되찾는다. 대기 큐뿐 아니라
+    // normalize 로 본문에 접힌 것(folded_corrections)까지 함께 본다
     var byReq = {};
-    (capsule && capsule.corrections || []).forEach(function(x){ byReq[x.request_id] = x; });
+    (capsule && capsule.corrections || []).forEach(function(x){ byReq[x.request_id] = {c:x, folded:false}; });
+    (capsule && capsule.folded_corrections || []).forEach(function(x){ byReq[x.request_id] = {c:x, folded:true}; });
 
     var h = '<div class="hist"><div class="hist-head">'+esc(skillId)+' — '+rows.length+' events</div>';
     rows.forEach(function(r, i){
@@ -394,13 +461,14 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
         block = '<div class="change"><div class="sub">등록된 Body</div>'
               + '<div class="body-pre">'+bodyHtml(r.body_snapshot||'')+'</div></div>';
       } else if(origin === 'nag'){
-        var c = byReq[r.request_id];
+        var hit = byReq[r.request_id];
         what = '잔소리 적립 — 본문은 그대로입니다';
         block = '<div class="change"><div class="sub">추가된 Correction</div>';
-        if(c){
-          block += '<div class="nag-text">'+esc(c.instruction_text)+'</div>';
+        if(hit){
+          block += '<div class="nag-text'+(hit.folded?' folded':'')+'">'+esc(hit.c.instruction_text)
+                +  (hit.folded ? '<span class="merged-tag">현재 합쳐짐</span>' : '')+'</div>';
         } else {
-          block += '<div class="empty-note">이 잔소리의 원문은 캡슐에 남아 있지 않습니다. 이후 normalize에서 본문에 반영되면서 corrections 목록이 비워졌기 때문입니다.</div>';
+          block += '<div class="empty-note">이 잔소리의 원문이 캡슐에 남아 있지 않습니다.</div>';
         }
         if(changed){
           block += '<div class="sub" style="margin-top:16px">본문도 함께 바뀜</div>' + renderBodyDiff(prev.body_snapshot, r.body_snapshot);
@@ -436,6 +504,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
   }
 
   function render(data){
+    attachFolded(data);
     var capsules = data.capsules || [], history = data.history || {};
     var byId = {}; capsules.forEach(function(c){ byId[c.skill_id] = c; });
     var events = Object.keys(history).reduce(function(n,k){ return n + history[k].length; }, 0);
