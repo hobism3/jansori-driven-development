@@ -85,6 +85,18 @@ a.logo:hover span.badge{background:#111}
 .metric.hl{box-shadow:6px 6px 0 var(--primary)}
 .metric.hl .v{color:var(--primary)}
 
+/* ---------- 캡슐 탭 ---------- */
+.cap-tabs{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:40px}
+.cap-tab{font-family:inherit;cursor:pointer;text-align:left;background:var(--card-bg);border:3px solid #111;
+  box-shadow:4px 4px 0 #111;padding:12px 18px;transition:transform .1s,box-shadow .1s}
+.cap-tab:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 #111}
+.cap-tab .t-name{font-weight:800;font-size:1.02rem;color:#111;display:block}
+.cap-tab .t-id{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);display:block;margin-top:3px}
+.cap-tab .t-meta{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);margin-top:7px}
+.cap-tab.active{background:#111;box-shadow:6px 6px 0 var(--primary);transform:translate(-1px,-1px)}
+.cap-tab.active .t-name{color:#fdf6e3}
+.cap-tab.active .t-id,.cap-tab.active .t-meta{color:#d9c9f5}
+
 /* ---------- 섹션 ---------- */
 section{margin-bottom:72px}
 .sec-title{display:flex;align-items:baseline;gap:14px;border-bottom:3px solid #111;padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap}
@@ -221,6 +233,41 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
       ],
       "created_at": 1788917446.1386619,
       "updated_at": 1788921785.4208934
+    },
+    {
+      "skill_id": "organize-weekly-report",
+      "name": "주간보고 정리",
+      "description": "주간 업무 메모를 표준 형식의 주간보고로 정리하는 절차",
+      "body": "주간 업무 메모를 아래 표준 형식의 주간보고로 정리한다.\n\n## 절차\n1. 입력된 업무 메모에서 각 항목을 다음 3개 섹션으로 분류한다.\n   - **이번 주 한 일**: 완료했거나 진행 중인 업무. 각 업무의 진행 상태(완료/진행중/지연/착수)를 함께 표기한다.\n   - **다음 주 계획**: 다음 주에 예정된 업무.\n   - **이슈**: 지연·차단 요인, 외부 의존성, 조치가 필요한 사항.\n2. '이번 주 한 일'은 업무별 상태를 한눈에 볼 수 있도록 표(업무 | 상태 | 비고) 형태로 정리하고, 필요 시 상세 설명을 덧붙인다.\n3. 상태는 이모지로 시각화한다: 완료/마무리 🟢, 진행중/착수 🟡, 지연/차단 🔴.\n4. 지연·이슈 항목에는 원인과 필요한 조치(follow-up)를 명시한다.\n5. 보고서 상단에 기준 날짜를 표기한다.\n6. 마지막에 담당자/마감일 추가나 슬랙 공유용 축약본 등 후속 옵션을 제안한다.\n\n## 출력 형식\n- 제목: '주간 업무 보고 (YYYY-MM-DD 기준)'\n- 섹션 순서: 이번 주 진행 현황(표) → 상세 내용 → 다음 주 계획 → 이슈/조치사항",
+      "version": 3,
+      "corrections": [
+        {
+          "id": "7c4ddfb4-aa5e-4f97-bd5d-c591c975cca1",
+          "target": "organize-weekly-report",
+          "instruction_text": "다음 주 계획은 우선순위 순으로 정렬한다. 보고서 맨 아래에 '도움 필요 / 에스컬레이션' 섹션을 추가하여, 다른 팀·상급자의 지원이나 결정이 필요한 항목을 명시한다.",
+          "request_id": "ce1681bd-bb9f-4b23-93d5-6627e8e69268",
+          "seq": 1,
+          "created_at": 1788923237.9984407
+        },
+        {
+          "id": "6b339265-e0c3-4ee4-a63b-b8757537bfd4",
+          "target": "organize-weekly-report",
+          "instruction_text": "이슈/조치사항 섹션은 단순 나열 대신 '리스크 → 대응방안 → 담당자/기한' 형태(표 또는 항목별)로 작성하여, 각 리스크마다 대응방안과 담당자·기한을 명시한다.",
+          "request_id": "c86d957d-9eb5-4c1c-a066-792c0231c1e4",
+          "seq": 2,
+          "created_at": 1788923291.0949373
+        }
+      ],
+      "refs_children": [],
+      "assets": [],
+      "protected_fields": [
+        "skill_id",
+        "name",
+        "refs_children",
+        "protected_fields"
+      ],
+      "created_at": 1788923125.690246,
+      "updated_at": 1788923291.0949373
     }
   ],
   "history": {
@@ -260,6 +307,29 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
         "origin": "normalize",
         "created_at": 1788921785.4208934
       }
+    ],
+    "organize-weekly-report": [
+      {
+        "number": 1,
+        "body_snapshot": "주간 업무 메모를 아래 표준 형식의 주간보고로 정리한다.\n\n## 절차\n1. 입력된 업무 메모에서 각 항목을 다음 3개 섹션으로 분류한다.\n   - **이번 주 한 일**: 완료했거나 진행 중인 업무. 각 업무의 진행 상태(완료/진행중/지연/착수)를 함께 표기한다.\n   - **다음 주 계획**: 다음 주에 예정된 업무.\n   - **이슈**: 지연·차단 요인, 외부 의존성, 조치가 필요한 사항.\n2. '이번 주 한 일'은 업무별 상태를 한눈에 볼 수 있도록 표(업무 | 상태 | 비고) 형태로 정리하고, 필요 시 상세 설명을 덧붙인다.\n3. 상태는 이모지로 시각화한다: 완료/마무리 🟢, 진행중/착수 🟡, 지연/차단 🔴.\n4. 지연·이슈 항목에는 원인과 필요한 조치(follow-up)를 명시한다.\n5. 보고서 상단에 기준 날짜를 표기한다.\n6. 마지막에 담당자/마감일 추가나 슬랙 공유용 축약본 등 후속 옵션을 제안한다.\n\n## 출력 형식\n- 제목: '주간 업무 보고 (YYYY-MM-DD 기준)'\n- 섹션 순서: 이번 주 진행 현황(표) → 상세 내용 → 다음 주 계획 → 이슈/조치사항",
+        "request_id": "042cf757-fed5-468a-8087-c9de13f65f12",
+        "origin": "register",
+        "created_at": 1788923125.690246
+      },
+      {
+        "number": 2,
+        "body_snapshot": "주간 업무 메모를 아래 표준 형식의 주간보고로 정리한다.\n\n## 절차\n1. 입력된 업무 메모에서 각 항목을 다음 3개 섹션으로 분류한다.\n   - **이번 주 한 일**: 완료했거나 진행 중인 업무. 각 업무의 진행 상태(완료/진행중/지연/착수)를 함께 표기한다.\n   - **다음 주 계획**: 다음 주에 예정된 업무.\n   - **이슈**: 지연·차단 요인, 외부 의존성, 조치가 필요한 사항.\n2. '이번 주 한 일'은 업무별 상태를 한눈에 볼 수 있도록 표(업무 | 상태 | 비고) 형태로 정리하고, 필요 시 상세 설명을 덧붙인다.\n3. 상태는 이모지로 시각화한다: 완료/마무리 🟢, 진행중/착수 🟡, 지연/차단 🔴.\n4. 지연·이슈 항목에는 원인과 필요한 조치(follow-up)를 명시한다.\n5. 보고서 상단에 기준 날짜를 표기한다.\n6. 마지막에 담당자/마감일 추가나 슬랙 공유용 축약본 등 후속 옵션을 제안한다.\n\n## 출력 형식\n- 제목: '주간 업무 보고 (YYYY-MM-DD 기준)'\n- 섹션 순서: 이번 주 진행 현황(표) → 상세 내용 → 다음 주 계획 → 이슈/조치사항",
+        "request_id": "ce1681bd-bb9f-4b23-93d5-6627e8e69268",
+        "origin": "nag",
+        "created_at": 1788923237.9984407
+      },
+      {
+        "number": 3,
+        "body_snapshot": "주간 업무 메모를 아래 표준 형식의 주간보고로 정리한다.\n\n## 절차\n1. 입력된 업무 메모에서 각 항목을 다음 3개 섹션으로 분류한다.\n   - **이번 주 한 일**: 완료했거나 진행 중인 업무. 각 업무의 진행 상태(완료/진행중/지연/착수)를 함께 표기한다.\n   - **다음 주 계획**: 다음 주에 예정된 업무.\n   - **이슈**: 지연·차단 요인, 외부 의존성, 조치가 필요한 사항.\n2. '이번 주 한 일'은 업무별 상태를 한눈에 볼 수 있도록 표(업무 | 상태 | 비고) 형태로 정리하고, 필요 시 상세 설명을 덧붙인다.\n3. 상태는 이모지로 시각화한다: 완료/마무리 🟢, 진행중/착수 🟡, 지연/차단 🔴.\n4. 지연·이슈 항목에는 원인과 필요한 조치(follow-up)를 명시한다.\n5. 보고서 상단에 기준 날짜를 표기한다.\n6. 마지막에 담당자/마감일 추가나 슬랙 공유용 축약본 등 후속 옵션을 제안한다.\n\n## 출력 형식\n- 제목: '주간 업무 보고 (YYYY-MM-DD 기준)'\n- 섹션 순서: 이번 주 진행 현황(표) → 상세 내용 → 다음 주 계획 → 이슈/조치사항",
+        "request_id": "c86d957d-9eb5-4c1c-a066-792c0231c1e4",
+        "origin": "nag",
+        "created_at": 1788923291.0949373
+      }
     ]
   }
 }
@@ -271,6 +341,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
   var syncText = document.getElementById('sync-text');
   var POLL_MS = 4000;
   var lastRaw = null, live = false, hitTimer = null;
+  var activeSkill = null, lastData = null;
 
   /* ── normalize 로 본문에 접혀 들어간 잔소리들. ──
      이건 실제 잔소리 DB(jansori-data.json)에는 남기지 않는다.
@@ -503,38 +574,65 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
     return h + '</div>';
   }
 
+  // 캡슐별 nag 누적 수(정리 뒤에도 history 의 nag 이벤트로 센다)
+  function nagCount(history, id){
+    return (history[id] || []).filter(function(r){ return r.origin === 'nag'; }).length;
+  }
+
   function render(data){
     attachFolded(data);
+    lastData = data;
     var capsules = data.capsules || [], history = data.history || {};
-    var byId = {}; capsules.forEach(function(c){ byId[c.skill_id] = c; });
-    var events = Object.keys(history).reduce(function(n,k){ return n + history[k].length; }, 0);
-    // 누적 잔소리는 corrections 가 아니라 history 의 nag 이벤트로 센다(정리 뒤에도 남으므로)
-    var nags = Object.keys(history).reduce(function(n,k){
-      return n + history[k].filter(function(r){ return r.origin === 'nag'; }).length; }, 0);
-    var ver = capsules.length ? capsules[0].version : '—';
 
-    var h = '<div class="metrics">';
-    h +=   '<div class="metric"><div class="k">capsules</div><div class="v">'+capsules.length+'</div></div>';
-    h +=   '<div class="metric"><div class="k">현재 버전</div><div class="v">v'+esc(ver)+'</div></div>';
+    // 선택된 캡슐 유지. 없어졌거나 처음이면 첫 캡슐로.
+    var ids = capsules.map(function(c){ return c.skill_id; });
+    if(ids.indexOf(activeSkill) < 0) activeSkill = ids.length ? ids[0] : null;
+    var active = capsules.filter(function(c){ return c.skill_id === activeSkill; })[0] || null;
+    var rows = activeSkill ? (history[activeSkill] || []) : [];
+    var events = rows.length;
+    var nags = active ? nagCount(history, activeSkill) : 0;
+
+    // ── 캡슐 탭: 하나당 캡슐 하나 ──
+    var h = '<div class="cap-tabs">';
+    capsules.forEach(function(c){
+      var on = c.skill_id === activeSkill;
+      h += '<button class="cap-tab'+(on?' active':'')+'" data-skill="'+esc(c.skill_id)+'">'
+        +    '<span class="t-name">'+esc(c.name || c.skill_id)+'</span>'
+        +    '<span class="t-id">'+esc(c.skill_id)+'</span>'
+        +    '<span class="t-meta">v'+esc(c.version)+' · 잔소리 '+nagCount(history, c.skill_id)+'건</span>'
+        +  '</button>';
+    });
+    h += '</div>';
+
+    // ── 선택된 캡슐 기준 지표 ──
+    h += '<div class="metrics">';
+    h +=   '<div class="metric"><div class="k">현재 버전</div><div class="v">v'+esc(active ? active.version : '—')+'</div></div>';
     h +=   '<div class="metric hl"><div class="k">누적 잔소리</div><div class="v">'+nags+'</div></div>';
     h +=   '<div class="metric"><div class="k">기록된 변화</div><div class="v">'+events+'</div></div>';
+    h +=   '<div class="metric"><div class="k">전체 캡슐</div><div class="v">'+capsules.length+'</div></div>';
     h += '</div>';
 
     h += '<section id="capsule">';
     h +=   '<div class="sec-title"><h2>Capsule</h2><span class="cnt">현재 상태</span></div>';
     h +=   '<p class="sec-note">지금 이 캡슐이 들고 있는 값입니다. 새 세션에 주입되는 것은 아래 Body입니다.</p>';
-    h +=   (capsules.length ? capsules.map(renderCapsule).join('') : '<div class="load-msg">캡슐이 없습니다.</div>');
+    h +=   (active ? renderCapsule(active) : '<div class="load-msg">캡슐이 없습니다.</div>');
     h += '</section>';
 
-    var keys = Object.keys(history);
     h += '<section id="history">';
     h +=   '<div class="sec-title"><h2>History</h2><span class="cnt">'+events+' events</span></div>';
     h +=   '<p class="sec-note">각 단계에서 <strong>바뀐 것만</strong> 보여줍니다. register는 등록된 본문을, nag는 적립된 잔소리를, normalize는 본문의 변경분을 냅니다.</p>';
-    h +=   (keys.length ? keys.map(function(k){ return renderHistory(k, history[k], byId[k]); }).join('')
-                        : '<div class="load-msg">기록이 없습니다.</div>');
+    h +=   (rows.length ? renderHistory(activeSkill, rows, active) : '<div class="load-msg">기록이 없습니다.</div>');
     h += '</section>';
 
     app.innerHTML = h;
+
+    // 탭 전환: 데이터를 다시 읽지 않고 선택만 바꿔 다시 그린다
+    Array.prototype.forEach.call(app.querySelectorAll('.cap-tab'), function(btn){
+      btn.addEventListener('click', function(){
+        activeSkill = btn.getAttribute('data-skill');
+        render(lastData);
+      });
+    });
   }
 
   function setSync(state, text){
