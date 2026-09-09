@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>예시 — Jansori Plugin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#fdf6e3;
+  --card-bg:#ffffff;
+  --text-main:#111111;
+  --text-muted:#4b4b4b;
+  --primary:#ff5a1f;
+  --accent-purple:#6d28d9;
+  --accent-cyan:#0891b2;
+  --accent-emerald:#15803d;
+  --accent-rose:#e11d48;
+  --font-sans:'Pretendard','Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --font-mono:'Fira Code',monospace;
+  --font-display:'Archivo Black','Pretendard','Inter',sans-serif;
+  --hdr-h:115px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:17px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text-main);font-family:var(--font-sans);line-height:1.6;overflow-x:hidden}
+::selection{background:#111;color:#fdf6e3}
+:focus-visible{outline:3px solid #111;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+.container{max-width:1360px;margin:0 auto;padding:0 24px}
+h1,h2,.logo{font-family:var(--font-display);font-weight:900;letter-spacing:-1.5px}
+
+/* ---------- 헤더 ---------- */
+header{padding:0;background:var(--bg);border-bottom:4px solid #111;position:sticky;top:0;z-index:100}
+.nav-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 24px 13px;max-width:1360px;margin:0 auto}
+a.logo{display:flex;align-items:center;gap:10px;font-size:1.25rem;text-decoration:none;color:inherit;white-space:nowrap}
+.logo span.badge{font-size:.7rem;background:var(--primary);color:#fff;border:2px solid #111;padding:3px 8px;font-weight:700;letter-spacing:0}
+a.logo:hover span.badge{background:#111}
+.nav-main{display:flex;gap:10px;font-size:.92rem;font-weight:700;flex:none}
+.nav-main a{text-decoration:none;color:var(--text-muted);padding:4px 13px;border:2px solid transparent;white-space:nowrap;transition:color .2s}
+.nav-main a:hover{color:#111;border-color:#111}
+.nav-main a.here{background:#111;color:#fdf6e3;border-color:#111}
+.nav-sub-bar{border-top:2px solid #111;background:#fff}
+.nav-sub{display:flex;gap:10px;font-size:.78rem;font-weight:700;color:var(--text-muted);
+  padding:8px 24px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;max-width:1360px;margin:0 auto;align-items:center}
+.nav-sub::-webkit-scrollbar{display:none}
+.nav-sub .lbl{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-right:4px}
+.scn{font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;background:#fff;border:2px solid #111;
+  padding:4px 13px;white-space:nowrap;color:#111;transition:background .15s,color .15s}
+.scn:hover{background:var(--primary);color:#fff}
+.scn.on{background:#111;color:#fdf6e3}
+@media(max-width:860px){
+  .nav-inner{flex-direction:column;align-items:flex-start;gap:10px}
+  .nav-main{width:100%;overflow-x:auto;scrollbar-width:none}
+  .nav-main::-webkit-scrollbar{display:none}
+}
+@media(max-width:560px){
+  .nav-main{gap:2px;font-size:.8rem}.nav-main a{padding:4px 7px}
+  .logo{font-size:1.02rem;gap:6px}.logo span.badge{font-size:.62rem;padding:2px 5px}
+}
+
+/* ---------- 페이지 타이틀 ---------- */
+.page-head{padding:30px 0 22px}
+.eyebrow{font-family:var(--font-mono);font-size:.8rem;color:var(--primary);display:block;margin-bottom:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.page-head h1{font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.1;margin-bottom:12px}
+.page-head p{color:var(--text-muted);max-width:900px}
+.page-head .scn-name{color:#111;font-weight:800}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;font-family:var(--font-mono);font-size:.74rem;color:var(--text-muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:13px;height:13px;border:2px solid #111;display:inline-block}
+.legend i.u{background:var(--primary)}
+.legend i.t{background:var(--accent-purple)}
+.legend i.s{background:var(--accent-emerald)}
+
+/* ---------- 터미널 3분할 ---------- */
+.term-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:8px 0 40px}
+.term{border:3px solid #111;box-shadow:6px 6px 0 #111;background:#0d0f14;display:flex;flex-direction:column;min-width:0;
+  height:calc(100vh - var(--hdr-h) - 250px);min-height:440px}
+.term-bar{display:flex;align-items:center;gap:10px;background:#1c1f27;border-bottom:2px solid #000;padding:9px 13px;flex:none}
+.term-bar .dots{display:flex;gap:6px;flex:none}
+.term-bar .dots i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.term-bar .dots i:nth-child(1){background:#ff5f56}
+.term-bar .dots i:nth-child(2){background:#ffbd2e}
+.term-bar .dots i:nth-child(3){background:#27c93f}
+.term-bar .tt{font-family:var(--font-mono);font-size:.76rem;color:#e2e8f0;font-weight:600}
+.term-bar .cap{font-family:var(--font-mono);font-size:.68rem;color:#8b93a7;margin-left:auto;text-align:right;line-height:1.3}
+.term-body{flex:1;overflow:auto;padding:14px 16px;font-family:var(--font-mono);font-size:.74rem;line-height:1.6;
+  color:#c8cdd8;white-space:pre;-webkit-overflow-scrolling:touch}
+.term-body::-webkit-scrollbar{width:10px;height:10px}
+.term-body::-webkit-scrollbar-thumb{background:#3a3f4b;border:2px solid #0d0f14}
+.term-body::-webkit-scrollbar-track{background:#0d0f14}
+
+/* 라인 종류 */
+.l{display:block}
+.l.blank{height:.7em}
+.l.user{background:rgba(255,90,31,.16);border-left:3px solid var(--primary);color:#fff;font-weight:600;
+  padding:2px 8px 2px 9px;margin:3px -16px 3px 0}
+.l.user .p{color:var(--primary);font-weight:800;margin-right:6px}
+.l.bar{border-left:3px solid #3f4757;padding-left:10px;color:#aeb6c6}
+.l.userbar{background:rgba(255,90,31,.09);border-left:3px solid var(--primary);color:#f4d9c8;padding:1px 8px 1px 9px;margin-right:-16px}
+.l.tool{color:#c4b5fd;font-weight:700}
+.l.tool .g{color:#a78bfa}
+.l.sys{color:#6ee7a8}
+.l.status{color:#6b7280;font-style:italic}
+.l.recap{color:#6b7280}
+.kw{color:#c4b5fd;font-weight:700}
+.kw.nd{color:#fca5a5}
+.warn{color:#fbbf24}
+
+.hint{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);margin:0 0 14px}
+.load-msg{font-family:var(--font-mono);font-size:.85rem;padding:20px;border:3px dashed #111;grid-column:1/-1}
+footer{border-top:4px solid #111;padding:30px 0;margin-top:20px;color:var(--text-muted);font-size:.88rem}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <a class="logo" href="index.html">⚡ Jansori <span class="badge">NDD Engine</span></a>
+    <nav class="nav-main">
+      <a href="index.html">소개글</a>
+      <a href="db.html">잔소리는 어디에 쌓이는가</a>
+      <a href="examples.html" class="here">예시</a>
+      <a href="demo.html">시연 영상</a>
+    </nav>
+  </div>
+  <div class="nav-sub-bar">
+    <nav class="nav-sub">
+      <span class="lbl">예시 선택</span>
+      <button class="scn on" data-scenario="business-dinner">🍖 회식 장소 고르기</button>
+      <button class="scn" data-scenario="weekly">🗂️ 주간보고 정리</button>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <div class="page-head">
+    <span class="eyebrow">Live Terminal Examples</span>
+    <h1>예시 — <span class="scn-name" id="scn-name">회식 장소 고르기</span></h1>
+    <p id="scn-desc">서로 다른 세 사람의 터미널(Session A · B · C)입니다. 한 사람이 <strong>스킬을 저장</strong>하고, 다른 사람이 <strong>잔소리(nag)</strong>로 고치면, 그 교정이 캡슐에 쌓여 <strong>다음 사람의 첫 답</strong>을 바꿉니다.</p>
+    <div class="legend">
+      <span><i class="u"></i> 사용자 입력</span>
+      <span><i class="t"></i> plugin 동작 (skill / nag / normalize)</span>
+      <span><i class="s"></i> 시스템 메시지</span>
+    </div>
+  </div>
+
+  <p class="hint">↕ 각 터미널 안에서 스크롤하세요. 넓은 표는 좌우로도 스크롤됩니다.</p>
+  <div class="term-wrap" id="wrap"><div class="load-msg">터미널을 불러오는 중…</div></div>
+</div>
+
+<footer>
+  <div class="container">
+    Jansori Plugin — 한 사람의 잔소리가 캡슐에 쌓여, 다음 사람의 첫 제출을 바꿉니다.
+  </div>
+</footer>
+
+<!-- 실제 데모 세션 로그. http 에서는 demo-result/*.txt 를 직접 읽고,
+     file:// 로 열어 fetch 가 막히면 아래 내장본으로 대체한다. -->
+<script type="text/plain" id="tx-business-dinner-A">
+❯ ㅎㅇ
+
+안녕하세요! 👋
+
+무엇을 도와드릴까요? 코드 작성, 디버깅, 파일 탐색 등 무엇이든 말씀해 주세요.
+
+✻ Crunched for 2s · done 오전 10:26
+
+❯ 우리 팀 회식 장소를 골라줘. 팀 10명, 강남 근처. 후보 3곳이랑 각 장단점, 최종 추천을 알려줘. 그리고 어떤 기준으로 골랐는지도 정리해줘.
+
+강남 팀 회식(10명) 장소를 후보 3곳으로 추려서 장단점과 추천, 선정 기준까지 정리해 드릴게요.
+
+먼저 짚어둘 점 하나입니다. 저는 실시간 예약 현황이나 최신 영업 정보를 조회할 수 없어서, 아래는 일반적으로 알려진 강남권 회식 장소 유형을 기준으로 정리한 추천입니다. 실제 예약 전 전화로 10인 단체석과 영업시간을 확인하시길 권합니다.
+
+선정 기준
+
+10명 회식에서 가장 중요한 4가지를 기준으로 잡았습니다.
+
+1. 단체석 수용력 — 10명이 한 테이블 또는 붙은 공간에 앉을 수 있는가.
+2. 대화 가능성 — 너무 시끄럽지 않아 팀 대화가 되는가.
+3. 메뉴 무난함 — 호불호 적고 술과 잘 맞는가.
+4. 접근성과 비용 — 강남역 도보권, 1인 3~5만 원대.
+
+후보 3곳
+
+아래 3곳은 특정 상호가 아니라 강남권에서 흔히 선택되는 유형별 대표 후보입니다.
+
+1. 강남역 한식 고깃집 (삼겹살·소갈비 전문점)
+- 장점: 단체 회식의 정석, 10인 룸 보유 매장 많음, 메뉴 호불호 적음, 술과 궁합 좋음.
+- 단점: 냄새·연기, 굽느라 대화 흐름 끊김, 금요일엔 예약 필수.
+
+2. 강남권 이자카야 / 퓨전 주점
+- 장점: 안주 다양해 취향 대응 쉬움, 분위기 캐주얼, 젊은 팀에 인기.
+- 단점: 테이블이 나뉘어 10명이 갈라 앉기 쉬움, 주말 소음 큼.
+
+3. 코스요리 한정식·중식당 (룸 개별실)
+- 장점: 독립 룸으로 대화 최적, 격식 있는 자리에 적합, 코스라 주문 편함.
+- 단점: 1인 비용 높음, 분위기가 다소 무거울 수 있음, 예약 리드타임 김.
+
+최종 추천
+
+강남역 한식 고깃집(후보 1)을 추천합니다.
+
+10명 규모 팀 회식에서 수용력, 메뉴 무난함, 비용 균형이 가장 좋습니다. 룸이 있는 고깃집을 잡으면 후보 3의 장점인 대화 환경까지 어느 정도 챙길 수 있습니다.
+
+다만 팀 성격에 따라 조정을 권합니다. 격식 있는 자리나 상견례성 회식이면 후보 3, 가볍고 편한 분위기를 원하면 후보 2가 낫습니다.
+
+원하시면 팀 예산, 회식 성격(가벼운/격식), 술 선호를 알려주세요. 그 조건에 맞춰 실제 상호 후보로 좁혀 드리겠습니다.
+
+✻ Cogitated for 21s · done 오전 10:27
+
+❯ ▎ 방금 회식 장소 고르는 이 방법을 재사용할 수 있게 jansori 스킬로 저장해줘. 이름은 "회식 장소 고르기", 설명은 "팀 규모·지역·예산·선호를 반영해 회식 장소를 고르는 절차". 기본 절차(후보 3곳 → 장단점 → 최종 추천)를 본문에 담아줘.
+
+새 재사용 스킬로 저장하겠습니다. /jansori:save를 실행할게요.
+
+● Skill(jansori:save)
+Successfully loaded skill · 1 tool allowed
+Allowed by auto mode classifier
+
+새 스킬이므로 중복이 없습니다. 인덱스가 비어 있어 유사 스킬도 없네요. 바로 등록하겠습니다.
+
+  Ran 3 shell commands
+
+--request-id는 서브커맨드 앞에 오는 전역 옵션이네요. 위치를 바꿔 다시 실행하겠습니다.
+
+  Ran 1 shell command
+
+스킬이 저장되었습니다. ✅
+
+- 스킬 ID: pick-team-dinner-venue
+- 이름: 회식 장소 고르기
+- 버전: 1
+
+본문에는 요청하신 기본 절차를 담았습니다. 입력 조건 정리, 4대 선정 기준 명시, 후보 3곳과 각 장단점, 최종 추천 1곳, 팀 성격별 대안, 예약 전 확인 권고까지 6단계로 구성했습니다.
+
+앞으로 회식 장소 관련 요청이 오면 이 절차를 따르게 됩니다. 방식을 다듬고 싶으면 /jansori:nag로 수정하면 됩니다.
+
+✻ Cooked for 36s · done 오전 10:30
+</script>
+<script type="text/plain" id="tx-business-dinner-B">
+❯ 팀 8명이고, 판교역 근처 회식장소좀 골라줘
+
+회식 장소 고르기 관련 스킬이 있네요. 먼저 불러오겠습니다.
+
+● Skill(jansori:load)
+Successfully loaded skill · 1 tool allowed
+
+  Ran 1 shell command
+
+스킬 절차에 따라 정리해드릴게요.
+
+입력 조건 정리
+
+- 인원: 8명
+- 지역: 판교역 근처 (도보권)
+- 아래는 확인 안 된 조건이라 가정을 두고 진행합니다. 다르면 알려주세요.
+  - 1인 예산: 3~4만 원대 가정
+  - 성격: 적당히 편한 저녁 회식 가정
+  - 술/메뉴: 무난한 한식+반주 가정
+
+▎ ⚠️ 실시간 영업·예약·단체석 정보는 제가 확인할 수 없어, 아래는 일반적으로 알려진 정보 기준입니다. 예약 전 전화로 단체석·영업시간 확인을 꼭 권합니다.
+
+선정 기준 (4대)
+
+(a) 8인 단체석 수용 (b) 대화 가능한 소음 수준 (c) 메뉴 무난함·술 궁합 (d) 판교역 도보권·예산
+
+후보 3곳
+
+1. 삼겹살/고깃집 (판교 알파돔·현대백화점 인근 고기 프랜차이즈류)
+- 장점: 8명 단체석 흔함, 술 궁합 최고, 호불호 적음, 예산 무난
+- 단점: 소음·연기 있어 대화 다소 방해, 격식 자리엔 부적합
+
+2. 한식 코스/한정식·전집 (반주 곁들이는 식)
+- 장점: 대화 편함, 메뉴 무난, 격식·편안함 균형
+- 단점: 인기 시간대 8인 단체석 예약 경쟁, 예산 다소 상향 가능
+
+3. 이자카야/다이닝펍 (알파돔시티·유스페이스 상권)
+- 장점: 다양한 안주로 취향 커버, 분위기 좋음, 술자리 지속성
+- 단점: 소음 큰 편, 1인 예산 편차 큼
+
+최종 추천 → 후보 2: 한식(반주형)
+
+8인 회식에서 가장 중요한 (b) 대화 가능성과 (c) 메뉴 무난함을 동시에 만족합니다. 고깃집(후보1)은 술 궁합은 좋지만 소음·연기로 8명이 함께 대화하기 어렵고, 이자카야(후보3)는 취향 편차·소음 리스크가 있습니다. 판교역 도보권에서 예산 대비 실패 확률이 가장 낮은 선택입니다.
+
+팀 성격별 대안
+
+- 캐주얼·화기애애 → 후보 1(고깃집) 또는 3(이자카야)
+- 격식·손님 동석/팀 공식 자리 → 후보 2(한정식 코스)
+
+원하시면 예산·성격·선호 메뉴를 알려주세요. 그에 맞춰 판교역 구체 상호로 좁혀드리겠습니다.
+
+✻ Cogitated for 30s · done 오전 10:33
+
+❯ 야, 정확한 상호명이 있어야 할거아니야.
+
+맞는 지적이에요. 이건 "회식 장소 고르기" 스킬에 반영할 교정사항이라 먼저 기록하겠습니다.
+
+● Skill(jansori:nag)
+
+  Ran 4 shell commands
+
+교정사항 기록 완료(버전 2). 이제 그 기준대로 실제 상호명으로 다시 드리겠습니다.
+
+▎ ⚠️ 실시간 영업 여부·단체석·가격은 제가 확정할 수 없습니다. 아래는 판교역 인근에 실재하는 것으로 알려진 곳들이며, 예약 전 전화 확인 필수입니다.
+
+판교역 8인 회식 후보 (실제 상호)
+
+1. 백년옥 판교점 (알파돔시티 인근) — 한식/설렁탕·수육 반주형
+- 장점: 8인 룸/단체석 운영, 대화 편함, 메뉴 호불호 적음
+- 단점: 저녁 피크에 룸 예약 경쟁
+
+2. 오발탄 판교점 — 돼지갈비/생고기 (연탄 화로)
+- 장점: 단체 회식 수요 커버, 술 궁합 최고, 인당 예산 무난
+- 단점: 연기·소음으로 대화 다소 방해
+
+3. 미도인 판교 (알파돔 현대백화점 인근) — 덮밥/모던 한식 다이닝
+- 장점: 분위기 깔끔, 취향 커버 넓음, 캐주얼+격식 중간
+- 단점: 대형 단체석은 제한적일 수 있어 사전 확인 필요
+
+최종 추천 → 1. 백년옥 판교점
+
+8인 회식 핵심인 (b) 대화 가능성 + (c) 메뉴 무난함 + (a) 단체석을 가장 안정적으로 만족합니다. 오발탄은 술자리로는 최고지만 소음·연기, 미도인은 대형 단체석이 변수입니다.
+
+팀 성격별 대안
+
+- 캐주얼·술자리 중심 → 오발탄 판교점
+- 깔끔·격식/손님 동석 → 미도인 판교
+
+더 정확히 좁히려면 **예산과 회식 성격(고기/한식/술 위주)**만 알려주세요. 필요하면 전화번호·위치까지 실시간으로 찾아 확인해드리겠습니다.
+
+✻ Cooked for 47s · done 오전 10:34
+
+❯ 야 우리회사 회의비 인당 4만 5천원이야. 해당 사항도 고려해.
+
+인당 4만 5천 원 기준으로 다시 정리했습니다. (8명 → 총 예산 약 36만 원)
+
+▎ ⚠️ 가격·단체석은 확정 정보가 아니니 예약 전 전화 확인 필수입니다.
+
+예산(인당 4.5만) 적합도 재평가
+
+1. 백년옥 판교점 — 한식 반주형
+- 인당 예상: 3~4만 원대 → 예산 내 여유 ✅
+- 반주(소주·막걸리) 추가해도 4.5만 안쪽 무난. 대화·메뉴·단체석 균형 최상.
+
+2. 오발탄 판교점 — 돼지갈비/생고기
+- 인당 예상: 갈비+주류 하면 4~5만 원 → 예산 경계선 ⚠️
+- 고기 위주면 딱 맞지만, 술 많이 들어가면 초과 가능.
+
+3. 미도인 판교 — 모던 한식 다이닝
+- 인당 예상: 코스/단품+주류 시 4.5만 초과 쉬움 → 예산 빠듯 ⚠️
+- 격식 자리엔 좋으나 술자리 겸하면 초과 리스크.
+
+최종 추천 → 1. 백년옥 판교점
+
+인당 4.5만 예산에서 가장 안전하게 예산 내 소화되면서 8인 회식 4대 기준(단체석·대화·메뉴·접근성)을 모두 만족합니다. 오발탄은 고기 회식으로 확정 시 좋은 대안이지만 주류 포함하면 예산 초과 위험이 있고, 미도인은 예산이 빠듯합니다.
+
+대안
+
+- 고기 회식 확정 + 주류 절제 → 오발탄 판교점 (4.5만 맞춤 가능)
+- 격식 자리인데 술은 가볍게 → 미도인 판교
+
+예산 딱 맞추실 거면 백년옥으로 8인 룸 예약하고 인당 주류 1~2병 선에서 잡으면 4.5만 안쪽으로 정리됩니다.
+
+✻ Baked for 17s · done 오전 10:36
+
+❯ 아니 잔소리 등록안해?
+
+맞아요, 방금 건 스킬에 반영할 교정사항이었네요. 등록하겠습니다.
+
+  Ran 2 shell commands
+
+등록 완료했습니다. ✅
+
+- "회식 장소 고르기" 스킬 버전 3으로 갱신
+- 추가된 교정(seq 2): "1인 예산은 회사 회의비/식대 규정 기준으로 반드시 확인·반영하고, 각 후보마다 예산 대비 인당 예상 비용과 소화 가능 여부(여유/경계선/초과)를 명시, 예산에 가장 안전한 곳 우선 추천"
+
+이제 앞으로 회식 장소 고를 때는 예산 규정을 기본으로 챙기게 됩니다. 방금 드린 추천(백년옥 판교점 — 인당 4.5만 예산 내 여유)도 이 기준에 맞는 결론이에요.
+</script>
+<script type="text/plain" id="tx-business-dinner-C">
+❯ "회식 장소 고르기" 스킬로 회식 장소 골라줘. 팀 12명, 강남.
+
+● Skill(jansori:load)
+Successfully loaded skill · 1 tool allowed
+
+  Ran 1 shell command
+
+회식 장소를 제대로 고르려면 예산과 회식 성격을 확인하는 게 좋겠습니다. 이 두 가지만 짚고 진행하겠습니다.
+
+● User answered Claude's questions:
+· 1인 예산은 어느 정도인가요? (회사 회의비/식대 규정 기준으로 확인 권장) → 인당 4.5만 원
+· 회식 성격은 어느 쪽에 가깝나요? → 캐주얼/술 곁들임
+
+확인된 조건으로 절차에 따라 정리했습니다.
+
+입력 조건
+
+- 인원: 12명 (단체석 필수)
+- 지역: 강남 (강남역 도보권 가정)
+- 1인 예산: 4.5만 원 (회사 식대 규정 상한 가정)
+- 성격: 캐주얼 + 술 곁들임
+
+선정 기준
+
+(a) 12인 단체석 수용 · (b) 대화 가능한 소음 수준 · (c) 호불호 적고 술 궁합 좋은 메뉴 · (d) 강남역 도보권 + 인당 4.5만 이내
+
+▎ ⚠️ 실시간 영업·예약·가격은 확인 불가하므로 아래는 일반적으로 알려진 정보 기준입니다. 상호는 실제 강남 매장이나, 세부 정보는 예약 전 전화 확인이 필요합니다.
+
+후보 3곳
+
+1. 하남돼지집 강남역점 (돼지구이 프랜차이즈)
+- 👍 단체석·룸 보유, 삼겹/목살 등 호불호 적음, 소주·맥주 잘 어울림
+- 👎 고기집 특성상 다소 소란, 격식 자리엔 부적합
+- 💰 인당 약 3만 원 → 예산 여유 (술 넉넉히 마셔도 안전)
+
+2. 우대포 강남점 (돼지 특수부위 + 술집 분위기)
+- 👍 특수부위 안주가 술과 궁합 최고, 캐주얼 회식에 적합, 단체 예약 가능
+- 👎 특수부위 위주라 호불호 갈릴 수 있음, 인기 매장이라 예약 필수
+- 💰 인당 약 4~4.5만 원 → 경계선 (술 많이 곁들이면 초과 위험)
+
+3. 새마을식당 강남점 (열탄불고기·7분돼지김치)
+- 👍 가성비 최고, 회전 빠르고 메뉴 무난, 부담 없는 분위기
+- 👎 테이블 간격 좁고 소음 큼, 12명 붙은 자리 확보가 관건
+- 💰 인당 약 2.5~3만 원 → 예산 여유
+
+최종 추천: 하남돼지집 강남역점
+
+예산 기준 가장 안전하게 소화되고(인당 3만, 술값 포함해도 4.5만 이내), 12인 단체석 확보가 용이하며, 메뉴 호불호가 적고 술 궁합도 좋아 캐주얼 회식 4대 기준을 고루 충족합니다. 술을 더 자유롭게 즐기려는 회식 성격에도 예산 여유가 완충 역할을 합니다.
+
+팀 성격별 대안
+
+- 더 특별하게 / 술자리 중심 → 우대포 강남점 (특수부위+술, 단 예산 경계선 주의)
+- 가볍고 빠르게 → 새마을식당 강남점
+
+예약 전 체크
+
+1. 12인 단체석/룸 가능 여부 및 최소 주문 조건
+2. 영업시간·라스트오더
+3. (경계선 후보인 우대포 택할 경우) 주류 포함 인당 예상액을 미리 문의해 4.5만 초과 여부 확인
+
+전화로 단체 예약을 먼저 확정하시길 권장합니다.
+
+✻ Worked for 1m 2s · done 오전 10:39
+
+※ recap: 회식 장소를 골라달라는 요청에 강남·12명·인당 4.5만·캐주얼 조건으로 후보 3곳을 정리하고 하남돼지집 강남역점을 추천했습니다. 다음은 사용자가 원하면 전화 예약 확인이나 후보 조정을 진행하면 됩니다. (disable recaps in /config)
+
+❯ 야 가게들 추천할때는 무조건 가게링크(네이버지도 등) 달아서 상세정보 잘 보게해줘.
+
+가게 추천 시 네이버지도 등 상세정보 링크를 다는 규칙이군요. 이건 "회식 장소 고르기" 스킬에 대한 보정이니 nag로 기록하고, 지금 답변에도 바로 반영하겠습니다.
+
+● Skill(jansori:nag)
+Successfully loaded skill · 1 tool allowed
+
+3. 새마을식당 강남점 (열탄불고기·7분돼지김치)
+- 👍 가성비 최고, 회전 빠르고 메뉴 무난, 부담 없는 분위기
+- 👎 테이블 간격 좁고 소음 큼, 12명 붙은 자리 확보가 관건
+- 💰 인당 약 2.5~3만 원 → 예산 여유
+
+최종 추천: 하남돼지집 강남역점
+
+예산 기준 가장 안전하게 소화되고(인당 3만, 술값 포함해도 4.5만 이내), 12인 단체석 확보가 용이하며, 메뉴 호불호가 적고 술 궁합도 좋아 캐주얼 회식 4대 기준을 고루 충족합니다. 술을 더 자유롭게 즐기려는 회식 성격에도 예산 여유가 완충 역할을 합니다.
+
+팀 성격별 대안
+
+- 더 특별하게 / 술자리 중심 → 우대포 강남점 (특수부위+술, 단 예산 경계선 주의)
+- 가볍고 빠르게 → 새마을식당 강남점
+
+예약 전 체크
+
+1. 12인 단체석/룸 가능 여부 및 최소 주문 조건
+2. 영업시간·라스트오더
+3. (경계선 후보인 우대포 택할 경우) 주류 포함 인당 예상액을 미리 문의해 4.5만 초과 여부 확인
+
+전화로 단체 예약을 먼저 확정하시길 권장합니다.
+
+✻ Worked for 1m 2s · done 오전 10:39
+
+※ recap: 회식 장소를 골라달라는 요청에 강남·12명·인당 4.5만·캐주얼 조건으로 후보 3곳을 정리하고 하남돼지집 강남역점을 추천했습니다. 다음은 사용자가 원하면 전화 예약 확인이나 후보 조정을 진행하면 됩니다. (disable recaps in /config)
+
+❯ 야 가게들 추천할때는 무조건 가게링크(네이버지도 등) 달아서 상세정보 잘 보게해줘.
+
+가게 추천 시 네이버지도 등 상세정보 링크를 다는 규칙이군요. 이건 "회식 장소 고르기" 스킬에 대한 보정이니 nag로 기록하고, 지금 답변에도 바로 반영하겠습니다.
+
+● Skill(jansori:nag)
+Successfully loaded skill · 1 tool allowed
+
+  Ran 3 shell commands
+
+✅ nag 저장됨 (버전 4). normalize_due=true라 백그라운드 정규화 서브에이전트를 띄우고, 링크를 반영해 다시 정리하겠습니다.
+
+● jansori:capsule-normalizer(Normalize dinner venue capsule)
+Backgrounded agent (↓ to manage · ctrl+o to expand)
+
+링크를 추가해 다시 정리했습니다.
+
+회식 장소 추천 — 강남 / 12명 / 인당 4.5만 / 캐주얼+술
+
+▎ ⚠️ 실시간 영업·예약·가격은 확인 불가하므로 아래는 일반적으로 알려진 정보 기준입니다. 아래 링크는 네이버지도 검색 링크로, 클릭 시 해당 매장의 실제 상세정보(주소·영업시간·메뉴·리뷰)를 바로 확인할 수 있습니다.
+
+후보 3곳
+
+1. 하남돼지집 강남역점 (돼지구이)
+- 🔗 네이버지도에서 보기
+- 👍 단체석·룸 보유, 삼겹/목살 호불호 적음, 소주·맥주 궁합 좋음
+- 👎 고기집 특성상 다소 소란, 격식 자리엔 부적합
+- 💰 인당 약 3만 원 → 예산 여유
+
+2. 우대포 강남점 (돼지 특수부위 + 술집 분위기)
+- 🔗 네이버지도에서 보기
+- 👍 특수부위 안주가 술과 궁합 최고, 캐주얼 회식에 적합
+- 👎 호불호 갈릴 수 있음, 인기 매장이라 예약 필수
+- 💰 인당 약 4~4.5만 원 → 경계선 (술 많이 곁들이면 초과 위험)
+
+3. 새마을식당 강남점 (열탄불고기·7분돼지김치)
+- 🔗 네이버지도에서 보기
+- 👍 가성비 최고, 메뉴 무난, 부담 없는 분위기
+- 👎 테이블 간격 좁고 소음 큼, 12인 붙은 자리 확보가 관건
+- 💰 인당 약 2.5~3만 원 → 예산 여유
+
+최종 추천: 하남돼지집 강남역점
+
+예산 기준 가장 안전하게 소화되고(술값 포함 4.5만 이내), 12인 단체석 확보가 용이하며, 메뉴 호불호가 적고 술 궁합도 좋아 캐주얼 회식 4대 기준을 고루 충족합니다.
+
+대안
+
+- 술자리 중심으로 특별하게 → 우대포 강남점 (예산 경계선 주의)
+- 가볍고 빠르게 → 새마을식당 강남점
+
+예약 전 체크
+
+1. 12인 단체석/룸 가능 여부 및 최소 주문 조건
+2. 영업시간·라스트오더
+3. (우대포 택할 경우) 주류 포함 인당 예상액 미리 문의
+
+전화로 단체 예약을 먼저 확정하시길 권장합니다. 참고로 네이버지도 링크의 상세 페이지에서 전화번호와 예약 버튼을 바로 확인하실 수 있습니다.
+</script>
+<script type="text/plain" id="tx-weekly-A">
+❯ ▎ 이번 주 내 업무 메모야. 주간보고로 정리해줘.
+  ▎ "로그인 리팩터링 거의 마무리. 결제 연동은 외부 API 이슈로 지연. 신규 대시보드 착수. 다음주엔 배포 준비랑 QA."
+
+주간보고로 정리했습니다.
+
+---
+
+주간 업무 보고 (2026-09-09 기준)
+
+이번 주 진행 현황
+
+┌─────────────────┬────────────────┬──────────────────────┐
+│      업무       │      상태      │         비고         │
+├─────────────────┼────────────────┼──────────────────────┤
+│ 로그인 리팩터링 │ 🟢 마무리 단계 │ 거의 완료, 마감 임박 │
+├─────────────────┼────────────────┼──────────────────────┤
+│ 결제 연동       │ 🔴 지연        │ 외부 API 이슈로 지연 │
+├─────────────────┼────────────────┼──────────────────────┤
+│ 신규 대시보드   │ 🟡 착수        │ 개발 시작            │
+└─────────────────┴────────────────┴───────────
+
+---
+
+필요하시면 담당자/일정(마감일) 항목을 추가하거나, 팀 공유용 슬랙 메시지 형태로 더 짧게 다듬어 드리겠습니다.
+
+✻ Cogitated for 9s · done 오후 12:04
+
+❯ ▎ 방금 주간보고 정리하는 이 방식을 재사용할 수 있게 jansori 스킬로 저장해줘. 이름은 "주간보고 정리", 설명은 "주간 업무 메모를 표준 형식의 주간보고로 정리하는 절차". 기본 절차(이번 주 한 일 / 다음 주 계획 / 이슈)를 본문에 담아줘.
+
+The user wants to save this weekly report method as a new jansori skill. I'll use the save skill.
+
+● Skill(jansori:save)
+Successfully loaded skill · 1 tool allowed
+Allowed by auto mode classifier
+
+새 스킬로 등록하겠습니다. 기존 인덱스에는 유사한 스킬(주간보고 관련)이 없어 중복이 아니므로 바로 등록합니다.
+
+  Ran 2 shell commands
+
+--request-id는 전역 옵션이라 서브커맨드 앞에 와야 합니다.
+
+  Ran 1 shell command
+
+저장 완료했습니다. ✅
+
+- 스킬 ID: organize-weekly-report
+- 이름: 주간보고 정리
+- 설명: 주간 업무 메모를 표준 형식의 주간보고로 정리하는 절차
+- 버전: v1
+
+본문에는 방금 사용한 방식(이번 주 한 일 / 다음 주 계획 / 이슈 3단 분류, 상태 표 + 이모지 시각화, 지연·이슈의 원인/조치 명시, 기준 날짜 표기, 후속 옵션 제안)을 절차와 출력 형식으로 담았습니다.
+
+앞으로 주간 업무 메모를 주실 때 이 스킬을 불러와 동일한 형식으로 정리해 드릴 수 있습니다. 절차를 다듬고 싶으시면 /jansori:nag로 이 스킬에 수정 사항을 덧붙이면 됩니다.
+
+</script>
+<script type="text/plain" id="tx-weekly-B">
+❯ ▎ "주간보고 정리" 스킬로 이번 주 보고 정리해줘.
+  ▎ "온보딩 플로우 개선 80% 완료, 알림 서버 버그 2건 수정, 결제 연동 착수했으나 스펙 미확정으로 대기. 다음주 목표: 온보딩 마무리, 결제 스펙 확정 회의."
+
+● Skill(jansori:load)
+Successfully loaded skill · 1 tool allowed
+
+  Ran 1 shell command
+
+주간보고 정리 스킬을 적용해서 정리했습니다.
+
+---
+
+주간 업무 보고 (2026-09-09 기준)
+
+이번 주 진행 현황
+
+┌─────────────────────┬─────────────────┬─────────────────────────────────┐
+│        업무         │      상태       │              비고               │
+├─────────────────────┼─────────────────┼─────────────────────────────────┤
+│ 온보딩 플로우 개선  │ 🟡 진행중 (80%) │ 마무리 단계, 다음 주 완료 예정  │
+├─────────────────────┼─────────────────┼─────────────────────────────────┤
+│ 알림 서버 버그 수정 │ 🟢 완료         │ 2건 수정 완료                   │
+├─────────────────────┼─────────────────┼─────────────────────────────────┤
+│ 결제 연동           │ 🔴 대기         │ 착수했으나 스펙 미확정으로 중단 │
+└─────────────────────┴─────────────────┴─────────────────────────────────┘
+
+상세 내용
+
+- 온보딩 플로우 개선: 전체 작업의 약 80% 완료. 잔여 작업 마무리 시 릴리스 가능한 수준.
+- 알림 서버 버그 수정: 발견된 버그 2건 모두 수정 완료.
+- 결제 연동: 초기 착수했으나 연동 스펙이 확정되지 않아 진행을 중단하고 대기 중.
+
+다음 주 계획
+
+- 온보딩 플로우 개선 작업 마무리 및 릴리스
+- 결제 스펙 확정 회의 진행
+
+이슈 / 조치사항
+
+┌───────────────────┬──────────────────┬──────────────────────────────────────────────────────────────────┐
+│       이슈        │       원인       │                     필요한 조치 (Follow-up)                      │
+├───────────────────┼──────────────────┼──────────────────────────────────────────────────────────────────┤
+│ 🔴 결제 연동 대기 │ 연동 스펙 미확정 │ 다음 주 결제 스펙 확정 회의를 통해 스펙 픽스 → 확정 후 개발 재개 │
+└───────────────────┴──────────────────┴──────────────────────────────────────────────────────────────────┘
+
+---
+
+후속으로 아래 옵션도 도와드릴 수 있습니다:
+- 담당자/마감일 컬럼 추가 — 각 업무에 책임자와 목표일 명시
+- 슬랙 공유용 축약본 — 이모지 기반 3~4줄 요약 버전
+- 다음 주 계획 상세화 — 온보딩 잔여 20% 태스크 분해
+
+원하시는 게 있으면 말씀해 주세요.
+
+✻ Crunched for 17s · done 오후 12:
+● Skill(jansori:nag)
+Successfully loaded skill · 1 tool allowed
+Allowed by auto mode classifier
+
+  Ran 3 shell commands
+
+스킬에 반영 완료(v2)했습니다. 개정된 형식으로 다시 정리했습니다.
+
+---
+
+주간 업무 보고 (2026-09-09 기준)
+
+이번 주 진행 현황
+
+┌─────────────────────┬─────────────────┬─────────────────────────────────┐
+│        업무         │      상태       │              비고               │
+├─────────────────────┼─────────────────┼─────────────────────────────────┤
+│ 온보딩 플로우 개선  │ 🟡 진행중 (80%) │ 마무리 단계, 다음 주 완료 예정  │
+├─────────────────────┼─────────────────┼─────────────────────────────────┤
+│ 알림 서버 버그 수정 │ 🟢 완료         │ 2건 수정 완료                   │
+├─────────────────────┼─────────────────┼─────────────────────────────────┤
+│ 결제 연동           │ 🔴 대기
+
+다음 주 계획 (우선순위 순)
+
+1. 결제 스펙 확정 회의 — 결제 연동 재개의 선행 조건, 최우선 처리
+2. 온보딩 플로우 개선 마무리 — 잔여 20% 완료 및 릴리스
+
+이슈 / 조치사항
+
+┌───────────────────┬──────────────────┬──────────────────────────────────────────────────────────┐
+│       이슈        │       원인       │                 필요한 조치 (Follow-up)                  │
+├───────────────────┼──────────────────┼──────────────────────────────────────────────────────────┤
+│ 🔴 결제 연동 대기 │ 연동 스펙 미확정 │ 결제 스펙 확정 회의를 통해 스펙 픽스 → 확정 후 개발 재개 │
+└───────────────────┴──────────────────┴──────────────────────────────────────────────────────────┘
+
+도움 필요 / 에스컬레이션
+
+- 결제 연동 스펙 확정: 스펙 미확정으로 개발이 중단된 상태입니다. 관련 팀(기획/결제 파트너) 및 의사결정권자의 회의 참석과 스펙 확정 결정이 필요합니다. 회의가 지연될 경우 결제 연동 일정 전체가 밀립니다.
+
+---
+
+Allowed by auto mode classifier
+
+  Ran 1 shell command
+
+스킬에 반영 완료(v3)했습니다. 이슈 섹션을 새 형식으로 재작성했습니다.
+
+---
+
+주간 업무 보고 (2026-09-09 기준)
+
+이번 주 진행 현황
+
+┌─────────────────────┬─────────────────┬─────────────────────────────────┐
+│        업무         │      상태       │              비고               │
+├─────────────────────┼─────────────────┼─────────────────────────────────┤
+│ 온보딩 플로우 개선  │ 🟡 진행중 (80%) │ 마무리 단계, 다음 주 완료 예정  │
+├─────────────────────┼─────────────────┼─────────────────────────────────┤
+│ 알림 서버 버그 수정 │ 🟢 완료         │ 2건 수정 완료                   │
+├─────────────────────┼─────────────────┼─────────────────────────────────┤
+│ 결제 연동           │ 🔴 대기         │ 착수했으나 스펙 미확정으로 중단 │
+└─────────────────────┴─────────────────┴─────────────────────────────────┘
+
+상세 내용
+
+- 온보딩 플로우 개선: 전체 작업의 약 80% 완료. 잔여 작업 마무리 시 릴리스 가능한 수준.
+- 알림 서버 버그 수정: 발견된 버그 2건 모두 수정 완료.
+- 결제 연동: 초기 착수했으나 연동 스펙이 확정되지 않아 진행을 중단하고 대기 중.
+
+다음 주 계획 (우선순위 순)
+
+1. 결제 스펙 확정 회의 — 결제 연동 재개의 선행 조건, 최우선 처리
+2. 온보딩 플로우 개선 마무리 — 잔여 20% 완료 및 릴리스
+
+이슈 / 조치사항
+
+┌─────────────────────────────────────────────────────────────┬────────────────────────────────────────────────────┬─────────────────────────────────┐
+│                           리스크                            │                      대응방안                      │          담당자 / 기한          │
+├─────────────────────────────────────────────────────────────┼────────────────────────────────────────────────────┼─────────────────────────────────┤
+│ 결제 연동 스펙 미확정으로 개발 중단 → 결제 일정 전체 지연   │ 결제 스펙 확정 회의 개최, 스펙 픽스 후 개발 즉시   │ (담당자 미지정) / 다음 주 회의  │
+│ 우려                                                        │ 재개                                               │ 시                              │
+├─────────────────────────────────────────────────────────────┼────────────────────────────────────────────────────┼─────────────────────────────────┤
+│ 온보딩 잔여 20% 지연 시 릴리스 일정 영향                    │ 잔여 태스크 우선 마무리, 리소스 집중               │ (담당자 미지정) / 다음 주       │
+└─────────────────────────────────────────────────────────────┴────────────────────────────────────────────────────┴─────────────────────────────────┘
+
+도움 필요 / 에스컬레이션
+
+- 결제 연동 스펙 확정: 스펙 미확정으로 개발이 중단된 상태입니다. 관련 팀(기획/결제 파트너) 및 의사결정권자의 회의 참석과 스펙 확정 결정이 필요합니다.
+
+---
+
+이슈 표의 담당자/기한은 원본 메모에 정보가 없어 비워 뒀습니다. 담당자와 목표일을 알려주시면 채워 넣겠습니다. 그대로 확정하려면 말씀해 주세요.
+
+</script>
+<script type="text/plain" id="tx-weekly-C">
+❯ ▎ "주간보고 정리" 스킬로 이번 주 보고 정리해줘.
+  ▎ "검색 성능 개선 배포함. 결제 연동은 외부사 응답 지연으로 절반쯤. 데이터 파이프라인 리팩터 시작. 다음주엔 결제 마무리랑 모니터링 대시보드."
+
+● Skill(jansori:load)
+Successfully loaded skill · 1 tool allowed
+
+  Ran 1 shell command
+
+주간 업무 보고 (2026-09-09 기준)
+
+이번 주 진행 현황
+
+┌────────────────────────────┬────────────────────┬────────────────────────────────┐
+│            업무            │        상태        │              비고              │
+├────────────────────────────┼────────────────────┼────────────────────────────────┤
+│ 검색 성능 개선             │ 🟢 완료            │ 배포 완료                      │
+├────────────────────────────┼────────────────────┼────────────────────────────────┤
+│ 결제 연동                  │ 🟡 진행중 (약 50%) │ 외부사 응답 지연으로 진척 지연 │
+├────────────────────────────┼────────────────────┼────────────────────────────────┤
+│ 데이터 파이프라인 리팩터링 │ 🟡 착수            │ 이번 주 시작                   │
+└────────────────────────────┴────────────────────┴────────────────────────────────┘
+
+상세 내용
+
+- 검색 성능 개선: 개선 작업 완료 후 배포까지 마무리했습니다.
+- 결제 연동: 연동 작업 진행 중이며 현재 절반 정도 완료. 외부사 측 응답 지연이 진행 속도의 병목입니다.
+- 데이터 파이프라인 리팩터링: 이번 주에 리팩터링 작업을 착수했습니다.
+
+다음 주 계획 (우선순위 순)
+
+1. 결제 연동 마무리 — 이번 주 지연분 만회 및 완료
+2. 모니터링 대시보드 구축
+
+이슈 / 조치사항
+
+┌──────────────────────────────────────────┬───────────────────────────────────────────────────────────────────┬────────────────────────────┐
+│                  리스크                  │                             대응방안                              │       담당자 / 기한        │
+├──────────────────────────────────────────┼───────────────────────────────────────────────────────────────────┼────────────────────────────┤
+│ 외부사 응답 지연으로 결제 연동 진척 지연 │ 외부사에 응답 기한 확정 요청, 병렬로 처리 가능한 내부 작업 선진행 │ 담당자 미지정 / 다음 주 내 │
+└──────────────────────────────────────────┴───────────────────────────────────────────────────────────────────┴────────────────────────────┘
+
+도움 필요 / 에스컬레이션
+
+- 결제 외부사 응답 지연: 외부사와의 커뮤니케이션 채널 강화 또는 상급자 차원의 일정 협의가 필요할 수 있습니다. 지연이 지속되면 다음 주 '결제 마무리' 목표 달성이 어려워집니다.
+
+---
+
+몇 가지 비어 있는 부분을 채우면 보고서가 더 완성됩니다:
+- 담당자/마감일 지정 — 이슈 표와 다음 주 계획에 담당자·기한을 넣어드릴 수 있습니다.
+- 슬랙 공유용 축약본 — 3~4줄 요약본으로 만들어 드릴까요?
+
+necessary 정보(결제 외부사명, 담당자 등)를 알려주시면 반영하겠습니다.
+
+✻
+</script>
+
+<script>
+(function(){
+  var wrap = document.getElementById('wrap');
+  var scnName = document.getElementById('scn-name');
+
+  var SCENARIOS = {
+    'business-dinner': {
+      name: '회식 장소 고르기',
+      sessions: [
+        {s:'A', cap:'스킬로 저장 · register'},
+        {s:'B', cap:'쌓이는 잔소리 · nag ×2'},
+        {s:'C', cap:'스킬 사용 → normalize'}
+      ]
+    },
+    'weekly': {
+      name: '주간보고 정리',
+      sessions: [
+        {s:'A', cap:'스킬로 저장 · register'},
+        {s:'B', cap:'형식을 다듬는 잔소리 · nag'},
+        {s:'C', cap:'학습된 형식으로 바로 정리'}
+      ]
+    }
+  };
+  var active = 'business-dinner';
+
+  function esc(s){
+    return String(s).replace(/[&<>]/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];
+    });
+  }
+  // 일반 라인 안의 jansori 키워드를 강조
+  function inlineKw(html){
+    html = html.replace(/(\/?jansori:[a-z-]+(?:\([^)]*\))?)/g, '<span class="kw">$1</span>');
+    html = html.replace(/(normalize_due=?(?:true|false)?)/g, '<span class="kw nd">$1</span>');
+    html = html.replace(/(⚠️[^\n]*)/g, '<span class="warn">$1</span>');
+    return html;
+  }
+
+  var SYS_RE = /(Successfully loaded skill|Allowed by |Backgrounded agent|Ran \d+ shell command|nag 저장됨)/;
+
+  function classify(line){
+    var t = line.replace(/^\s+/, '');
+    if(t.indexOf('❯') === 0) return 'user';
+    if(t.indexOf('●') === 0) return 'tool';
+    if(t.indexOf('▎') === 0) return 'bar';
+    if(SYS_RE.test(line) || t.indexOf('✅') === 0) return 'sys';
+    if(t.indexOf('✻') === 0) return 'status';
+    if(t.indexOf('※') === 0) return 'recap';
+    return 'plain';
+  }
+
+  function renderLine(line, prevType){
+    if(line.trim() === '') return '<span class="l blank"></span>';
+    var kind = classify(line);
+    var body = esc(line);
+    if(kind === 'user'){
+      body = body.replace(/❯/, '<span class="p">❯</span>');
+      return '<span class="l user">'+body+'</span>';
+    }
+    if(kind === 'bar'){
+      // 사용자 프롬프트 바로 아래 이어지는 인용바는 사용자 발화로 취급
+      var cls = (prevType === 'user' || prevType === 'userbar') ? 'userbar' : 'bar';
+      return '<span class="l '+cls+'">'+inlineKw(body)+'</span>';
+    }
+    if(kind === 'tool'){
+      body = body.replace(/(jansori:[a-z-]+)/g, '<span class="g">$1</span>');
+      return '<span class="l tool">'+body+'</span>';
+    }
+    if(kind === 'sys')    return '<span class="l sys">'+inlineKw(body)+'</span>';
+    if(kind === 'status') return '<span class="l status">'+body+'</span>';
+    if(kind === 'recap')  return '<span class="l recap">'+body+'</span>';
+    return '<span class="l">'+inlineKw(body)+'</span>';
+  }
+
+  function toHtml(raw){
+    var lines = raw.replace(/\r\n/g, '\n').split('\n');
+    var out = '', prevType = null;
+    lines.forEach(function(line){
+      out += renderLine(line, prevType);
+      prevType = line.trim() === '' ? prevType : classify(line);
+    });
+    return out;
+  }
+
+  function embedded(scn, s){
+    var el = document.getElementById('tx-'+scn+'-'+s);
+    return el ? el.textContent.replace(/^\n/, '') : null;
+  }
+
+  function loadOne(scn, s){
+    return fetch('demo-result/'+scn+'/session'+s+'.txt', {cache:'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+      .catch(function(){ var e = embedded(scn, s); if(e != null) return e; throw new Error('no data'); });
+  }
+
+  function renderScenario(scn){
+    var cfg = SCENARIOS[scn];
+    scnName.textContent = cfg.name;
+    wrap.innerHTML = '<div class="load-msg">터미널을 불러오는 중…</div>';
+    Promise.all(cfg.sessions.map(function(ss){
+      return loadOne(scn, ss.s).then(function(txt){ return {ss:ss, txt:txt}; },
+                                     function(){ return {ss:ss, txt:null}; });
+    })).then(function(results){
+      var h = '';
+      results.forEach(function(r){
+        h += '<section class="term">';
+        h +=   '<div class="term-bar"><span class="dots"><i></i><i></i><i></i></span>';
+        h +=     '<span class="tt">Session '+r.ss.s+'</span>';
+        h +=     '<span class="cap">'+r.ss.cap+'</span></div>';
+        h +=   '<div class="term-body">'+(r.txt != null ? toHtml(r.txt)
+                 : '<span class="l status">로그를 불러오지 못했습니다.</span>')+'</div>';
+        h += '</section>';
+      });
+      wrap.innerHTML = h;
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.scn'), function(btn){
+    btn.addEventListener('click', function(){
+      active = btn.getAttribute('data-scenario');
+      Array.prototype.forEach.call(document.querySelectorAll('.scn'), function(b){
+        b.classList.toggle('on', b === btn);
+      });
+      renderScenario(active);
+    });
+  });
+
+  renderScenario(active);
+})();
+</script>
+<script>
+// 2단 헤더 높이를 실제 값으로 맞춰 터미널 높이 계산(--hdr-h)에 쓴다.
+(function(){
+  var hdr = document.querySelector('header');
+  if(!hdr) return;
+  var sync = function(){ document.documentElement.style.setProperty('--hdr-h', hdr.offsetHeight + 'px'); };
+  sync();
+  addEventListener('resize', sync);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(sync);
+})();
+</script>
+</body>
+</html>

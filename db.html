@@ -69,20 +69,12 @@ a.logo:hover span.badge{background:#111}
 .page-head h1{font-size:clamp(2rem,4.6vw,3rem);line-height:1.1;margin-bottom:14px}
 .page-head p{color:var(--text-muted);max-width:780px}
 
-/* 실시간 연동 표시 */
-.sync{display:inline-flex;align-items:center;gap:9px;font-family:var(--font-mono);font-size:.76rem;
-  border:2px solid #111;background:#fff;padding:5px 11px;margin-top:16px;font-weight:600}
-.sync .led{width:9px;height:9px;background:var(--accent-emerald);flex:none}
-.sync.off .led{background:var(--text-muted)}
-.sync.hit{background:var(--primary);color:#fff}
-.sync.hit .led{background:#fff}
-
 /* ---------- 지표 타일 ---------- */
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:20px;margin-bottom:56px}
-.metric{background:var(--card-bg);border:3px solid #111;box-shadow:6px 6px 0 #111;padding:20px 22px}
-.metric .k{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
-.metric .v{font-family:var(--font-display);font-size:2.3rem;line-height:1.1;margin-top:6px}
-.metric.hl{box-shadow:6px 6px 0 var(--primary)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:40px}
+.metric{background:var(--card-bg);border:2px solid #111;box-shadow:3px 3px 0 #111;padding:11px 13px}
+.metric .k{font-family:var(--font-mono);font-size:.62rem;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.metric .v{font-family:var(--font-display);font-size:1.35rem;line-height:1.1;margin-top:3px}
+.metric.hl{box-shadow:3px 3px 0 var(--primary)}
 .metric.hl .v{color:var(--primary)}
 
 /* ---------- 캡슐 탭 ---------- */
@@ -183,6 +175,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
     <nav class="nav-main">
       <a href="index.html">소개글</a>
       <a href="db.html" class="here">잔소리는 어디에 쌓이는가</a>
+      <a href="examples.html">예시</a>
       <a href="demo.html">시연 영상</a>
     </nav>
   </div>
@@ -200,7 +193,6 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
     <h1>잔소리는 어디에 쌓이는가</h1>
     <p>사람이 한 번 한 잔소리는 <strong>correction</strong>으로 캡슐에 적립되고, <strong>normalize</strong>에서 본문(body)에 접혀 들어갑니다.
        아래 <strong>Capsule</strong>은 지금 이 순간의 상태를, <strong>History</strong>는 매 단계에서 <em>바뀐 것만</em> 보여줍니다.</p>
-    <div class="sync off" id="sync"><span class="led"></span><span id="sync-text">불러오는 중…</span></div>
   </div>
 
   <div id="app"><div class="load-msg">데이터를 불러오는 중…</div></div>
@@ -337,10 +329,8 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
 <script>
 (function(){
   var app = document.getElementById('app');
-  var syncEl = document.getElementById('sync');
-  var syncText = document.getElementById('sync-text');
   var POLL_MS = 4000;
-  var lastRaw = null, live = false, hitTimer = null;
+  var lastRaw = null, live = false;
   var activeSkill = null, lastData = null;
 
   /* ── normalize 로 본문에 접혀 들어간 잔소리들. ──
@@ -399,10 +389,6 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
     if(typeof ts !== 'number') return '—';
     var d = new Date(ts*1000), p = function(n){ return String(n).padStart(2,'0'); };
     return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
-  }
-  function clock(){
-    var d = new Date(), p = function(n){ return String(n).padStart(2,'0'); };
-    return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
   }
   function bodyHtml(t){ return esc(t).replace(/^(\d+\.)/gm, '<span class="num">$1</span>'); }
 
@@ -489,17 +475,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
       h += '<div class="empty-note">비어 있습니다. 쌓였던 잔소리는 normalize에서 본문에 반영되어 대기 큐가 정리된 상태입니다.</div>';
     }
 
-    // normalize 로 본문에 접혀 들어간 잔소리. 대기 큐에서는 빠졌지만 기록은 남긴다
-    var folded = c.folded_corrections || [];
-    if(folded.length){
-      h += '<div class="sub" style="margin-top:28px">합쳐진 잔소리 — 본문에 이미 반영됨</div>';
-      folded.forEach(function(x){
-        h += '<div class="corr folded"><div class="corr-seq">'+esc(x.seq)+'</div><div>'
-          +  '<div>'+esc(x.instruction_text)+'<span class="merged-tag">현재 합쳐짐</span></div>'
-          +  '<div class="corr-foot">'+when(x.created_at)+' · v'+esc(x.folded_into_version)+' 에 반영 · request '+esc(x.request_id)+'</div>'
-          +  '</div></div>';
-      });
-    }
+    // 합쳐진 잔소리는 여기서 다시 보여주지 않는다. History 에서 확인할 수 있다.
 
     if((c.protected_fields||[]).length){
       h += '<div class="sub" style="margin-top:28px">Protected fields — 잔소리로도 못 바꾸는 칸</div>';
@@ -635,17 +611,7 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
     });
   }
 
-  function setSync(state, text){
-    syncEl.className = 'sync' + (state ? ' ' + state : '');
-    syncText.textContent = text;
-  }
-  function flashUpdated(){
-    setSync('hit', '방금 갱신됨 · ' + clock());
-    clearTimeout(hitTimer);
-    hitTimer = setTimeout(function(){ setSync('', '연동 중 · 마지막 확인 ' + clock()); }, 2500);
-  }
-
-  // jansori-data.json 을 주기적으로 다시 읽어 바뀌면 그 자리에서 갱신한다.
+  // jansori-data.json 을 주기적으로 다시 읽어 바뀌면 그 자리에서 조용히 갱신한다.
   // file:// 로 열어 fetch 가 막히면 내장 스냅샷으로 한 번만 그린다.
   function poll(first){
     fetch('jansori-data.json', {cache:'no-store'})
@@ -653,23 +619,16 @@ footer{border-top:4px solid #111;padding:30px 0;margin-top:40px;color:var(--text
       .then(function(txt){
         live = true;
         if(txt !== lastRaw){
-          var data = JSON.parse(txt);
           lastRaw = txt;
-          render(data);
-          if(first) setSync('', '연동 중 · 마지막 확인 ' + clock());
-          else flashUpdated();
-        } else if(syncEl.className.indexOf('hit') === -1){
-          setSync('', '연동 중 · 마지막 확인 ' + clock());
+          render(JSON.parse(txt));
         }
       })
       .catch(function(){
         if(first){
           try{
             render(JSON.parse(document.getElementById('embedded-data').textContent));
-            setSync('off', '내장 스냅샷 (파일 연동 불가)');
           }catch(e){
             app.innerHTML = '<div class="load-msg">jansori-data.json 을 불러오지 못했습니다.</div>';
-            setSync('off', '불러오기 실패');
           }
         }
       })
