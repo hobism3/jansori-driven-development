@@ -503,3 +503,22 @@ Local Python 3.12.7 (target 3.10-3.11; code uses future annotations + X|None, 3.
 **Context**: OPERATIONS (placeholder) — AI-DLC construction workflow complete."
 
 ---
+
+## U1 REOPEN — optional JSON-snapshot persistence (design gate)
+**Timestamp**: 2026-09-09T00:00:00Z
+**User Input**: "서버 데이터 저장을 위해 아주 간단하게 구현 ... ai dlc 작업 ... 얼마나 수행? 간단한 작업같은데" + 선택: "JSON 스냅샷 파일 / 캡슐+버전 히스토리" + 질문 "커밋 단위가 뭐야? 스킬 업데이트마다 저장하면 되는거 아냐?"
+**AI Response**: "Assessed as SMALL brownfield change. Reopening U1 only; SKIP reverse-eng/user-stories/units/NFR/infra. Clarified 'commit' = store state-confirmation point (register/nag/protected-change/normalize all funnel through CapsuleStore._commit_locked) → persist there = save on every skill create/update; reads don't persist. Chosen: JSON snapshot, capsule+version-history scope. Persistence opt-in via env JANSORI_DATA_FILE (unset → in-memory, preserving approved Q9; avoids §9 reversal). Presenting minimal design decisions D-P1..D-P5 + file plan for a single approval gate before code."
+**Context**: CONSTRUCTION — U1 reopened for optional persistence; awaiting design+plan approval.
+
+---
+
+## U1 persistence — decision revised: persist-by-default (Q9 superseded)
+**Timestamp**: 2026-09-09T00:10:00Z
+**User Input**: "기본 설정은 JSON 스냅샷 파일로 저장. opt 으로 인메모리."
+**AI Response**: "Revised D-P1: persistence is now the DEFAULT for the running server; in-memory is opt-out. Env JANSORI_DATA_FILE default='jansori-data.json' (cwd); opt-out via JANSORI_DATA_FILE=:memory:. This deliberately SUPERSEDES approved Q9 (in-memory only) — recorded as user-authorized §9 adjustment. Isolation guard: persist-by-default applies to the server entrypoint main() only; Container.build()/create_app() KEEP in-memory default so the 138 existing tests + live_url fixture stay isolated and green. D-P2..D-P5 unchanged (persist on every _commit_locked; capsule+history; atomic temp+os.replace under lock; load on startup, corrupt/missing→empty+warn). Implementing now."
+**Context**: CONSTRUCTION — U1 persistence default-on; Q9 superseded (user-authorized).
+
+## U1 persistence — IMPLEMENTED & VERIFIED
+**Timestamp**: 2026-09-09T00:40:00Z
+**AI Response**: "Implemented persist-by-default JSON snapshot. NEW server/store/persistence.py (serialize/atomic_write/load_state fail-safe); CapsuleStore(data_file) hydrate + _commit_locked persist hook; Container.build(data_file=None) in-memory default; main() resolves JANSORI_DATA_FILE (default jansori-data.json, :memory: opt-out) and builds persistent app; tests/unit/u1/test_persistence.py (6). .gitignore + README + build-instructions + persistence-summary.md updated. RAN pytest tests -q -> 144 passed (138+6), Python 3.12.7. END-TO-END: seed 3 skills + nag->v2, kill server, reboot same file -> 3 skills + cmodel-refactoring v2 + correction survived (snapshot 5740B). Persist scoped to main() so all prior tests stay in-memory/isolated. Q9 superseded (user-authorized)."
+**Context**: CONSTRUCTION — U1 persistence complete & verified.

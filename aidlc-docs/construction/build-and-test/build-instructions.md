@@ -10,6 +10,7 @@
   - `JANSORI_PORT` (default `8765`)
   - `JANSORI_URL` (client target; default `http://127.0.0.1:8765`)
   - `JANSORI_MAX_CONTENT_LENGTH` (default `10000`), `JANSORI_NORMALIZE_THRESHOLD` (default `3`)
+  - `JANSORI_DATA_FILE` (default `jansori-data.json`; `:memory:` = no persistence) — server persists by default (U1 reopen 2026-09-09)
   - `JANSORI_HYPOTHESIS_PROFILE` (`dev`|`ci`), `JANSORI_HYPOTHESIS_MAX_EXAMPLES`
 - **System Requirements**: **Python 3.10–3.11** (`requires-python = ">=3.10,<3.12"`). Windows (win32) primary; portable elsewhere. No database/disk (in-memory store).
 

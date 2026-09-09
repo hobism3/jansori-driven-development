@@ -29,6 +29,16 @@ def configured_host() -> str:
     return os.environ.get("JANSORI_HOST", "127.0.0.1")
 
 
+# U1 reopen 2026-09-09: the running server PERSISTS by default (supersedes Q9, user-authorized).
+# JANSORI_DATA_FILE default = "jansori-data.json" (cwd); opt out to in-memory with ":memory:"
+# (or an empty value). Tests build create_app()/Container.build() directly and stay in-memory.
+def configured_data_file() -> "str | None":
+    raw = os.environ.get("JANSORI_DATA_FILE", "jansori-data.json")
+    if raw.strip() in ("", ":memory:"):
+        return None
+    return raw
+
+
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
     # SPEC 5: re-assert loopback on every serving path that honors JANSORI_HOST.
@@ -59,7 +69,14 @@ def main() -> None:
     host = configured_host()
     port = int(os.environ.get("JANSORI_PORT", "8765"))
     assert_loopback(host)  # SPEC 5: refuse non-loopback bind before serving
-    uvicorn.run(app, host=host, port=port, log_level="info")
+    # Build a persistent app (default) or in-memory (:memory:) for the actual server run.
+    data_file = configured_data_file()
+    application = create_app(Container.build(data_file=data_file))
+    if data_file:
+        print(f"[jansori] persisting store to {data_file}")
+    else:
+        print("[jansori] in-memory store (JANSORI_DATA_FILE=:memory:)")
+    uvicorn.run(application, host=host, port=port, log_level="info")
 
 
 if __name__ == "__main__":

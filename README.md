@@ -22,17 +22,20 @@ condensed capsule body.
 
 ```bash
 make install     # pip install -e ".[dev]"  (fastapi, uvicorn, pydantic + pytest, hypothesis, httpx)
-make run         # start loopback server on 127.0.0.1:8765 (EMPTY in-memory store)
+make run         # start loopback server on 127.0.0.1:8765 (persists to ./jansori-data.json)
 make seed        # in another shell: populate the RUNNING server from fixtures/seed/*.json
 ```
 
-`make run` starts with an **empty** store (in-memory only, not persisted across restarts —
-Q9). `make seed` is **generic** (no hardcoded ids): it registers every `fixtures/seed/*.json`
+`make run` **persists** the store to a JSON snapshot (default `./jansori-data.json`), written
+through on every skill create/update and reloaded on restart (U1 reopen 2026-09-09; supersedes
+the original in-memory-only Q9). To run purely in-memory (e.g. a throwaway session), set
+`JANSORI_DATA_FILE=:memory:`. `make seed` is **generic** (no hardcoded ids): it registers every `fixtures/seed/*.json`
 capsule (leaves first for depth-1 refs) and replays any declared corrections as nags.
 
 Environment overrides: `JANSORI_HOST` (default `127.0.0.1`, **loopback only**),
 `JANSORI_PORT` (default `8765`), `JANSORI_URL` (client target), `JANSORI_MAX_CONTENT_LENGTH`
-(default `10000`), `JANSORI_NORMALIZE_THRESHOLD` (default `3`).
+(default `10000`), `JANSORI_NORMALIZE_THRESHOLD` (default `3`),
+`JANSORI_DATA_FILE` (default `jansori-data.json`; `:memory:` = no persistence).
 
 If GNU Make is unavailable on Windows, run the recipe commands directly (see `Makefile`),
 e.g. `python -m server.app.main`.

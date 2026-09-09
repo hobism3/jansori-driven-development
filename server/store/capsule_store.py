@@ -20,21 +20,30 @@ request_id across skills can never observe a partial or duplicated write (I-05/I
 from __future__ import annotations
 
 import threading
+from pathlib import Path
 from typing import Optional
 
 from ..domain.errors import DuplicateRegistration, StaleBaseVersion, ValidationError
 from ..domain.models import Capsule, Version
+from . import persistence
 
 
 class CapsuleStore:
-    def __init__(self) -> None:
+    def __init__(self, data_file: Optional[str | Path] = None) -> None:
+        # Optional JSON-snapshot persistence (U1 reopen 2026-09-09). data_file=None => in-memory
+        # (the Container.build()/test default). The server entrypoint passes a path so a running
+        # instance persists across restarts; a missing/corrupt file loads as empty (fail-safe).
+        self._data_file: Optional[Path] = Path(data_file) if data_file else None
         self._capsules: dict[str, Capsule] = {}          # skill_id -> latest confirmed Capsule
         self._history: dict[str, list[Version]] = {}     # skill_id -> immutable version snapshots (I-01)
-        # request_id -> the exact Capsule that request produced (for precise replay, M1/I-05)
+        # request_id -> the exact Capsule that request produced (for precise replay, M1/I-05).
+        # NOT persisted: a restart is a fresh session (D-P3).
         self._request_log: dict[str, Capsule] = {}
         self._skill_locks: dict[str, threading.RLock] = {}
         self._registry_lock = threading.RLock()          # guards lock creation + capsule-map scans
         self._request_lock = threading.Lock()            # global: serializes request_id reserve/record
+        if self._data_file is not None:
+            self._capsules, self._history = persistence.load_state(self._data_file)
 
     # ----- lock management ---------------------------------------------------
     def _lock_for(self, skill_id: str) -> threading.RLock:
@@ -151,3 +160,7 @@ class CapsuleStore:
         self._history.setdefault(capsule.skill_id, []).append(snapshot)
         # 4) record idempotency with the EXACT produced capsule (same atomic unit, I-05/I-12/M1)
         self._request_log[request_id] = capsule
+        # 5) persist the whole snapshot (write-through) if a data file is configured. Runs under
+        #    both locks so the on-disk snapshot is never torn; atomic temp+replace (D-P4).
+        if self._data_file is not None:
+            persistence.atomic_write(self._data_file, persistence.dump_state(self._capsules, self._history))

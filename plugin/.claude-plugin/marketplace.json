@@ -1,0 +1,11 @@
+{
+  "name": "jansori-local",
+  "owner": { "name": "Woongbum" },
+  "plugins": [
+    {
+      "name": "jansori",
+      "source": ".",
+      "description": "Jansori — accumulate corrections into versioned skill capsules and propagate them to the next session (loopback local server client)."
+    }
+  ]
+}
